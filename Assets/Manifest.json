@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "bundles": [
+    {
+      "name": "Fonts",
+      "assets": [
+        {
+          "name": "Orbitron-Regular",
+          "type": "font",
+          "path": "Assets/Fonts/Orbitron/Orbitron-Regular.ttf"
+        }
+      ]
+    }
+  ]
+}

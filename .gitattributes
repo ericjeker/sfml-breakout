@@ -1,0 +1,10 @@
+* text=auto eol=lf
+
+*.png -text -eol
+*.jpg -text -eol
+*.wav -text -eol
+*.ogg -text -eol
+*.flac -text -eol
+*.ttf -text -eol
+*.icns -text -eol
+*.rtf -text -eol

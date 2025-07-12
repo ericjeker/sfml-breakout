@@ -1,0 +1,19 @@
+// Copyright (c) Eric Jeker. All Rights Reserved.
+#pragma once
+
+#include "SFML/System/Vector2.hpp"
+
+namespace ApplicationConfiguration
+{
+
+constexpr auto windowTitle = "Animation System";
+constexpr sf::Vector2u windowSize = {1920, 1080};
+constexpr auto windowStyle = sf::Style::Close;
+constexpr auto windowState = sf::State::Windowed;
+constexpr bool isFullscreen = false;
+
+constexpr unsigned int framesPerSecond = 60;
+constexpr bool isVSync = true;
+constexpr unsigned int antiAliasingLevel = 16;
+
+} // namespace ApplicationConfiguration
