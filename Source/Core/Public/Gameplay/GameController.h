@@ -17,6 +17,8 @@
  *
  * @short Game Controller with a stack state pattern.
  *
+ * Given we use a Stack State, only the top State is Updated.
+ *
  * Examples of State-Scene Relationships:
  *
  * - One-to-One Mapping, one state has one scene loaded from a manifest file
@@ -31,7 +33,6 @@ public:
     void ChangeState(std::unique_ptr<GameState> state);
 
     void Update(float deltaTime);
-    void Render(sf::RenderWindow& window);
     void HandleEvent(const std::optional<sf::Event>& event);
 
 private:

@@ -11,17 +11,55 @@ SceneManager::SceneManager(ResourceManager& resourceManager)
 {
 }
 
-void SceneManager::Render(sf::RenderWindow& window)
+void SceneManager::AddScene(std::unique_ptr<Scene> scene)
 {
-    const auto& font = _resourceManager.GetResource<sf::Font>("Orbitron-Regular");
-    sf::Text text(*font, "Animations");
-    text.setFillColor(sf::Color::White);
-    text.setPosition({20, 20});
-
-    window.draw(text);
+    _scenes.push_back(std::move(scene));
 }
 
-void SceneManager::HandleEvent(const sf::Event& event)
+void SceneManager::LoadScene(const std::string& scenePath, const LoadMode mode)
 {
-    _currentScene.HandleEvent(event);
+    if (mode == LoadMode::Single)
+    {
+        CleanUp();
+    }
+
+    // TODO: Logic to load the scene given the scenePath
+    // auto scene = std::make_unique<Scene>();
+    // _scenes.push_back(std::move(scene));
+}
+
+void SceneManager::UnloadScene(const std::string& scenePath)
+{
+}
+
+void SceneManager::CleanUp()
+{
+    for (auto& scene : _scenes)
+    {
+        // TODO: unload the scene
+    }
+}
+
+void SceneManager::Update(float deltaTime)
+{
+    for (const auto& scene : _scenes)
+    {
+        scene->Update(deltaTime);
+    }
+}
+
+void SceneManager::Render(sf::RenderWindow& window)
+{
+    for (const auto& scene : _scenes)
+    {
+        scene->Render(window);
+    }
+}
+
+void SceneManager::HandleEvent(const std::optional<sf::Event>& event)
+{
+    for (const auto& scene : _scenes)
+    {
+        scene->HandleEvent(event);
+    }
 }

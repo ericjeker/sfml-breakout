@@ -5,6 +5,7 @@
 #define SCENEMANAGER_H
 
 #include "ResourceManager.h"
+#include "Scenes/Scene.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -13,45 +14,37 @@
 #include <vector>
 
 
-struct Entity
+enum class LoadMode
 {
-
+    Single,
+    Additive
 };
 
-class Scene
-{
-public:
-    void Update(float deltaTime);
-    void Render(sf::RenderWindow& window);
-    void HandleEvent(const sf::Event& event);
-
-private:
-    std::string _name;
-    std::string _path;
-    std::vector<std::unique_ptr<Entity>> _entities;
-};
-
+/**
+ * The SceneManager responsibility is to maintain a list of all currently active scenes, regardless of which GameState
+ * requested them. It handles the low-level loading, unloading, updating, and rendering of these scenes.
+ *
+ * Scenes can overlap, and even if the GameState is paused because another state has been pushed at the top of the state
+ * stack, all the scenes still need to be rendered in order.
+ */
 class SceneManager
 {
 public:
     explicit SceneManager(ResourceManager& resourceManager);
     ~SceneManager() = default;
 
-    void LoadScene(const std::string& scenePath);
+    void AddScene(std::unique_ptr<Scene> scene);
+    void LoadScene(const std::string& scenePath, LoadMode mode);
     void UnloadScene(const std::string& scenePath);
     void CleanUp();
 
-    // Add scene elements from another manifest file
-    void LoadOverlayScene(const std::string& scenePath);
-    void UnloadOverlayScene(const std::string& scenePath);
-
     void Update(float deltaTime);
     void Render(sf::RenderWindow& window);
-    void HandleEvent(const sf::Event& event);
+    void HandleEvent(const std::optional<sf::Event>& event);
 
 private:
     ResourceManager& _resourceManager;
-    std::unique_ptr<Scene> _currentScene;
+    std::vector<std::unique_ptr<Scene>> _scenes;
 };
 
 

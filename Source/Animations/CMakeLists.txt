@@ -2,6 +2,7 @@ set(SOURCE_FILES
         Private/Main.cpp
         Private/Application.cpp
         Private/Gameplay/MainMenuState.cpp
+        Private/Scenes/DemoScene.cpp
 )
 
 # --- Create the main library ---

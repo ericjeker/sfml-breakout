@@ -2,6 +2,7 @@
 
 #include "MainMenuState.h"
 
+#include "../Scenes/DemoScene.h"
 #include "Logger.h"
 
 MainMenuState::MainMenuState(SceneManager& sceneManager)
@@ -11,7 +12,9 @@ MainMenuState::MainMenuState(SceneManager& sceneManager)
 
 void MainMenuState::Enter()
 {
-    LOG_DEBUG("(MainMenuState::Enter): Entering MainMenuState");
+    LOG_DEBUG("(MainMenuState::Enter): Adding DemoScene to the SceneManager");
+    auto scene = std::make_unique<DemoScene>();
+    _sceneManager.AddScene(std::move(scene));
 }
 
 void MainMenuState::Exit()
@@ -23,10 +26,6 @@ void MainMenuState::Update(float deltaTime)
 {
 }
 
-void MainMenuState::Render(sf::RenderWindow& window)
-{
-}
-
-void MainMenuState::HandleEvent(const sf::Event& event)
+void MainMenuState::HandleEvent(const std::optional<sf::Event>& event)
 {
 }

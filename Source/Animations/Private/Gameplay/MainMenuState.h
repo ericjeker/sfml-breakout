@@ -4,8 +4,9 @@
 #ifndef MAINMENUSTATE_H
 #define MAINMENUSTATE_H
 
-#include "Gameplay/GameController.h"
+#include "Gameplay/GameState.h"
 #include "Managers/SceneManager.h"
+
 
 class MainMenuState final : public GameState
 {
@@ -15,9 +16,9 @@ public:
 
     void Enter() override;
     void Exit() override;
+
     void Update(float deltaTime) override;
-    void Render(sf::RenderWindow& window) override;
-    void HandleEvent(const sf::Event& event) override;
+    void HandleEvent(const std::optional<sf::Event>& event) override;
 
 private:
     SceneManager& _sceneManager;

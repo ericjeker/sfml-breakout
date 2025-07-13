@@ -45,7 +45,7 @@ void Application::Run(sf::RenderWindow& renderWindow)
 
 void Application::HandleEvents(sf::RenderWindow& renderWindow)
 {
-    while (const std::optional event = renderWindow.pollEvent())
+    while (const auto event = renderWindow.pollEvent())
     {
         if (event->is<sf::Event::Closed>())
         {
@@ -63,18 +63,20 @@ void Application::HandleEvents(sf::RenderWindow& renderWindow)
 
         // We delegate the event to the game controller
         GetGameController().HandleEvent(event);
+        GetSceneManager().HandleEvent(event);
     }
 }
 
 void Application::Update(const float deltaTime)
 {
     GetGameController().Update(deltaTime);
+    GetSceneManager().Update(deltaTime);
 }
 
 void Application::Render(sf::RenderWindow& renderWindow)
 {
     renderWindow.clear();
-    GetGameController().Render(renderWindow);
+    GetSceneManager().Render(renderWindow);
     renderWindow.display();
 }
 
