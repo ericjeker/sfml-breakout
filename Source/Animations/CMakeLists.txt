@@ -1,6 +1,6 @@
 set(SOURCE_FILES
+        Private/Animations.cpp
         Private/Main.cpp
-        Private/Application.cpp
         Private/Gameplay/MainMenuState.cpp
         Private/Scenes/DemoScene.cpp
 )

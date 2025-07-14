@@ -2,6 +2,7 @@
 #pragma once
 
 #include "SFML/System/Vector2.hpp"
+#include "SFML/Window/Window.hpp"
 
 namespace ApplicationConfiguration
 {

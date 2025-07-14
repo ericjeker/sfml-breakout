@@ -1,7 +1,9 @@
 set(SOURCE_FILES
         Private/Logger.cpp
+        Private/GameInstance.cpp
         Private/Gameplay/GameController.cpp
         Private/Gameplay/GameState.cpp
+        Private/Managers/GameService.cpp
         Private/Managers/FileManager.cpp
         Private/Managers/ResourceManager.cpp
         Private/Managers/SceneManager.cpp

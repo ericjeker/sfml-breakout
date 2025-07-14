@@ -1,7 +1,12 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Application.h"
+#include "Animations.h"
 #include "ApplicationConfiguration.h"
+#include "GameInstance.h"
+#include "Gameplay/GameController.h"
+#include "Managers/GameService.h"
+#include "Managers/ResourceManager.h"
+#include "Managers/SceneManager.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -32,17 +37,20 @@ int main()
     renderWindow.setFramerateLimit(ApplicationConfiguration::framesPerSecond);
     renderWindow.setVerticalSyncEnabled(ApplicationConfiguration::isVSync);
 
-    // Create the game instance and initialize the different managers
-    Application application;
-    application.SetResourceManager(std::make_unique<ResourceManager>());
-    application.SetSceneManager(std::make_unique<SceneManager>(application.GetResourceManager()));
-    application.SetGameController(std::make_unique<GameController>());
+    // Initialize the different managers
+    auto gameService = std::make_unique<GameService>();
+    gameService->Register<ResourceManager>(std::make_unique<ResourceManager>());
+    gameService->Register<SceneManager>(std::make_unique<SceneManager>(*gameService->Get<ResourceManager>()));
+    gameService->Register<GameController>(std::make_unique<GameController>());
     // NetworkManager
     // AudioManager
     // SoundManager
     // EventSystem
 
-    // Initialize and Start the game loop
-    application.Initialization();
-    application.Run(renderWindow);
+    // Create the game instance
+    LOG_DEBUG("(Main::main): Creating GameInstance");
+    Animations animations(std::move(gameService));
+    animations.Initialize();
+    animations.Run(renderWindow);
+    animations.Shutdown();
 }
