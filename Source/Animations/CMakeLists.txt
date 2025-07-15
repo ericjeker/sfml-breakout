@@ -3,6 +3,7 @@ set(SOURCE_FILES
         Private/Main.cpp
         Private/Gameplay/MainMenuState.cpp
         Private/Scenes/DemoScene.cpp
+        Private/Systems/DrawableRenderer.cpp
 )
 
 # --- Create the main library ---

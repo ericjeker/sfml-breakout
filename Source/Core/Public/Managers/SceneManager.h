@@ -33,9 +33,39 @@ public:
     explicit SceneManager(ResourceManager& resourceManager);
     ~SceneManager() = default;
 
-    void AddScene(std::unique_ptr<Scene> scene);
-    void LoadScene(const std::string& scenePath, LoadMode mode);
-    void UnloadScene(const std::string& scenePath);
+    template<typename T>
+    void AddScene(std::unique_ptr<T> scene) {
+        static_assert(std::is_base_of_v<Scene, T>, "T must inherit from Scene");
+        _scenes[std::type_index(typeid(T))] = std::move(scene);
+    }
+
+    template<typename T>
+    void LoadScene() {
+        static_assert(std::is_base_of_v<Scene, T>, "T must inherit from Scene");
+        auto it = _scenes.find(std::type_index(typeid(T)));
+        if (it != _scenes.end() && !it->second->IsLoaded()) {
+            it->second->Initialize();
+            it->second->SetLoaded(true);
+        }
+    }
+
+    template<typename T>
+    void UnloadScene() {
+        static_assert(std::is_base_of_v<Scene, T>, "T must inherit from Scene");
+        auto it = _scenes.find(std::type_index(typeid(T)));
+        if (it != _scenes.end() && it->second->IsLoaded()) {
+            it->second->Shutdown();
+            it->second->SetLoaded(false);
+        }
+    }
+
+    template<typename T>
+    T* GetScene() {
+        static_assert(std::is_base_of_v<Scene, T>, "T must inherit from Scene");
+        auto it = _scenes.find(std::type_index(typeid(T)));
+        return it != _scenes.end() ? static_cast<T*>(it->second.get()) : nullptr;
+    }
+
     void CleanUp();
 
     void Update(float deltaTime);
@@ -44,7 +74,7 @@ public:
 
 private:
     ResourceManager& _resourceManager;
-    std::vector<std::unique_ptr<Scene>> _scenes;
+    std::unordered_map<std::type_index, std::unique_ptr<Scene>> _scenes;
 };
 
 

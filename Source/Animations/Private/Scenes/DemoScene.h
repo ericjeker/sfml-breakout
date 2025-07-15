@@ -12,12 +12,9 @@
 class DemoScene final : public Scene
 {
 public:
-    DemoScene();
-    ~DemoScene() override = default;
-
-    void Update(float deltaTime) override;
-    void Render(sf::RenderWindow& window) override;
-    void HandleEvent(const std::optional<sf::Event>& event) override;
+    DemoScene() = default;
+    void Initialize() override;
+    void Shutdown() override;
 
 private:
     std::unique_ptr<sf::CircleShape> _circle;

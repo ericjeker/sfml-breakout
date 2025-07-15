@@ -1,0 +1,7 @@
+{
+  "type": "Circle",
+  "radius": 10,
+  "origin": [0, 0],
+  "position": [300, 300],
+  "fillColor": "Red"
+}

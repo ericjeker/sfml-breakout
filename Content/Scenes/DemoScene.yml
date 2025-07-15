@@ -1,0 +1,40 @@
+{
+  "settings": {
+    "backgroundColor": [ 0, 0, 0 ]
+  },
+  "entities": [
+    {
+      "id": "MainText",
+      "blueprint": "Text",
+      "text": "Animation",
+      "font": "Orbitron-Regular",
+      "origin": [ 0, 0 ],
+      "position": [ 200, 200 ]
+    },
+    {
+      "id": "MainCircle",
+      "type": "Circle",
+      "radius": 10,
+      "origin": [ 0, 0 ],
+      "position": [ 300, 300 ],
+      "fillColor": "Red"
+    }
+  ],
+  "systems": [
+    {
+      "id": "InputSystem"
+    },
+    {
+      "id": "PhysicsSystem"
+    },
+    {
+      "id": "CollisionSystem"
+    },
+    {
+      "id": "AnimationSystem"
+    },
+    {
+      "id": "RenderingSystem"
+    }
+  ]
+}

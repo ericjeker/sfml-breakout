@@ -57,7 +57,7 @@ public:
     }
 
 private:
-    // We use type erasure here to avoid having to use std::any
+    // We use type erasure here to avoid using std::any
     struct ServiceBase
     {
         virtual ~ServiceBase() = default;

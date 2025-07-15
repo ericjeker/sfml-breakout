@@ -8,17 +8,20 @@
 MainMenuState::MainMenuState(SceneManager& sceneManager)
     : _sceneManager(sceneManager)
 {
+    LOG_DEBUG("(MainMenuState::MainMenuState): Adding DemoScene to the SceneManager");
+    _sceneManager.AddScene<DemoScene>(std::make_unique<DemoScene>());
 }
 
 void MainMenuState::Enter()
 {
-    LOG_DEBUG("(MainMenuState::Enter): Adding DemoScene to the SceneManager");
-    _sceneManager.AddScene(std::make_unique<DemoScene>());
+    LOG_DEBUG("(MainMenuState::Enter): Loading DemoScene");
+    _sceneManager.LoadScene<DemoScene>();
 }
 
 void MainMenuState::Exit()
 {
     LOG_DEBUG("(MainMenuState::Exit)");
+    _sceneManager.UnloadScene<DemoScene>();
 }
 
 void MainMenuState::Update(float deltaTime)

@@ -2,24 +2,35 @@
 
 #include "DemoScene.h"
 
+#include "../Components/Drawable.h"
+#include "../Systems/DrawableRenderer.h"
+#include "Logger.h"
+
 #include <SFML/Graphics/CircleShape.hpp>
 
-DemoScene::DemoScene()
+void DemoScene::Initialize()
 {
-    _circle = std::make_unique<sf::CircleShape>(50.f);
-    _circle->setFillColor(sf::Color::Red);
-    _circle->setPosition({200.f, 200.f});
+    LOG_DEBUG("(DemoScene:Initialize)");
+
+    // --- Create the Entities ---
+    auto circle = std::make_unique<sf::CircleShape>(50.f);
+    circle->setFillColor(sf::Color::Red);
+    circle->setPosition({200.f, 200.f});
+
+    Drawable drawable;
+    drawable.drawable = std::move(circle);
+
+    auto circleEntity = std::make_unique<Entity>(GenerateId());
+    circleEntity->AddComponent<Drawable>(std::move(drawable));
+
+    AddEntity(std::move(circleEntity));
+
+    // --- Create the Systems ---
+    auto renderer = std::make_unique<DrawableRenderer>();
+    AddSystem(std::move(renderer));
 }
 
-void DemoScene::Update(float deltaTime)
+void DemoScene::Shutdown()
 {
-}
-
-void DemoScene::Render(sf::RenderWindow& window)
-{
-    window.draw(*_circle);
-}
-
-void DemoScene::HandleEvent(const std::optional<sf::Event>& event)
-{
+    LOG_DEBUG("(DemoScene:Shutdown)");
 }

@@ -7,7 +7,9 @@ set(SOURCE_FILES
         Private/Managers/FileManager.cpp
         Private/Managers/ResourceManager.cpp
         Private/Managers/SceneManager.cpp
+        Private/Scenes/Entity.cpp
         Private/Scenes/Scene.cpp
+        Private/Systems/System.cpp
 )
 
 add_library(Core)
