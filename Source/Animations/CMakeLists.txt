@@ -2,8 +2,8 @@ set(SOURCE_FILES
         Private/Animations.cpp
         Private/Main.cpp
         Private/Gameplay/MainMenuState.cpp
-        Private/Scenes/BlueDemoScene.cpp
-        Private/Scenes/RedDemoScene.cpp
+        Private/Scenes/DemoScene.cpp
+        Private/Systems/AnimationSystem.cpp
         Private/Systems/DrawableRenderer.cpp
 )
 

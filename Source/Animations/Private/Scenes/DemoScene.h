@@ -1,16 +1,16 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef BLUEDEMOSCENE_H
-#define BLUEDEMOSCENE_H
+#ifndef DEMOSCENE_H
+#define DEMOSCENE_H
 
 #include "Scenes/Scene.h"
 
 
-class BlueDemoScene final : public Scene
+class DemoScene final : public Scene
 {
 public:
-    BlueDemoScene() = default;
+    DemoScene() = default;
     void Initialize() override;
 };
 

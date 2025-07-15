@@ -1,6 +1,7 @@
 # TODO
 
-- [ ] EventSystem
 - [x] ServiceLocator
-- [ ] Scene Loading
-- [ ] Entity Factory
+- [x] Scene Loading
+- [ ] EventSystem
+- [ ] Entity, Component, System Factories
+- [ ] Load scenes, entities, components, systems from serialized files

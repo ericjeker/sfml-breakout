@@ -5,17 +5,25 @@ A new SFML Sandbox to try different architectures for a game engine.
 ## Call Hierarchy
 
 ```
-Application -> GameController -> GameState -> SceneManager -> Scene -> Systems -> Components (EnTT)
+GameInstance -> GameController -> GameState
+                               -> SceneManager -> Scene -> Systems
+                                                        -> Entities -> Components
 ```
 
-## Application / Game Instance
+## ECS-Lite
+
+The Scene holds entities in an ECS-lite architecture. Entities (`Entity`) contain Components. Scene contains Systems.
+But the "Lite" comes from the fact that there is no query system. The systems always receive all the entities and
+they can check for each of them if they have a given component.
+
+## Game Instance
 
 The responsibility of the game instance is to load the base resources. This class owns the different
-managers stored in the engine context.
+managers stored in the `GameService` service locator class.
 
-It is also where the game loop is started, and the root of the call hierarchy.
+It is also where the game loop is started (`Run()`), and the root of the call hierarchy.
 
-The Game Instance holds the instance of the Window where everything will be drawn.
+The `GameInstance` also holds the instance of the Window where everything will be drawn.
 
 Four events are processed:
 
@@ -33,7 +41,7 @@ The GameController also manages the global game state that persists across all G
 
 ## GameState
 
-Hold the current game mode, encapsulate state-specific behavior and data. The GameState also manage which scene should
+Hold the current game mode, encapsulate state-specific behavior and data. The GameState also manages which scene should
 be active given its particular state.
 
 The GameState to Scene relationship can be:
@@ -44,11 +52,12 @@ The GameState to Scene relationship can be:
 
 ## SceneManager
 
-Responsible for loading scenes and keeping track of the current loaded scene. The SceneManager can
-overlay multiple scenes, or load scenes additively.
+Responsible for loading and unloading scenes and keeping track of the current loaded scene. The SceneManager can load
+scenes in two different modes: single or additive. `Single` mode cleans up the previously loaded scenes before loading
+the new scene. `Additive` loads the new scene on top of the previous one as to create an overlay system.
 
 ## Scene / UIScene
 
-A scene is a cohesive set of game objects (entities) or UI Elements that can be handled with an ECS system (EnTT) or
+A scene is a cohesive set of game objects (entities) or UI Elements that can be handled with an ECS system or
 a UI Manager.
 
