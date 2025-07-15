@@ -14,7 +14,7 @@
 #include <vector>
 
 
-enum class LoadMode
+enum class SceneLoadMode
 {
     Single,
     Additive
@@ -40,8 +40,14 @@ public:
     }
 
     template<typename T>
-    void LoadScene() {
+    void LoadScene(const SceneLoadMode mode) {
         static_assert(std::is_base_of_v<Scene, T>, "T must inherit from Scene");
+
+        if (mode == SceneLoadMode::Single)
+        {
+            CleanUp();
+        }
+
         auto it = _scenes.find(std::type_index(typeid(T)));
         if (it != _scenes.end() && !it->second->IsLoaded()) {
             it->second->Initialize();
@@ -66,6 +72,14 @@ public:
         return it != _scenes.end() ? static_cast<T*>(it->second.get()) : nullptr;
     }
 
+    /**
+     * Cleans up all currently active scenes by invoking their shutdown routine and marking them as not loaded.
+     *
+     * This method iterates through all stored scenes, calling their `Shutdown()` method to perform any required
+     * resource cleanup or deinitialization. Afterward, it sets the scene's loaded state to false.
+     * It is primarily used for unloading all active scenes when transitioning between different configurations
+     * or when loading new scenes in `Single` load mode.
+     */
     void CleanUp();
 
     void Update(float deltaTime);

@@ -22,7 +22,7 @@ void SceneManager::CleanUp()
     }
 }
 
-void SceneManager::Update(float deltaTime)
+void SceneManager::Update(const float deltaTime)
 {
     for (const auto& val : _scenes | std::views::values)
     {

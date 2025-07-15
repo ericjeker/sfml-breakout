@@ -28,7 +28,7 @@ public:
     virtual ~Scene() = default;
 
     virtual void Initialize() = 0;
-    virtual void Shutdown() = 0;
+    virtual void Shutdown();
     virtual void Update(float deltaTime);
     virtual void Render(sf::RenderWindow& window);
     virtual void HandleEvent(const std::optional<sf::Event>& event);

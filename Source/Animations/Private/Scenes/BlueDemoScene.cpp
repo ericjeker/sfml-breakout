@@ -1,6 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "DemoScene.h"
+#include "BlueDemoScene.h"
 
 #include "../Components/Drawable.h"
 #include "../Systems/DrawableRenderer.h"
@@ -8,14 +8,14 @@
 
 #include <SFML/Graphics/CircleShape.hpp>
 
-void DemoScene::Initialize()
+void BlueDemoScene::Initialize()
 {
-    LOG_DEBUG("(DemoScene:Initialize)");
+    LOG_DEBUG("(BlueDemoScene:Initialize)");
 
     // --- Create the Entities ---
     auto circle = std::make_unique<sf::CircleShape>(50.f);
-    circle->setFillColor(sf::Color::Red);
-    circle->setPosition({200.f, 200.f});
+    circle->setFillColor(sf::Color::Blue);
+    circle->setPosition({200.f, 500.f});
 
     Drawable drawable;
     drawable.drawable = std::move(circle);
@@ -28,9 +28,4 @@ void DemoScene::Initialize()
     // --- Create the Systems ---
     auto renderer = std::make_unique<DrawableRenderer>();
     AddSystem(std::move(renderer));
-}
-
-void DemoScene::Shutdown()
-{
-    LOG_DEBUG("(DemoScene:Shutdown)");
 }

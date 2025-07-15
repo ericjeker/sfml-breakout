@@ -2,8 +2,22 @@
 
 #include "Scenes/Scene.h"
 
+#include "Logger.h"
+
+void Scene::Shutdown()
+{
+    LOG_DEBUG("(Scene:Shutdown)");
+    _entities.clear();
+    _systems.clear();
+}
+
 void Scene::Update(const float deltaTime)
 {
+    if (!IsLoaded() || IsPaused())
+    {
+        return;
+    }
+
     for (const auto& system : _systems)
     {
         system->Update(GetEntities(), deltaTime);
@@ -12,6 +26,11 @@ void Scene::Update(const float deltaTime)
 
 void Scene::Render(sf::RenderWindow& window)
 {
+    if (!IsLoaded())
+    {
+        return;
+    }
+
     for (const auto& system : _systems)
     {
         system->Render(GetEntities(), window);
@@ -20,6 +39,11 @@ void Scene::Render(sf::RenderWindow& window)
 
 void Scene::HandleEvent(const std::optional<sf::Event>& event)
 {
+    if (!IsLoaded() || IsPaused())
+    {
+        return;
+    }
+
     for (const auto& system : _systems)
     {
         system->HandleEvent(GetEntities(), event);
