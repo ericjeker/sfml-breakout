@@ -17,7 +17,11 @@ public:
 
     virtual void Update(const std::vector<std::unique_ptr<Entity>>& entities, float deltaTime);
     virtual void Render(const std::vector<std::unique_ptr<Entity>>& entities, sf::RenderWindow& window);
-    virtual void HandleEvent(const std::vector<std::unique_ptr<Entity>>& entities, const std::optional<sf::Event>& event);
+    virtual void HandleEvent(
+        const std::vector<std::unique_ptr<Entity>>& entities,
+        const std::optional<sf::Event>& event,
+        sf::RenderWindow& window
+    );
 };
 
 

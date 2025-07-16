@@ -11,7 +11,7 @@
 #include <memory>
 
 
-struct Drawable final : Component
+struct DrawableComponent final : Component
 {
     std::unique_ptr<sf::Drawable> drawable;
 };

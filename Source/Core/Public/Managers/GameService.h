@@ -20,7 +20,6 @@ public:
     GameService();
     ~GameService() = default;
 
-    // TODO: use an interface and implementation instead
     template <typename T>
     void Register(std::unique_ptr<T> service)
     {
@@ -36,24 +35,32 @@ public:
         _services[typeIndex] = std::make_unique<ServiceWrapper<T>>(std::move(service));
     }
 
+    template<typename T>
+    void Register(T& service)
+    {
+        const std::type_index typeIndex(typeid(T));
+
+        if (_services.contains(typeIndex))
+        {
+            LOG_ERROR("(GameService): Service " + std::string(typeid(T).name()) + " already exists.");
+            return;
+        }
+
+        _services[typeIndex] = std::make_unique<ServiceReferenceWrapper<T>>(service);
+    }
+
     template <typename T>
-    T* Get()
+    T& Get()
     {
         const std::type_index typeIndex(typeid(T));
 
         if (const auto it = _services.find(typeIndex); it != _services.end())
         {
             auto* wrapper = static_cast<ServiceWrapper<T>*>(it->second.get());
-            return wrapper->service.get();
+            return *wrapper->service.get();
         }
 
-        return nullptr;
-    }
-
-    template <typename T>
-    bool IsRegistered() const
-    {
-        return _services.contains(std::type_index(typeid(T)));
+        throw std::runtime_error("Game Service not found: " + std::string(typeid(T).name()));
     }
 
 private:
@@ -71,6 +78,13 @@ private:
             : service(std::move(s))
         {
         }
+    };
+
+    template<typename T>
+    struct ServiceReferenceWrapper final : ServiceBase
+    {
+        T& service;
+        explicit ServiceReferenceWrapper(T& s) : service(s) {}
     };
 
     std::unordered_map<std::type_index, std::unique_ptr<ServiceBase>> _services;

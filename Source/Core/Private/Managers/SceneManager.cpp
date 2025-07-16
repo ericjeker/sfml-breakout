@@ -38,10 +38,10 @@ void SceneManager::Render(sf::RenderWindow& window)
     }
 }
 
-void SceneManager::HandleEvent(const std::optional<sf::Event>& event)
+void SceneManager::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow)
 {
-    for (const auto& val : _scenes | std::views::values)
+    for (const auto& scene : _scenes | std::views::values)
     {
-        val->HandleEvent(event);
+        scene->HandleEvent(event, renderWindow);
     }
 }

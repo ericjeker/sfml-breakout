@@ -4,6 +4,9 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
+#include "Managers/GameService.h"
+
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 
 #include <optional>
@@ -12,6 +15,7 @@
 class GameState
 {
 public:
+    explicit GameState(GameService& gameService);
     virtual ~GameState() = default;
 
     virtual void Enter() = 0;
@@ -21,11 +25,15 @@ public:
     virtual void Resume();
     [[nodiscard]] bool IsPaused() const;
 
+    [[nodiscard]] GameService& GetGameService() const;
+
     virtual void Update(float deltaTime) = 0;
-    virtual void HandleEvent(const std::optional<sf::Event>& event) = 0;
+    virtual void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow) = 0;
 
 private:
     bool _paused = false;
+
+    GameService& _gameService;
 };
 
 

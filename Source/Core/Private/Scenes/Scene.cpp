@@ -4,6 +4,16 @@
 
 #include "Logger.h"
 
+Scene::Scene(ResourceManager& resourceManager, EventManager& eventManager)
+    : _eventManager(eventManager)
+    , _resourceManager(resourceManager)
+{
+}
+
+void Scene::Initialize()
+{
+}
+
 void Scene::Shutdown()
 {
     LOG_DEBUG("(Scene:Shutdown)");
@@ -37,7 +47,7 @@ void Scene::Render(sf::RenderWindow& window)
     }
 }
 
-void Scene::HandleEvent(const std::optional<sf::Event>& event)
+void Scene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow)
 {
     if (!IsLoaded() || IsPaused())
     {
@@ -46,7 +56,7 @@ void Scene::HandleEvent(const std::optional<sf::Event>& event)
 
     for (const auto& system : _systems)
     {
-        system->HandleEvent(GetEntities(), event);
+        system->HandleEvent(GetEntities(), event, renderWindow);
     }
 }
 
@@ -134,4 +144,14 @@ std::vector<std::unique_ptr<Entity>>& Scene::GetEntities()
 void Scene::AddSystem(std::unique_ptr<System> system)
 {
     _systems.push_back(std::move(system));
+}
+
+EventManager& Scene::GetEventManager() const
+{
+    return _eventManager;
+}
+
+ResourceManager& Scene::GetResourceManager() const
+{
+    return _resourceManager;
 }

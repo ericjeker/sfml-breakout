@@ -3,6 +3,7 @@ set(SOURCE_FILES
         Private/GameInstance.cpp
         Private/Gameplay/GameController.cpp
         Private/Gameplay/GameState.cpp
+        Private/Managers/EventManager.cpp
         Private/Managers/GameService.cpp
         Private/Managers/FileManager.cpp
         Private/Managers/ResourceManager.cpp

@@ -2,8 +2,8 @@
 
 #include "DrawableRenderer.h"
 
-#include "../Components/Drawable.h"
-#include "../Components/Transform.h"
+#include "../Components/DrawableComponent.h"
+#include "../Components/TransformComponent.h"
 
 #include <SFML/Graphics/Transformable.hpp>
 
@@ -11,8 +11,8 @@ void DrawableRenderer::Render(const std::vector<std::unique_ptr<Entity>>& entiti
 {
     for (const auto& entity : entities)
     {
-        auto* transform = entity->GetComponent<Transform>();
-        auto* drawable = entity->GetComponent<Drawable>();
+        auto* transform = entity->GetComponent<TransformComponent>();
+        auto* drawable = entity->GetComponent<DrawableComponent>();
 
         if (!transform || !drawable)
         {
@@ -27,12 +27,4 @@ void DrawableRenderer::Render(const std::vector<std::unique_ptr<Entity>>& entiti
             window.draw(*drawable->drawable);
         }
     }
-}
-
-void DrawableRenderer::Update(const std::vector<std::unique_ptr<Entity>>& entities, float deltaTime)
-{
-}
-
-void DrawableRenderer::HandleEvent(const std::vector<std::unique_ptr<Entity>>& entities, const std::optional<sf::Event>& event)
-{
 }

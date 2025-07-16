@@ -7,7 +7,7 @@
 #include <SFML/System/Vector2.hpp>
 
 
-struct Animation final : Component
+struct AnimationComponent final : Component
 {
     enum Type
     {

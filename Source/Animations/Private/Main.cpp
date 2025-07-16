@@ -39,18 +39,20 @@ int main()
 
     // Initialize the different managers
     auto gameService = std::make_unique<GameService>();
+    gameService->Register<sf::RenderWindow>(renderWindow);
     gameService->Register<ResourceManager>(std::make_unique<ResourceManager>());
-    gameService->Register<SceneManager>(std::make_unique<SceneManager>(*gameService->Get<ResourceManager>()));
+    gameService->Register<SceneManager>(std::make_unique<SceneManager>(gameService->Get<ResourceManager>()));
     gameService->Register<GameController>(std::make_unique<GameController>());
+    gameService->Register<EventManager>(std::make_unique<EventManager>());
     // NetworkManager
     // AudioManager
     // SoundManager
-    // EventSystem
 
     // Create the game instance
-    LOG_DEBUG("(Main::main): Creating GameInstance");
+    LOG_DEBUG("(Main::main): Creating the GameInstance");
     Animations animations(std::move(gameService));
     animations.Initialize();
     animations.Run(renderWindow);
     animations.Shutdown();
+    LOG_DEBUG("(Main::main): Bye bye!");
 }

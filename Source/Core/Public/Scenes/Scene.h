@@ -5,6 +5,8 @@
 #define SCENE_H
 
 #include "Entity.h"
+#include "Managers/EventManager.h"
+#include "Managers/ResourceManager.h"
 #include "Systems/System.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -20,19 +22,23 @@
 /**
  * A container for all the Entities, lights, cameras, and other elements
  * that make up a level or a screen (like a menu).
+ *
+ * Scene should contain only thing related to a Scene, and not a game state as a single game state
+ * can load multiple scenes.
  */
 class Scene
 {
 public:
-    Scene() = default;
+    Scene(ResourceManager& resourceManager, EventManager& eventManager);
     virtual ~Scene() = default;
 
-    virtual void Initialize() = 0;
+    virtual void Initialize();
     virtual void Shutdown();
     virtual void Update(float deltaTime);
     virtual void Render(sf::RenderWindow& window);
-    virtual void HandleEvent(const std::optional<sf::Event>& event);
+    virtual void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window);
 
+    // -- Scene States --
     [[nodiscard]] bool IsLoaded() const;
     void SetLoaded(bool loaded);
 
@@ -40,19 +46,26 @@ public:
     void Pause();
     void Resume();
 
+    // -- Scene Description --
     [[nodiscard]] const std::string& GetName() const;
     [[nodiscard]] const std::string& GetPath() const;
     void SetName(const std::string& name);
     void SetPath(const std::string& path);
 
+    // -- Entity Management --
     static int GenerateId();
 
     void AddEntity(std::unique_ptr<Entity> entity);
     void RemoveEntity(int id);
-    Entity* GetEntity(int id) const;
+    [[nodiscard]] Entity* GetEntity(int id) const;
     std::vector<std::unique_ptr<Entity>>& GetEntities();
 
+    // -- System Management --
     void AddSystem(std::unique_ptr<System> system);
+
+    // -- Accessors --
+    EventManager& GetEventManager() const;
+    ResourceManager& GetResourceManager() const;
 
 private:
     std::string _name;
@@ -63,6 +76,9 @@ private:
 
     std::vector<std::unique_ptr<Entity>> _entities;
     std::vector<std::unique_ptr<System>> _systems;
+
+    EventManager& _eventManager;
+    ResourceManager& _resourceManager;
 };
 
 #endif

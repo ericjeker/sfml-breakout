@@ -24,7 +24,7 @@ public:
     void Update(float deltaTime);
     void Render(sf::RenderWindow& renderWindow);
 
-    [[nodiscard]] GameService* GetGameService() const;
+    [[nodiscard]] GameService& GetGameService() const;
 
 private:
     std::unique_ptr<GameService> _gameService;

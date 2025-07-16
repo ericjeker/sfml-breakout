@@ -2,16 +2,16 @@
 
 #include "AnimationSystem.h"
 
-#include "../Components/Animation.h"
-#include "../Components/Transform.h"
+#include "../Components/AnimationComponent.h"
+#include "../Components/TransformComponent.h"
 
 void AnimationSystem::Update(const std::vector<std::unique_ptr<Entity>>& entities, const float deltaTime)
 {
     // Process all entities with Animation and Transform components
-    for (auto& entity : entities)
+    for (const auto& entity : entities)
     {
-        auto* animation = entity->GetComponent<Animation>();
-        auto* transform = entity->GetComponent<Transform>();
+        auto* animation = entity->GetComponent<AnimationComponent>();
+        auto* transform = entity->GetComponent<TransformComponent>();
 
         animation->elapsed += deltaTime;
         float progress = animation->elapsed / animation->duration;
@@ -28,13 +28,13 @@ void AnimationSystem::Update(const std::vector<std::unique_ptr<Entity>>& entitie
         // Apply animation based on type
         switch (animation->type)
         {
-            case Animation::ROTATE:
+            case AnimationComponent::ROTATE:
                 transform->rotation = sf::degrees(lerp(animation->startFloat, animation->endFloat, progress));
                 break;
-            case Animation::SCALE:
+            case AnimationComponent::SCALE:
                 transform->scale = lerp(animation->startValue, animation->endValue, progress);
                 break;
-            case Animation::MOVE:
+            case AnimationComponent::MOVE:
                 transform->position = lerp(animation->startValue, animation->endValue, progress);
                 break;
             // ... other animation types

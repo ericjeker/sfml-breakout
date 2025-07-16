@@ -26,7 +26,6 @@ public:
 	void UnloadResource(const std::string& name);
 	void CleanUp();
 
-	/** Templates are evaluated at compile time, so they need to be defined here */
 	template <typename T>
 	std::shared_ptr<T> GetResource(const std::string& name)
 	{

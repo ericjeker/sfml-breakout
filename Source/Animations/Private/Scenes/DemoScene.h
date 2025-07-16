@@ -10,8 +10,9 @@
 class DemoScene final : public Scene
 {
 public:
-    DemoScene() = default;
+    DemoScene(ResourceManager& resourceManager, EventManager& eventManager);
     void Initialize() override;
+    void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
 };
 
 

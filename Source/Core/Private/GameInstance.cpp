@@ -55,25 +55,25 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
         }
 
         // We delegate the event to the game controller
-        _gameService->Get<GameController>()->HandleEvent(event);
-        _gameService->Get<SceneManager>()->HandleEvent(event);
+        GetGameService().Get<GameController>().HandleEvent(event, renderWindow);
+        GetGameService().Get<SceneManager>().HandleEvent(event, renderWindow);
     }
 }
 
 void GameInstance::Update(const float deltaTime)
 {
-    _gameService->Get<GameController>()->Update(deltaTime);
-    _gameService->Get<SceneManager>()->Update(deltaTime);
+    GetGameService().Get<GameController>().Update(deltaTime);
+    GetGameService().Get<SceneManager>().Update(deltaTime);
 }
 
 void GameInstance::Render(sf::RenderWindow& renderWindow)
 {
     renderWindow.clear();
-    _gameService->Get<SceneManager>()->Render(renderWindow);
+    GetGameService().Get<SceneManager>().Render(renderWindow);
     renderWindow.display();
 }
 
-GameService* GameInstance::GetGameService() const
+GameService& GameInstance::GetGameService() const
 {
-    return _gameService.get();
+    return *_gameService;
 }

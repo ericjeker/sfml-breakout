@@ -10,8 +10,6 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include <memory>
-#include <string>
-#include <vector>
 
 
 enum class SceneLoadMode
@@ -33,14 +31,16 @@ public:
     explicit SceneManager(ResourceManager& resourceManager);
     ~SceneManager() = default;
 
-    template<typename T>
-    void AddScene(std::unique_ptr<T> scene) {
+    template <typename T>
+    void AddScene(std::unique_ptr<T> scene)
+    {
         static_assert(std::is_base_of_v<Scene, T>, "T must inherit from Scene");
         _scenes[std::type_index(typeid(T))] = std::move(scene);
     }
 
-    template<typename T>
-    void LoadScene(const SceneLoadMode mode) {
+    template <typename T>
+    void LoadScene(const SceneLoadMode mode)
+    {
         static_assert(std::is_base_of_v<Scene, T>, "T must inherit from Scene");
 
         if (mode == SceneLoadMode::Single)
@@ -49,27 +49,35 @@ public:
         }
 
         auto it = _scenes.find(std::type_index(typeid(T)));
-        if (it != _scenes.end() && !it->second->IsLoaded()) {
+        if (it != _scenes.end() && !it->second->IsLoaded())
+        {
             it->second->Initialize();
             it->second->SetLoaded(true);
         }
     }
 
-    template<typename T>
-    void UnloadScene() {
+    template <typename T>
+    void UnloadScene()
+    {
         static_assert(std::is_base_of_v<Scene, T>, "T must inherit from Scene");
         auto it = _scenes.find(std::type_index(typeid(T)));
-        if (it != _scenes.end() && it->second->IsLoaded()) {
+        if (it != _scenes.end() && it->second->IsLoaded())
+        {
             it->second->Shutdown();
             it->second->SetLoaded(false);
         }
     }
 
-    template<typename T>
-    T* GetScene() {
+    template <typename T>
+    T& GetScene()
+    {
         static_assert(std::is_base_of_v<Scene, T>, "T must inherit from Scene");
         auto it = _scenes.find(std::type_index(typeid(T)));
-        return it != _scenes.end() ? static_cast<T*>(it->second.get()) : nullptr;
+        if (it == _scenes.end())
+        {
+            throw std::runtime_error("Scene not found");
+        }
+        return *static_cast<T*>(it->second.get());
     }
 
     /**
@@ -84,7 +92,7 @@ public:
 
     void Update(float deltaTime);
     void Render(sf::RenderWindow& window);
-    void HandleEvent(const std::optional<sf::Event>& event);
+    void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow);
 
 private:
     ResourceManager& _resourceManager;

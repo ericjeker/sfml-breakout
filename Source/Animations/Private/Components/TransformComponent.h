@@ -9,7 +9,7 @@
 #include <SFML/System/Vector2.hpp>
 
 
-struct Transform final : Component
+struct TransformComponent final : Component
 {
     sf::Vector2f position;
     sf::Angle rotation;

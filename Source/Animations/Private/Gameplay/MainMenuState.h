@@ -5,24 +5,22 @@
 #define MAINMENUSTATE_H
 
 #include "Gameplay/GameState.h"
-#include "Managers/SceneManager.h"
+#include "Managers/GameService.h"
 
 
 class MainMenuState final : public GameState
 {
 public:
-    explicit MainMenuState(SceneManager& sceneManager);
+    explicit MainMenuState(GameService& gameService);
     ~MainMenuState() override = default;
 
     void Enter() override;
     void Exit() override;
 
     void Update(float deltaTime) override;
-    void HandleEvent(const std::optional<sf::Event>& event) override;
+    void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
 
 private:
-    SceneManager& _sceneManager;
+    bool _isPaused = false;
 };
-
-
 #endif
