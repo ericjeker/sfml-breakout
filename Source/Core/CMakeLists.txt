@@ -10,6 +10,8 @@ set(SOURCE_FILES
         Private/Managers/SceneManager.cpp
         Private/Scenes/Entity.cpp
         Private/Scenes/Scene.cpp
+        Private/Systems/AnimationSystem.cpp
+        Private/Systems/DrawableRenderer.cpp
         Private/Systems/System.cpp
 )
 

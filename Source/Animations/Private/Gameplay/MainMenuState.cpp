@@ -37,11 +37,21 @@ void MainMenuState::Update(float deltaTime)
 
 void MainMenuState::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
 {
-    if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+    auto& sceneManager = GetGameService().Get<SceneManager>();
+
+    if (event->is<sf::Event::FocusLost>())
+    {
+        sceneManager.GetScene<DemoScene>().Pause();
+        sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
+        _isPaused = true;
+    }
+    else if (event->is<sf::Event::FocusGained>())
+    {
+    }
+    else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
     {
         if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
         {
-            auto& sceneManager = GetGameService().Get<SceneManager>();
             if (_isPaused)
             {
                 sceneManager.UnloadScene<PauseScene>();

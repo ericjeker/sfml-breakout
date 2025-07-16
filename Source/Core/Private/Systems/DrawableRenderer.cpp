@@ -1,9 +1,9 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "DrawableRenderer.h"
+#include "Systems/DrawableRenderer.h"
 
-#include "../Components/DrawableComponent.h"
-#include "../Components/TransformComponent.h"
+#include "Components/DrawableComponent.h"
+#include "Components/TransformComponent.h"
 
 #include <SFML/Graphics/Transformable.hpp>
 

@@ -46,7 +46,6 @@ int main()
     gameService->Register<EventManager>(std::make_unique<EventManager>());
     // NetworkManager
     // AudioManager
-    // SoundManager
 
     // Create the game instance
     LOG_DEBUG("(Main::main): Creating the GameInstance");
@@ -55,4 +54,6 @@ int main()
     animations.Run(renderWindow);
     animations.Shutdown();
     LOG_DEBUG("(Main::main): Bye bye!");
+
+    return 0;
 }

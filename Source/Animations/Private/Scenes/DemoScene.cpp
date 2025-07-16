@@ -2,12 +2,14 @@
 
 #include "DemoScene.h"
 
-#include "../Components/AnimationComponent.h"
-#include "../Components/DrawableComponent.h"
-#include "../Components/TransformComponent.h"
-#include "../Systems/AnimationSystem.h"
-#include "../Systems/DrawableRenderer.h"
+#include "ApplicationConfiguration.h"
+#include "Components/AnimationComponent.h"
+#include "Components/DrawableComponent.h"
+#include "Components/TransformComponent.h"
 #include "Logger.h"
+#include "Systems/AnimationSystem.h"
+#include "Systems/DrawableRenderer.h"
+#include "Themes/Nord.h"
 
 #include <SFML/Graphics/RectangleShape.hpp>
 
@@ -21,9 +23,18 @@ void DemoScene::Initialize()
     LOG_DEBUG("(DemoScene:Initialize)");
     Scene::Initialize();
 
+    auto background = std::make_unique<sf::RectangleShape>(sf::Vector2f{ApplicationConfiguration::windowSize});
+    background->setFillColor(NordTheme::Frost1);
+    background->setPosition({0.f, 0.f});
+
+    auto backgroundEntity = std::make_unique<Entity>(GenerateId());
+    backgroundEntity->AddComponent<DrawableComponent>({.drawable = std::move(background)});
+    backgroundEntity->AddComponent<TransformComponent>({});
+    AddEntity(std::move(backgroundEntity));
+
     // --- Create the Entities ---
     auto rectangleShape = std::make_unique<sf::RectangleShape>(sf::Vector2f{200.f, 200.f});
-    rectangleShape->setFillColor(sf::Color::White);
+    rectangleShape->setFillColor(NordTheme::Aurora1);
     rectangleShape->setOrigin({100.f, 100.f});
 
     DrawableComponent drawable;
@@ -41,18 +52,16 @@ void DemoScene::Initialize()
     animation.duration = 1.f;
     animation.loop = true;
 
-    auto entity = std::make_unique<Entity>(GenerateId());
-    entity->AddComponent<DrawableComponent>(std::move(drawable));
-    entity->AddComponent<TransformComponent>(std::move(transform));
-    entity->AddComponent<AnimationComponent>(std::move(animation));
+    auto rectangleEntity = std::make_unique<Entity>(GenerateId());
+    rectangleEntity->AddComponent<DrawableComponent>(std::move(drawable));
+    rectangleEntity->AddComponent<TransformComponent>(transform);
+    rectangleEntity->AddComponent<AnimationComponent>(animation);
 
-    AddEntity(std::move(entity));
+    AddEntity(std::move(rectangleEntity));
 
     // --- Create the Systems ---
-    auto renderer = std::make_unique<DrawableRenderer>();
-    AddSystem(std::move(renderer));
-    auto animationSystem = std::make_unique<AnimationSystem>();
-    AddSystem(std::move(animationSystem));
+    AddSystem(std::make_unique<DrawableRenderer>());
+    AddSystem(std::make_unique<AnimationSystem>());
 }
 
 void DemoScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)

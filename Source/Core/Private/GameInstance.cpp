@@ -27,12 +27,8 @@ void GameInstance::Run(sf::RenderWindow& renderWindow)
         // Call Hierarchy: GameInstance -> GameController -> GameState
         //                              -> SceneManager -> Scene -> Systems -> Components
         HandleEvents(renderWindow);
-
-        if (renderWindow.hasFocus())
-        {
-            Update(deltaTime);
-            Render(renderWindow);
-        }
+        Update(deltaTime);
+        Render(renderWindow);
     }
 }
 
@@ -43,15 +39,6 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
         if (event->is<sf::Event::Closed>())
         {
             renderWindow.close();
-        }
-        else if (event->is<sf::Event::Resized>())
-        {
-        }
-        else if (event->is<sf::Event::FocusLost>())
-        {
-        }
-        else if (event->is<sf::Event::FocusGained>())
-        {
         }
 
         // We delegate the event to the game controller

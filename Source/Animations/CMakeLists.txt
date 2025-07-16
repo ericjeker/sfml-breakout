@@ -4,8 +4,6 @@ set(SOURCE_FILES
         Private/Gameplay/MainMenuState.cpp
         Private/Scenes/DemoScene.cpp
         Private/Scenes/PauseScene.cpp
-        Private/Systems/AnimationSystem.cpp
-        Private/Systems/DrawableRenderer.cpp
 )
 
 # --- Create the main library ---

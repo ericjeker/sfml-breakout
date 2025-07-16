@@ -35,7 +35,16 @@ public:
     void AddScene(std::unique_ptr<T> scene)
     {
         static_assert(std::is_base_of_v<Scene, T>, "T must inherit from Scene");
-        _scenes[std::type_index(typeid(T))] = std::move(scene);
+
+        const std::type_index typeIndex(typeid(T));
+
+        if (_scenes.contains(typeIndex))
+        {
+            throw std::runtime_error("Scene already exists");
+        }
+
+        _sceneOrder.push_back(typeIndex);
+        _scenes[typeIndex] = std::move(scene);
     }
 
     template <typename T>
@@ -95,8 +104,10 @@ public:
     void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow);
 
 private:
-    ResourceManager& _resourceManager;
     std::unordered_map<std::type_index, std::unique_ptr<Scene>> _scenes;
+    std::vector<std::type_index> _sceneOrder;
+
+    ResourceManager& _resourceManager;
 };
 
 

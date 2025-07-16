@@ -25,13 +25,6 @@ It is also where the game loop is started (`Run()`), and the root of the call hi
 
 The `GameInstance` also holds the instance of the Window where everything will be drawn.
 
-Four events are processed:
-
-- Closed: when the user closes the window (Alt+F4, or clicking on the close button)
-- Resized: the user resized the window, this event is pushed down the call hierarchy so that the scene can be redrawn
-- FocusLost: pause the game loop
-- FocusGained: resume the game loop
-
 ## GameController
 
 Responsible for handling the game flow using a Stack State Pattern holding different GameStates. Multiple game states can
@@ -56,7 +49,7 @@ Responsible for loading and unloading scenes and keeping track of the current lo
 scenes in two different modes: single or additive. `Single` mode cleans up the previously loaded scenes before loading
 the new scene. `Additive` loads the new scene on top of the previous one as to create an overlay system.
 
-## Scene / UIScene
+## Scene / ECSScene / UIScene / CinematicScene
 
 A scene is a cohesive set of game objects (entities) or UI Elements that can be handled with an ECS system or
 a UI Manager.

@@ -6,7 +6,6 @@
 
 
 struct Component {
-    virtual ~Component() = default;
 };
 
 

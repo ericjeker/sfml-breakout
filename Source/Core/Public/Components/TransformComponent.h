@@ -11,9 +11,9 @@
 
 struct TransformComponent final : Component
 {
-    sf::Vector2f position;
-    sf::Angle rotation;
-    sf::Vector2f scale;
+    sf::Vector2f position{0.f, 0.f};
+    sf::Angle rotation = sf::degrees(0);
+    sf::Vector2f scale{1.f, 1.f};
 };
 
 

@@ -15,26 +15,29 @@ SceneManager::SceneManager(ResourceManager& resourceManager)
 
 void SceneManager::CleanUp()
 {
-    for (const auto& val : _scenes | std::views::values)
+    for (const auto& scene : _scenes | std::views::values)
     {
-        val->Shutdown();
-        val->SetLoaded(false);
+        scene->Shutdown();
+        scene->SetLoaded(false);
     }
 }
 
 void SceneManager::Update(const float deltaTime)
 {
-    for (const auto& val : _scenes | std::views::values)
+    for (const auto& scene : _scenes | std::views::values)
     {
-        val->Update(deltaTime);
+        scene->Update(deltaTime);
     }
 }
 
 void SceneManager::Render(sf::RenderWindow& window)
 {
-    for (const auto& val : _scenes | std::views::values)
+    for (const auto& typeIndex : _sceneOrder)
     {
-        val->Render(window);
+        if (const auto& scene = _scenes[typeIndex]; scene->IsLoaded())
+        {
+            scene->Render(window);
+        }
     }
 }
 

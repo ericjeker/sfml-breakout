@@ -1,9 +1,9 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "AnimationSystem.h"
+#include "Systems/AnimationSystem.h"
 
-#include "../Components/AnimationComponent.h"
-#include "../Components/TransformComponent.h"
+#include "Components/AnimationComponent.h"
+#include "Components/TransformComponent.h"
 
 void AnimationSystem::Update(const std::vector<std::unique_ptr<Entity>>& entities, const float deltaTime)
 {
@@ -12,6 +12,11 @@ void AnimationSystem::Update(const std::vector<std::unique_ptr<Entity>>& entitie
     {
         auto* animation = entity->GetComponent<AnimationComponent>();
         auto* transform = entity->GetComponent<TransformComponent>();
+
+        if (!animation || !transform)
+        {
+            continue;
+        }
 
         animation->elapsed += deltaTime;
         float progress = animation->elapsed / animation->duration;
