@@ -68,6 +68,11 @@ void DemoScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWin
 {
     Scene::HandleEvent(event, window);
 
+    if (!IsLoaded())
+    {
+        return;
+    }
+
     if (event->is<sf::Event::MouseButtonPressed>())
     {
         LOG_DEBUG("(DemoScene:HandleEvent): Mouse button pressed");

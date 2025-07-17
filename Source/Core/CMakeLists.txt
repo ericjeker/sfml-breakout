@@ -12,6 +12,8 @@ set(SOURCE_FILES
         Private/Scenes/Scene.cpp
         Private/Systems/AnimationSystem.cpp
         Private/Systems/DrawableRenderer.cpp
+        Private/Systems/PhysicsSystem.cpp
+        Private/Systems/ScreenBounceSystem.cpp
         Private/Systems/System.cpp
 )
 

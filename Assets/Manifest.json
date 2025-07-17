@@ -5,6 +5,11 @@
       "name": "Fonts",
       "assets": [
         {
+          "name": "Orbitron-Bold",
+          "type": "font",
+          "path": "Assets/Fonts/Orbitron/Orbitron-Bold.ttf"
+        },
+        {
           "name": "Orbitron-Regular",
           "type": "font",
           "path": "Assets/Fonts/Orbitron/Orbitron-Regular.ttf"

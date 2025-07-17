@@ -15,6 +15,6 @@ constexpr bool isFullscreen = false;
 
 constexpr unsigned int framesPerSecond = 60;
 constexpr bool isVSync = true;
-constexpr unsigned int antiAliasingLevel = 16;
+constexpr unsigned int antiAliasingLevel = 4;
 
 } // namespace ApplicationConfiguration

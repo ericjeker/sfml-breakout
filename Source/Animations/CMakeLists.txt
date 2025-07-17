@@ -2,8 +2,11 @@ set(SOURCE_FILES
         Private/Animations.cpp
         Private/Main.cpp
         Private/Gameplay/MainMenuState.cpp
+        Private/Scenes/BouncingBallScene.cpp
+        Private/Scenes/DebugScene.cpp
         Private/Scenes/DemoScene.cpp
         Private/Scenes/PauseScene.cpp
+        Private/Systems/FpsSystem.cpp
 )
 
 # --- Create the main library ---

@@ -11,6 +11,40 @@
 - [ ] Entity, Component, System Factories
 - [ ] Load scenes, entities, components, systems from serialized files
 
+## General Optimizations
+
+### 1. Rendering Optimizations
+
+- Batch rendering: Instead of drawing each ball individually, use `sf::VertexArray` or `sf::VertexBuffer` to draw
+  multiple balls in a single draw call
+- Culling: Only render balls that are visible on screen
+- Sprite batching: Use texture atlases and batch similar sprites together
+
+### 2. Physics Optimizations
+
+- Spatial partitioning: Use a spatial hash grid, quadtree, or broad-phase collision detection
+- Object pooling: Reuse ball objects instead of creating/destroying them
+- Fixed timestep: Use a fixed timestep for physics calculations to improve consistency
+
+### 3. ECS Optimizations
+
+- Component data layout: Use Structure of Arrays (SoA) instead of Array of Structures (AoS) for better cache
+  locality
+- System batching: Process components in batches to improve cache efficiency
+- Memory alignment: Ensure components are properly aligned in memory
+
+### 4. SFML-Specific Optimizations
+
+- Reduce state changes: Minimize texture binding and shader changes
+- Use sf::Transform: Cache transformation matrices instead of recalculating them
+- Profile with sf::Clock: Measure actual frame times to identify bottlenecks
+
+### 5. General C++ Optimizations
+
+- Avoid dynamic allocation: Use object pools and stack allocation where possible
+- Profile-guided optimization: Use profilers to identify hotspots
+- Compiler flags: Use `-O3` and appropriate optimization flags
+
 ## Games
 
 ### 1. Bouncing Ball Animation

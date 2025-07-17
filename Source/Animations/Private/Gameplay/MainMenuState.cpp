@@ -2,6 +2,8 @@
 
 #include "MainMenuState.h"
 
+#include "../Scenes/BouncingBallScene.h"
+#include "../Scenes/DebugScene.h"
 #include "../Scenes/DemoScene.h"
 #include "../Scenes/PauseScene.h"
 #include "Logger.h"
@@ -10,19 +12,22 @@
 MainMenuState::MainMenuState(GameService& gameService)
     : GameState(gameService)
 {
-    LOG_DEBUG("(MainMenuState::MainMenuState): Adding DemoScene to the SceneManager");
     auto& sceneManager = GetGameService().Get<SceneManager>();
     auto& resourceManager = GetGameService().Get<ResourceManager>();
     auto& eventManager = GetGameService().Get<EventManager>();
 
+    LOG_DEBUG("(MainMenuState::MainMenuState): Adding scenes to the SceneManager");
+    sceneManager.AddScene<BouncingBallScene>(std::make_unique<BouncingBallScene>(resourceManager, eventManager));
     sceneManager.AddScene<DemoScene>(std::make_unique<DemoScene>(resourceManager, eventManager));
     sceneManager.AddScene<PauseScene>(std::make_unique<PauseScene>(resourceManager, eventManager));
+    sceneManager.AddScene<DebugScene>(std::make_unique<DebugScene>(resourceManager, eventManager));
 }
 
 void MainMenuState::Enter()
 {
-    LOG_DEBUG("(MainMenuState::Enter): Loading DemoScene");
-    GetGameService().Get<SceneManager>().LoadScene<DemoScene>(SceneLoadMode::Single);
+    LOG_DEBUG("(MainMenuState::Enter): Loading BouncingBallScene");
+    GetGameService().Get<SceneManager>().LoadScene<BouncingBallScene>(SceneLoadMode::Single);
+    GetGameService().Get<SceneManager>().LoadScene<DebugScene>(SceneLoadMode::Additive);
 }
 
 void MainMenuState::Exit()
@@ -41,7 +46,7 @@ void MainMenuState::HandleEvent(const std::optional<sf::Event>& event, sf::Rende
 
     if (event->is<sf::Event::FocusLost>())
     {
-        sceneManager.GetScene<DemoScene>().Pause();
+        sceneManager.GetScene<BouncingBallScene>().Pause();
         sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
         _isPaused = true;
     }
@@ -55,12 +60,12 @@ void MainMenuState::HandleEvent(const std::optional<sf::Event>& event, sf::Rende
             if (_isPaused)
             {
                 sceneManager.UnloadScene<PauseScene>();
-                sceneManager.GetScene<DemoScene>().Resume();
+                sceneManager.GetScene<BouncingBallScene>().Resume();
                 _isPaused = false;
             }
             else
             {
-                sceneManager.GetScene<DemoScene>().Pause();
+                sceneManager.GetScene<BouncingBallScene>().Pause();
                 sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
                 _isPaused = true;
             }

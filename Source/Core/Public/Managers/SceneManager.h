@@ -54,12 +54,14 @@ public:
 
         if (mode == SceneLoadMode::Single)
         {
+            LOG_DEBUG("(SceneManager): Cleaning up for loading in Single mode.");
             CleanUp();
         }
 
         auto it = _scenes.find(std::type_index(typeid(T)));
         if (it != _scenes.end() && !it->second->IsLoaded())
         {
+            LOG_DEBUG("(SceneManager): Loading scene " + std::string(typeid(T).name()) + ".");
             it->second->Initialize();
             it->second->SetLoaded(true);
         }

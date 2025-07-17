@@ -1,0 +1,16 @@
+// Copyright (c) Eric Jeker 2025.
+
+#pragma once
+#ifndef DEBUGSCENE_H
+#define DEBUGSCENE_H
+#include "Scenes/Scene.h"
+
+
+class DebugScene final : public Scene {
+public:
+    DebugScene(ResourceManager& resourceManager, EventManager& eventManager);
+    void Initialize() override;
+};
+
+
+#endif
