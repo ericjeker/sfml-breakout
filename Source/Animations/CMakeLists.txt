@@ -6,6 +6,7 @@ set(SOURCE_FILES
         Private/Scenes/DebugScene.cpp
         Private/Scenes/DemoScene.cpp
         Private/Scenes/PauseScene.cpp
+        Private/Systems/CleanUpSystem.cpp
         Private/Systems/FpsSystem.cpp
 )
 

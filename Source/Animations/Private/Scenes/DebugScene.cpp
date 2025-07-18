@@ -18,7 +18,7 @@ void DebugScene::Initialize()
 {
     const auto font = GetResourceManager().GetResource<sf::Font>("Orbitron-Bold");
     auto fpsText = std::make_unique<sf::Text>(*font, "", 10);
-    fpsText->setFillColor(NordTheme::PolarNight1);
+    fpsText->setFillColor(NordTheme::SnowStorm3);
 
     auto entity = std::make_unique<Entity>(GenerateId());
     entity->AddComponent<DrawableComponent>({.drawable = std::move(fpsText)});

@@ -11,7 +11,7 @@ class PhysicsSystem final : public System
 {
 public:
     PhysicsSystem(sf::Vector2f gravity, float pixelsPerCentimeters);
-    void Update(const std::vector<std::unique_ptr<Entity>>& entities, float deltaTime) override;
+    void Update(const std::unique_ptr<Entity>& entity, float deltaTime) override;
 
 private:
     sf::Vector2f _gravity{0.f, 0.f};

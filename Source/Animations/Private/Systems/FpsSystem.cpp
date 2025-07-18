@@ -7,30 +7,27 @@
 
 #include <SFML/Graphics/Text.hpp>
 
-void FpsSystem::Update(const std::vector<std::unique_ptr<Entity>>& entities, float deltaTime)
+void FpsSystem::Update(const std::unique_ptr<Entity>& entity, const float deltaTime)
 {
-    for (const auto& entity : entities)
+    if (!entity->HasComponent<DrawableComponent>() || !entity->HasComponent<FpsComponent>())
     {
-        if (!entity->HasComponent<DrawableComponent>() || !entity->HasComponent<FpsComponent>())
-        {
-            continue;
-        }
+        return;
+    }
 
-        auto *drawable = entity->GetComponent<DrawableComponent>();
-        auto *const fps = entity->GetComponent<FpsComponent>();
+    auto* drawable = entity->GetComponent<DrawableComponent>();
+    auto* const fps = entity->GetComponent<FpsComponent>();
 
-        fps->timeSinceLastUpdate += deltaTime;
-        if (fps->timeSinceLastUpdate < fps->updateEvery)
-        {
-            continue;
-        }
-        fps->timeSinceLastUpdate = 0.f;
+    fps->timeSinceLastUpdate += deltaTime;
+    if (fps->timeSinceLastUpdate < fps->updateEvery)
+    {
+        return;
+    }
+    fps->timeSinceLastUpdate = 0.f;
 
-        fps->fps = 1.f / deltaTime;
+    fps->fps = 1.f / deltaTime;
 
-        if (auto* text = dynamic_cast<sf::Text*>(drawable->drawable.get()))
-        {
-            text->setString(std::to_string(fps->fps));
-        }
+    if (auto* text = dynamic_cast<sf::Text*>(drawable->drawable.get()))
+    {
+        text->setString(std::to_string(fps->fps));
     }
 }

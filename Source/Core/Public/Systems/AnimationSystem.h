@@ -10,7 +10,7 @@
 class AnimationSystem final : public System
 {
 public:
-    void Update(const std::vector<std::unique_ptr<Entity>>& entities, float deltaTime) override;
+    void Update(const std::unique_ptr<Entity>& entity, float deltaTime) override;
 
 private:
     float lerp(const float a, const float b, const float t)

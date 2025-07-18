@@ -43,6 +43,13 @@ public:
         return components.contains(std::type_index(typeid(T)));
     }
 
+    template <typename T>
+    void RemoveComponent()
+    {
+        static_assert(std::is_base_of_v<Component, T>, "T must inherit from Component");
+        components.erase(std::type_index(typeid(T)));
+    }
+
     int GetId() const
     {
         return _id;

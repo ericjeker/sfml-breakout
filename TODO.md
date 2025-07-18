@@ -26,7 +26,7 @@
 
 ## Bugs / Improvements
 
-- [ ] ScreenBouncing doesn't account for drawable size
+- [x] ScreenBouncing doesn't account for drawable size
 - [ ] MainMenuState contains everything, it should be a game selector with a FSM
 
 ## Clean Code
@@ -74,21 +74,23 @@
 
 ### 1. Bouncing Ball Animation
 
-- Simple physics simulation with a ball bouncing around the screen
+- [x] Simple physics simulation with a ball bouncing around the screen
 - Tests: Basic rendering, animation system, collision detection with screen boundaries
 - Great for showcasing smooth movement and your animation framework
 
 #### Visual Enhancements
+
 - Trail Effects: Add particle trails behind each ball that fade over time
 - Color Variations: Make balls change color based on velocity, or cycle through colors
 - Size Variations: Create balls of different sizes with different physics properties
 - Lighting Effects: Add a simple bloom or glow effect around the balls
 
 #### Interactive Features
+
 - Mouse Interaction:
-    - Click to spawn new balls at mouse position
-    - Mouse repulsion/attraction forces
-    - Click and drag to create balls with initial velocity
+    - [x] Click to spawn new balls at the mouse position
+    - [ ] Mouse repulsion/attraction forces
+    - [x] Click and drag to create balls with initial velocity
 
 - Keyboard Controls:
     - Toggle gravity on/off
@@ -97,12 +99,14 @@
     - Reset scene
 
 #### Physics Enhancements
+
 - Ball-to-Ball Collisions: Implement elastic collisions between balls
 - Different Materials: Give balls different bounce coefficients and friction
 - Air Resistance: Add drag force that increases with velocity
 - Magnetic/Electric Forces: Add attraction/repulsion between certain balls
 
 #### Advanced Challenges
+
 - Spatial Partitioning: Implement a quadtree or grid for efficient collision detection
 - Performance Optimization: Profile and optimize to handle 1000+ balls smoothly
 - Collision Response: Add realistic physics with conservation of momentum
@@ -110,6 +114,7 @@
 - Fluid Dynamics: Simulate basic fluid-like behavior when balls cluster
 
 #### Game-like Features
+
 - Score System: Points for ball interactions or achieving certain patterns
 - Power-ups: Special balls that affect others when they collide
 - Obstacles: Add static or moving obstacles in the scene

@@ -15,13 +15,9 @@ public:
     System() = default;
     virtual ~System() = default;
 
-    virtual void Update(const std::vector<std::unique_ptr<Entity>>& entities, float deltaTime);
-    virtual void Render(const std::vector<std::unique_ptr<Entity>>& entities, sf::RenderWindow& window);
-    virtual void HandleEvent(
-        const std::vector<std::unique_ptr<Entity>>& entities,
-        const std::optional<sf::Event>& event,
-        sf::RenderWindow& window
-    );
+    virtual void Update(const std::unique_ptr<Entity>& entity, float deltaTime);
+    virtual void Render(const std::unique_ptr<Entity>& entity, sf::RenderWindow& window);
+    virtual void HandleEvent(const std::unique_ptr<Entity>& entity, const std::optional<sf::Event>& event, sf::RenderWindow& window);
 };
 
 

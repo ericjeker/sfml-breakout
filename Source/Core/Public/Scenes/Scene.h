@@ -46,13 +46,13 @@ public:
     void Pause();
     void Resume();
 
-    // -- Scene Description --
+    // --- Scene Description ---
     [[nodiscard]] const std::string& GetName() const;
     [[nodiscard]] const std::string& GetPath() const;
     void SetName(const std::string& name);
     void SetPath(const std::string& path);
 
-    // -- Entity Management --
+    // --- Entity Management ---
     static int GenerateId();
 
     void AddEntity(std::unique_ptr<Entity> entity);
@@ -60,12 +60,23 @@ public:
     [[nodiscard]] Entity* GetEntity(int id) const;
     std::vector<std::unique_ptr<Entity>>& GetEntities();
 
-    // -- System Management --
+    template <typename T>
+    [[nodiscard]] Entity* GetEntityWithComponent() {
+        const auto it = std::find_if(
+            std::begin(_entities),
+            std::end(_entities),
+            [](const std::unique_ptr<Entity>& entity) { return entity->HasComponent<T>(); }
+        );
+
+        return it != std::end(_entities) ? static_cast<Entity*>(it->get()) : nullptr;
+    };
+
+    // --- System Management ---
     void AddSystem(std::unique_ptr<System> system);
 
-    // -- Accessors --
-    EventManager& GetEventManager() const;
-    ResourceManager& GetResourceManager() const;
+    // --- Accessors ---
+    [[nodiscard]] EventManager& GetEventManager() const;
+    [[nodiscard]] ResourceManager& GetResourceManager() const;
 
 private:
     std::string _name;

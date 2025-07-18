@@ -30,7 +30,10 @@ void Scene::Update(const float deltaTime)
 
     for (const auto& system : _systems)
     {
-        system->Update(GetEntities(), deltaTime);
+        for (const auto& entity : GetEntities())
+        {
+            system->Update(entity, deltaTime);
+        }
     }
 }
 
@@ -43,7 +46,10 @@ void Scene::Render(sf::RenderWindow& window)
 
     for (const auto& system : _systems)
     {
-        system->Render(GetEntities(), window);
+        for (const auto& entity : GetEntities())
+        {
+            system->Render(entity, window);
+        }
     }
 }
 
@@ -54,10 +60,13 @@ void Scene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow&
         return;
     }
 
-    for (const auto& system : _systems)
-    {
-        system->HandleEvent(GetEntities(), event, renderWindow);
-    }
+    // for (const auto& system : _systems)
+    // {
+    //     for (const auto& entity : GetEntities())
+    //     {
+    //         system->HandleEvent(entity, event, renderWindow);
+    //     }
+    // }
 }
 
 bool Scene::IsLoaded() const

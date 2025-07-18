@@ -10,7 +10,7 @@ class ScreenBounceSystem final : public System
 {
 public:
     explicit ScreenBounceSystem(sf::Vector2u screenSize);
-    void Update(const std::vector<std::unique_ptr<Entity>>& entities, float deltaTime) override;
+    void Update(const std::unique_ptr<Entity>& entity, float deltaTime) override;
 
 private:
     sf::Vector2u _screenSize;

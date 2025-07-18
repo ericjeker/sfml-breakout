@@ -13,7 +13,7 @@
 class DrawableRenderer final : public System
 {
 public:
-    void Render(const std::vector<std::unique_ptr<Entity>>& entities, sf::RenderWindow& window) override;
+    void Render(const std::unique_ptr<Entity>& entity, sf::RenderWindow& window) override;
 };
 
 

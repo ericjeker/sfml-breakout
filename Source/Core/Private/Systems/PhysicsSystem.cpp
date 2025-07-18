@@ -2,6 +2,7 @@
 
 #include "Systems/PhysicsSystem.h"
 
+#include "../../../Animations/Private/Components/PlayerPossessedComponent.h"
 #include "Components/PhysicsComponent.h"
 #include "Components/TransformComponent.h"
 
@@ -11,13 +12,12 @@ PhysicsSystem::PhysicsSystem(const sf::Vector2f gravity, const float pixelsPerCe
 {
 }
 
-void PhysicsSystem::Update(const std::vector<std::unique_ptr<Entity>>& entities, const float deltaTime)
+void PhysicsSystem::Update(const std::unique_ptr<Entity>& entity, const float deltaTime)
 {
-    for (const auto& entity : entities)
-    {
-        if (!entity->HasComponent<PhysicsComponent>() || !entity->HasComponent<TransformComponent>())
+        if (entity->HasComponent<PlayerPossessedComponent>() || !entity->HasComponent<PhysicsComponent>() ||
+            !entity->HasComponent<TransformComponent>())
         {
-            continue;
+            return;
         }
 
         auto* physics = entity->GetComponent<PhysicsComponent>();
@@ -30,5 +30,5 @@ void PhysicsSystem::Update(const std::vector<std::unique_ptr<Entity>>& entities,
 
         transform->position += physics->velocity * deltaTime;
         physics->acceleration = sf::Vector2f(0.f, 0.f);
-    }
+
 }

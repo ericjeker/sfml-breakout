@@ -13,7 +13,10 @@ public:
     void Initialize() override;
     void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
 
-    std::unique_ptr<Entity> CreateBallEntity(sf::Vector2f position, sf::Vector2f velocity);
+    static std::unique_ptr<Entity> CreateBallEntity(sf::Vector2f position, sf::Vector2f velocity);
+
+private:
+    sf::Vector2i _throwStartPos;
 };
 
 

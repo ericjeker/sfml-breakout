@@ -7,24 +7,21 @@
 
 #include <SFML/Graphics/Transformable.hpp>
 
-void DrawableRenderer::Render(const std::vector<std::unique_ptr<Entity>>& entities, sf::RenderWindow& window)
+void DrawableRenderer::Render(const std::unique_ptr<Entity>& entity, sf::RenderWindow& window)
 {
-    for (const auto& entity : entities)
+    const auto* transform = entity->GetComponent<TransformComponent>();
+    const auto* drawable = entity->GetComponent<DrawableComponent>();
+
+    if (!transform || !drawable)
     {
-        auto* transform = entity->GetComponent<TransformComponent>();
-        auto* drawable = entity->GetComponent<DrawableComponent>();
+        return;
+    }
 
-        if (!transform || !drawable)
-        {
-            return;
-        }
-
-        if (auto* transformable = dynamic_cast<sf::Transformable*>(drawable->drawable.get()))
-        {
-            transformable->setPosition(transform->position);
-            transformable->setRotation(transform->rotation);
-            transformable->setScale(transform->scale);
-            window.draw(*drawable->drawable);
-        }
+    if (auto* transformable = dynamic_cast<sf::Transformable*>(drawable->drawable.get()))
+    {
+        transformable->setPosition(transform->position);
+        transformable->setRotation(transform->rotation);
+        transformable->setScale(transform->scale);
+        window.draw(*drawable->drawable);
     }
 }
