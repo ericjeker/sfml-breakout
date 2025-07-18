@@ -11,8 +11,6 @@ ScreenBounceSystem::ScreenBounceSystem(const sf::Vector2u screenSize) : _screenS
 }
 void ScreenBounceSystem::Update(const std::vector<std::unique_ptr<Entity>>& entities, const float deltaTime)
 {
-    System::Update(entities, deltaTime);
-
     for (const auto& entity : entities)
     {
         if (!entity->HasComponent<PhysicsComponent>() || !entity->HasComponent<TransformComponent>())

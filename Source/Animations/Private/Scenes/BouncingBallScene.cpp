@@ -55,9 +55,9 @@ void BouncingBallScene::Initialize()
         AddEntity(std::move(CreateBallEntity(position, velocity)));
     }
 
-    // Add the systems
-    constexpr float pixelsPerMeter = ApplicationConfiguration::windowSize.x / 2.f;
-    AddSystem(std::make_unique<PhysicsSystem>(sf::Vector2f{0.f, 9.81f}, pixelsPerMeter));
+    // --- Add the systems ---
+    constexpr float pixelsPerCentimeters = ApplicationConfiguration::windowSize.x / 200.f;
+    AddSystem(std::make_unique<PhysicsSystem>(sf::Vector2f{0.f, 981.f}, pixelsPerCentimeters));
     AddSystem(std::make_unique<ScreenBounceSystem>(ApplicationConfiguration::windowSize));
     AddSystem(std::make_unique<DrawableRenderer>());
 }
@@ -74,7 +74,7 @@ void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::R
     if (event->is<sf::Event::MouseButtonPressed>())
     {
         LOG_DEBUG("(BouncingBallScene:HandleEvent): Mouse button pressed");
-        const auto position = sf::Mouse::getPosition();
+        const auto position = sf::Mouse::getPosition(window);
         constexpr sf::Vector2f velocity{0.f, 0.f};
         AddEntity(std::move(CreateBallEntity(sf::Vector2f(position), velocity)));
     }
@@ -91,7 +91,7 @@ std::unique_ptr<Entity> BouncingBallScene::CreateBallEntity(const sf::Vector2f p
     auto ballEntity = std::make_unique<Entity>(GenerateId());
     ballEntity->AddComponent<DrawableComponent>({.drawable = std::move(ball)});
     ballEntity->AddComponent<TransformComponent>({.position = position});
-    ballEntity->AddComponent<PhysicsComponent>({.velocity = velocity, .friction = 0.98});
+    ballEntity->AddComponent<PhysicsComponent>({.velocity = velocity, .friction = 0.98f});
 
     return ballEntity;
 }

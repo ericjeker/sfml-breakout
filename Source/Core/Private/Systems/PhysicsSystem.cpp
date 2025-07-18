@@ -5,9 +5,9 @@
 #include "Components/PhysicsComponent.h"
 #include "Components/TransformComponent.h"
 
-PhysicsSystem::PhysicsSystem(const sf::Vector2f gravity, const float pixelsPerMeter)
+PhysicsSystem::PhysicsSystem(const sf::Vector2f gravity, const float pixelsPerCentimeters)
     : _gravity(gravity)
-    , _pixelsPerMeter(pixelsPerMeter)
+    , _pixelsPerCentimeters(pixelsPerCentimeters)
 {
 }
 
@@ -23,9 +23,11 @@ void PhysicsSystem::Update(const std::vector<std::unique_ptr<Entity>>& entities,
         auto* physics = entity->GetComponent<PhysicsComponent>();
         auto* transform = entity->GetComponent<TransformComponent>();
 
-        physics->acceleration += _gravity * _pixelsPerMeter * deltaTime;
+        physics->acceleration += _gravity * _pixelsPerCentimeters;
 
-        physics->velocity += physics->acceleration * physics->friction * deltaTime;
+        physics->velocity += physics->acceleration * deltaTime;
+        physics->velocity *= physics->friction;
+
         transform->position += physics->velocity * deltaTime;
         physics->acceleration = sf::Vector2f(0.f, 0.f);
     }
