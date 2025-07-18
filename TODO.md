@@ -9,6 +9,7 @@
 - [ ] AudioManager
 - [ ] CameraManager, CameraSystem, Scrolling, Culling (?)
 - [ ] UIManager, GraphScene, SceneNode
+- [ ] Reusable ObjectPool
 
 ## Features
 
@@ -22,6 +23,17 @@
   - [ ] Possession
 - [ ] AnimationSystem, SpriteAnimations
 - [ ] ParticleSystem, ShaderEffects
+
+## Bugs / Improvements
+
+- [ ] ScreenBouncing doesn't account for drawable size
+- [ ] MainMenuState contains everything, it should be a game selector with a FSM
+
+## Clean Code
+
+- [ ] Remove magic numbers in BouncingBallScene (radius, gravity, etc.)
+- [ ] Error handling can certainly be improved everywhere
+
 
 ## General Optimizations
 
@@ -43,7 +55,8 @@
 - Component data layout: Use Structure of Arrays (SoA) instead of Array of Structures (AoS) for better cache
   locality
 - System batching: Process components in batches to improve cache efficiency
-- Memory alignment: Ensure components are properly aligned in memory
+- Memory alignment: Ensure components are properly aligned in memory using a ComponentManager
+- Filter entities: Systems should not loop all the entities/components, only the one they need
 
 ### 4. SFML-Specific Optimizations
 
@@ -105,9 +118,17 @@
 
 ### 2. Simple Snake Game
 
+#### Features
+
 - Classic snake that grows when eating food
 - Tests: Input handling, game state management, collision detection, score tracking
 - Uses basic sprites and grid-based movement
+
+#### Implementations
+
+- `SimpleSnakeScene`
+
+#### Improvements
 
 ### 3. Asteroid Field
 
