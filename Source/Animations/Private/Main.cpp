@@ -44,8 +44,8 @@ int main()
     gameService->Register<SceneManager>(std::make_unique<SceneManager>(gameService->Get<ResourceManager>()));
     gameService->Register<GameController>(std::make_unique<GameController>());
     gameService->Register<EventManager>(std::make_unique<EventManager>());
-    // NetworkManager
-    // AudioManager
+    // TODO: NetworkManager
+    // TODO: AudioManager
 
     // Create the game instance
     LOG_DEBUG("(Main::main): Creating the GameInstance");

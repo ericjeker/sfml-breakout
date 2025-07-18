@@ -26,7 +26,7 @@ void PhysicsSystem::Update(const std::unique_ptr<Entity>& entity, const float de
     physics->acceleration += _gravity * _pixelsPerCentimeters;
 
     physics->velocity += physics->acceleration * deltaTime;
-    physics->velocity *= physics->friction;
+    physics->velocity *= physics->damping;
 
     transform->position += physics->velocity * deltaTime;
     physics->acceleration = sf::Vector2f(0.f, 0.f);

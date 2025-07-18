@@ -4,6 +4,8 @@
 #ifndef PHYSICSCONSTANTS_H
 #define PHYSICSCONSTANTS_H
 
+#include "ApplicationConfiguration.h"
+
 #include <SFML/System/Vector2.hpp>
 
 namespace PhysicsConstants
@@ -16,10 +18,11 @@ constexpr sf::Vector2f GRAVITY_UP = {0.f, -EARTH_GRAVITY};
 constexpr sf::Vector2f NO_GRAVITY = {0.f, 0.f};
 
 // Other physics constants
-constexpr float DEFAULT_FRICTION = 0.98f;
-constexpr float DEFAULT_BALL_RADIUS = 5.f;
+constexpr float DEFAULT_DAMPING = 0.998f;
+constexpr float DEFAULT_BALL_RADIUS = 8.f;
 
-constexpr float PIXELS_PER_CENTIMETER = ApplicationConfiguration::WINDOW_SIZE.x / 200.f;
+// Consider that the height of the screen is 2 meters (200 cm) high
+constexpr float PIXELS_PER_CENTIMETER = ApplicationConfiguration::WINDOW_SIZE.y / 200.f;
 
 }
 

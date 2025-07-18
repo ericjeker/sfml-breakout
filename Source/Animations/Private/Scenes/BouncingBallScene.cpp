@@ -6,19 +6,20 @@
 #include "../Events/BallCountChangedEvent.h"
 #include "../Events/RequestBallCountEvent.h"
 #include "../Systems/CleanUpSystem.h"
-#include "ApplicationConfiguration.h"
-#include "Components/DrawableComponent.h"
-#include "Components/PhysicsComponent.h"
-#include "Components/TransformComponent.h"
-#include "PhysicsConstants.h"
-#include "Systems/DrawableRenderer.h"
-#include "Systems/PhysicsSystem.h"
-#include "Systems/ScreenBounceSystem.h"
 
 #include <SFML/Graphics/RectangleShape.hpp>
 
+#include <ApplicationConfiguration.h>
+#include <PhysicsConstants.h>
+#include <Systems/DrawableRenderer.h>
+#include <Systems/PhysicsSystem.h>
+#include <Systems/ScreenBounceSystem.h>
 #include <Themes/Nord.h>
 #include <random>
+
+#include <Components/DrawableComponent.h>
+#include <Components/PhysicsComponent.h>
+#include <Components/TransformComponent.h>
 
 BouncingBallScene::BouncingBallScene(ResourceManager& resourceManager, EventManager& eventManager)
     : Scene(resourceManager, eventManager)
@@ -57,7 +58,7 @@ void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::R
 {
     Scene::HandleEvent(event, window);
 
-    if (!IsLoaded())
+    if (!IsLoaded() || IsPaused())
     {
         return;
     }
@@ -100,7 +101,7 @@ void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::R
             player->RemoveComponent<PlayerPossessedComponent>();
             player->AddComponent<PhysicsComponent>(
                 {.velocity = sf::Vector2f(delta.x, delta.y) * PhysicsConstants::PIXELS_PER_CENTIMETER,
-                 .friction = PhysicsConstants::DEFAULT_FRICTION}
+                 .damping = PhysicsConstants::DEFAULT_DAMPING}
             );
 
             if (auto* transform = player->GetComponent<TransformComponent>())
@@ -202,7 +203,7 @@ std::unique_ptr<Entity> BouncingBallScene::CreateBallEntity(const sf::Vector2f p
     auto ballEntity = std::make_unique<Entity>(GenerateId());
     ballEntity->AddComponent<DrawableComponent>({.drawable = std::move(ball)});
     ballEntity->AddComponent<TransformComponent>({.position = position});
-    ballEntity->AddComponent<PhysicsComponent>({.velocity = velocity, .friction = PhysicsConstants::DEFAULT_FRICTION});
+    ballEntity->AddComponent<PhysicsComponent>({.velocity = velocity, .damping = PhysicsConstants::DEFAULT_DAMPING});
 
     return ballEntity;
 }
