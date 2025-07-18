@@ -23,7 +23,7 @@ void DemoScene::Initialize()
     LOG_DEBUG("(DemoScene:Initialize)");
     Scene::Initialize();
 
-    auto background = std::make_unique<sf::RectangleShape>(sf::Vector2f{ApplicationConfiguration::windowSize});
+    auto background = std::make_unique<sf::RectangleShape>(sf::Vector2f{ApplicationConfiguration::WINDOW_SIZE});
     background->setFillColor(NordTheme::Frost1);
     background->setPosition({0.f, 0.f});
 

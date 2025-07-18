@@ -25,7 +25,7 @@ void PauseScene::Initialize()
     LOG_DEBUG("(PauseScene:Initialize)");
 
     // -- Overlay --
-    auto background = std::make_unique<sf::RectangleShape>(sf::Vector2f{ApplicationConfiguration::windowSize});
+    auto background = std::make_unique<sf::RectangleShape>(sf::Vector2f{ApplicationConfiguration::WINDOW_SIZE});
     auto backgroundColor = NordTheme::PolarNight1;
     backgroundColor.a = 127;
     background->setFillColor(backgroundColor);
@@ -41,8 +41,8 @@ void PauseScene::Initialize()
     text->setFillColor(NordTheme::SnowStorm3);
     text->setOrigin(text->getLocalBounds().size / 2.f);
 
-    const float centerX = ApplicationConfiguration::windowSize.x / 2;
-    const float centerY = ApplicationConfiguration::windowSize.y / 2;
+    const float centerX = ApplicationConfiguration::WINDOW_SIZE.x / 2;
+    const float centerY = ApplicationConfiguration::WINDOW_SIZE.y / 2;
 
     auto entity = std::make_unique<Entity>(GenerateId());
     entity->AddComponent<DrawableComponent>({.drawable = std::move(text)});

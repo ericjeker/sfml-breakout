@@ -150,6 +150,11 @@ std::vector<std::unique_ptr<Entity>>& Scene::GetEntities()
     return _entities;
 }
 
+void Scene::ClearEntities()
+{
+    _entities.clear();
+}
+
 void Scene::AddSystem(std::unique_ptr<System> system)
 {
     _systems.push_back(std::move(system));

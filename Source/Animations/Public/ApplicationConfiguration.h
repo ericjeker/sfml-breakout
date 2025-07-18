@@ -7,14 +7,14 @@
 namespace ApplicationConfiguration
 {
 
-constexpr auto windowTitle = "Animation System";
-constexpr sf::Vector2u windowSize = {1920, 1080};
-constexpr auto windowStyle = sf::Style::None;
-constexpr auto windowState = sf::State::Windowed;
-constexpr bool isFullscreen = false;
+constexpr auto WINDOW_TITLE = "Animation System";
+constexpr sf::Vector2u WINDOW_SIZE = {1920, 1080};
+constexpr auto WINDOW_STYLE = sf::Style::None;
+constexpr auto WINDOW_STATE = sf::State::Windowed;
+constexpr bool IS_FULL_SCREEN = false;
 
-constexpr unsigned int framesPerSecond = 60;
-constexpr bool isVSync = true;
-constexpr unsigned int antiAliasingLevel = 4;
+constexpr unsigned int FRAMES_PER_SECOND = 60;
+constexpr bool IS_VSYNC = true;
+constexpr unsigned int ANTI_ALIASING_LEVEL = 4;
 
 }

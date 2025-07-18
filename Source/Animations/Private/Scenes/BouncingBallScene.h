@@ -13,6 +13,12 @@ public:
     void Initialize() override;
     void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
 
+    void DecreaseGravity();
+    void IncreaseGravity();
+    void ResetSimulation();
+    void ToggleGravity();
+
+    void CreateBalls(int numberOfBalls);
     static std::unique_ptr<Entity> CreateBallEntity(sf::Vector2f position, sf::Vector2f velocity);
 
 private:

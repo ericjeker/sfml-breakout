@@ -93,10 +93,10 @@
     - [x] Click and drag to create balls with initial velocity
 
 - Keyboard Controls:
-    - Toggle gravity on/off
-    - Adjust gravity strength
-    - Pause/resume simulation
-    - Reset scene
+    - [x] Toggle gravity on/off
+    - [ ] Adjust gravity strength
+    - [x] Pause/resume simulation
+    - [x] Reset scene
 
 #### Physics Enhancements
 

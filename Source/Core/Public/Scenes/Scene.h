@@ -59,9 +59,24 @@ public:
     void RemoveEntity(int id);
     [[nodiscard]] Entity* GetEntity(int id) const;
     std::vector<std::unique_ptr<Entity>>& GetEntities();
+    void ClearEntities();
 
     template <typename T>
-    [[nodiscard]] Entity* GetEntityWithComponent() {
+    void ClearEntitiesWithComponent()
+    {
+        _entities.erase(
+            std::remove_if(
+                std::begin(_entities),
+                std::end(_entities),
+                [this](const std::unique_ptr<Entity>& entity) { return entity->HasComponent<T>(); }
+            ),
+            std::end(_entities)
+        );
+    }
+
+    template <typename T>
+    [[nodiscard]] Entity* GetEntityWithComponent()
+    {
         const auto it = std::find_if(
             std::begin(_entities),
             std::end(_entities),
@@ -74,7 +89,19 @@ public:
     // --- System Management ---
     void AddSystem(std::unique_ptr<System> system);
 
-    // --- Accessors ---
+    template <typename T>
+    [[nodiscard]] T* GetSystem()
+    {
+        const auto it = std::find_if(
+            std::begin(_systems),
+            std::end(_systems),
+            [](const std::unique_ptr<System>& system) { return dynamic_cast<T*>(system.get()) != nullptr; }
+        );
+
+        return it != std::end(_systems) ? static_cast<T*>(it->get()) : nullptr;
+    }
+
+    // --- Accessors for child classes ---
     [[nodiscard]] EventManager& GetEventManager() const;
     [[nodiscard]] ResourceManager& GetResourceManager() const;
 

@@ -25,6 +25,12 @@ public:
     void AddComponent(T component)
     {
         static_assert(std::is_base_of_v<Component, T>, "T must inherit from Component");
+
+        if (HasComponent<T>())
+        {
+            return;
+        }
+
         components[std::type_index(typeid(T))] = std::make_unique<T>(std::move(component));
     }
 
@@ -47,6 +53,12 @@ public:
     void RemoveComponent()
     {
         static_assert(std::is_base_of_v<Component, T>, "T must inherit from Component");
+
+        if (!HasComponent<T>())
+        {
+            return;
+        }
+
         components.erase(std::type_index(typeid(T)));
     }
 

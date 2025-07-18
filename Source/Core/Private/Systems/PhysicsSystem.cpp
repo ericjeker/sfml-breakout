@@ -14,21 +14,33 @@ PhysicsSystem::PhysicsSystem(const sf::Vector2f gravity, const float pixelsPerCe
 
 void PhysicsSystem::Update(const std::unique_ptr<Entity>& entity, const float deltaTime)
 {
-        if (entity->HasComponent<PlayerPossessedComponent>() || !entity->HasComponent<PhysicsComponent>() ||
-            !entity->HasComponent<TransformComponent>())
-        {
-            return;
-        }
+    if (entity->HasComponent<PlayerPossessedComponent>() || !entity->HasComponent<PhysicsComponent>() ||
+        !entity->HasComponent<TransformComponent>())
+    {
+        return;
+    }
 
-        auto* physics = entity->GetComponent<PhysicsComponent>();
-        auto* transform = entity->GetComponent<TransformComponent>();
+    auto* physics = entity->GetComponent<PhysicsComponent>();
+    auto* transform = entity->GetComponent<TransformComponent>();
 
-        physics->acceleration += _gravity * _pixelsPerCentimeters;
+    physics->acceleration += _gravity * _pixelsPerCentimeters;
 
-        physics->velocity += physics->acceleration * deltaTime;
-        physics->velocity *= physics->friction;
+    physics->velocity += physics->acceleration * deltaTime;
+    physics->velocity *= physics->friction;
 
-        transform->position += physics->velocity * deltaTime;
-        physics->acceleration = sf::Vector2f(0.f, 0.f);
+    transform->position += physics->velocity * deltaTime;
+    physics->acceleration = sf::Vector2f(0.f, 0.f);
+}
 
+void PhysicsSystem::ToggleGravity()
+{
+    if (_gravity.x > 0.f || _gravity.y > 0.f)
+    {
+        _oldGravity = _gravity;
+        _gravity *= 0.f;
+    }
+    else
+    {
+        _gravity = _oldGravity;
+    }
 }

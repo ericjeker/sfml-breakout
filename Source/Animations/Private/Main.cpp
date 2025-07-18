@@ -20,22 +20,22 @@
 int main()
 {
     // Create the window mode
-    const sf::VideoMode mode(ApplicationConfiguration::windowSize);
+    const sf::VideoMode mode(ApplicationConfiguration::WINDOW_SIZE);
 
     // Enable anti-aliasing
     sf::ContextSettings settings;
-    settings.antiAliasingLevel = ApplicationConfiguration::antiAliasingLevel;
+    settings.antiAliasingLevel = ApplicationConfiguration::ANTI_ALIASING_LEVEL;
 
     auto renderWindow = sf::RenderWindow(
         mode,
-        ApplicationConfiguration::windowTitle,
-        ApplicationConfiguration::windowStyle,
-        ApplicationConfiguration::windowState,
+        ApplicationConfiguration::WINDOW_TITLE,
+        ApplicationConfiguration::WINDOW_STYLE,
+        ApplicationConfiguration::WINDOW_STATE,
         settings
     );
 
-    renderWindow.setFramerateLimit(ApplicationConfiguration::framesPerSecond);
-    renderWindow.setVerticalSyncEnabled(ApplicationConfiguration::isVSync);
+    renderWindow.setFramerateLimit(ApplicationConfiguration::FRAMES_PER_SECOND);
+    renderWindow.setVerticalSyncEnabled(ApplicationConfiguration::IS_VSYNC);
 
     // Initialize the different managers
     auto gameService = std::make_unique<GameService>();
