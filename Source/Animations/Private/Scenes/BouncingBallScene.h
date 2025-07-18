@@ -9,8 +9,11 @@
 class BouncingBallScene final : public Scene {
 public:
     BouncingBallScene(ResourceManager& resourceManager, EventManager& eventManager);
+
     void Initialize() override;
     void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
+
+    std::unique_ptr<Entity> CreateBallEntity(sf::Vector2f position, sf::Vector2f velocity);
 };
 
 

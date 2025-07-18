@@ -39,27 +39,20 @@ void BouncingBallScene::Initialize()
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> distX(0.f, ApplicationConfiguration::windowSize.x);
     std::uniform_real_distribution<float> distY(0.f, ApplicationConfiguration::windowSize.y);
-    std::uniform_real_distribution<float> velX(0.f, 100.f);
-    std::uniform_real_distribution<float> velY(0.f, 100.f);
+    std::uniform_real_distribution<float> velX(-100.f, 100.f);
+    std::uniform_real_distribution<float> velY(-100.f, 100.f);
 
     // For now, I can go up to 5000 at 60 FPS, sounds pretty poor...
     // But let's show some self-compassion and be happy that the system works.
-    for (int i = 0; i < 50; ++i)
+    // The reason it's slow is that I slap the components to the entities and end-up with a standard array of
+    // structure (entities) instead of a structure of array with column orientation. To re-orient my data
+    // I should have an array for each component type: Transform, Physics, etc. Right now I am using
+    // the composition pattern, not an ECS architecture.
+    for (int i = 0; i < 100; ++i)
     {
-        // Create a ball
-        auto ball = std::make_unique<sf::CircleShape>(10.f);
-        ball->setFillColor(NordTheme::Aurora1);
-        ball->setOrigin({5.f, 5.f});
-
-        const sf::Vector2f randomPosition = {distX(gen), distY(gen)};
+        const sf::Vector2f position = {distX(gen), distY(gen)};
         const sf::Vector2f velocity = {velX(gen), velY(gen)};
-
-        auto ballEntity = std::make_unique<Entity>(GenerateId());
-        ballEntity->AddComponent<DrawableComponent>({.drawable = std::move(ball)});
-        ballEntity->AddComponent<TransformComponent>({.position = randomPosition});
-        ballEntity->AddComponent<PhysicsComponent>({.velocity = velocity, .friction = 0.98});
-
-        AddEntity(std::move(ballEntity));
+        AddEntity(std::move(CreateBallEntity(position, velocity)));
     }
 
     // Add the systems
@@ -81,5 +74,24 @@ void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::R
     if (event->is<sf::Event::MouseButtonPressed>())
     {
         LOG_DEBUG("(BouncingBallScene:HandleEvent): Mouse button pressed");
+        const auto position = sf::Mouse::getPosition();
+        constexpr sf::Vector2f velocity{0.f, 0.f};
+        AddEntity(std::move(CreateBallEntity(sf::Vector2f(position), velocity)));
     }
+}
+
+
+std::unique_ptr<Entity> BouncingBallScene::CreateBallEntity(const sf::Vector2f position, const sf::Vector2f velocity)
+{
+    // Create a ball
+    auto ball = std::make_unique<sf::CircleShape>(5.f);
+    ball->setFillColor(NordTheme::Aurora1);
+    ball->setOrigin({2.5f, 2.5f});
+
+    auto ballEntity = std::make_unique<Entity>(GenerateId());
+    ballEntity->AddComponent<DrawableComponent>({.drawable = std::move(ball)});
+    ballEntity->AddComponent<TransformComponent>({.position = position});
+    ballEntity->AddComponent<PhysicsComponent>({.velocity = velocity, .friction = 0.98});
+
+    return ballEntity;
 }

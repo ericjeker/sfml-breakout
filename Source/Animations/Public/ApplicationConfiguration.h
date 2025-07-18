@@ -9,12 +9,12 @@ namespace ApplicationConfiguration
 
 constexpr auto windowTitle = "Animation System";
 constexpr sf::Vector2u windowSize = {1920, 1080};
-constexpr auto windowStyle = sf::Style::Close;
-constexpr auto windowState = sf::State::Windowed;
+constexpr auto windowStyle = sf::Style::None;
+constexpr auto windowState = sf::State::Fullscreen;
 constexpr bool isFullscreen = false;
 
 constexpr unsigned int framesPerSecond = 60;
 constexpr bool isVSync = true;
 constexpr unsigned int antiAliasingLevel = 4;
 
-} // namespace ApplicationConfiguration
+}
