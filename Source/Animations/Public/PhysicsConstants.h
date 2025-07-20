@@ -19,6 +19,7 @@ constexpr sf::Vector2f NO_GRAVITY = {0.f, 0.f};
 
 // Other physics constants
 constexpr float DEFAULT_DAMPING = 0.98f;
+constexpr float NO_DAMPING = 1.f;
 constexpr float DEFAULT_BALL_RADIUS = 8.f;
 
 // Consider that the height of the screen is 2 meters (200 cm) high

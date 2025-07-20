@@ -1,4 +1,7 @@
 // Copyright (c) Eric Jeker 2025.
+#ifdef TRACY_ENABLE
+#include <tracy/Tracy.hpp>
+#endif
 
 #include "Managers/SceneManager.h"
 
@@ -24,6 +27,7 @@ void SceneManager::CleanUp()
 
 void SceneManager::Update(const float deltaTime)
 {
+    ZoneScopedN("SceneManager::Update");
     for (const auto& scene : _scenes | std::views::values)
     {
         scene->Update(deltaTime);
@@ -32,6 +36,7 @@ void SceneManager::Update(const float deltaTime)
 
 void SceneManager::Render(sf::RenderWindow& window)
 {
+    ZoneScopedN("SceneManager::Render");
     for (const auto& typeIndex : _sceneOrder)
     {
         if (const auto& scene = _scenes[typeIndex]; scene->IsLoaded())
@@ -43,6 +48,7 @@ void SceneManager::Render(sf::RenderWindow& window)
 
 void SceneManager::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow)
 {
+    ZoneScopedN("SceneManager::HandleEvent");
     for (const auto& scene : _scenes | std::views::values)
     {
         scene->HandleEvent(event, renderWindow);

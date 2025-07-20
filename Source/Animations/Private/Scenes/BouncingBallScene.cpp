@@ -2,6 +2,10 @@
 
 #include "BouncingBallScene.h"
 
+#ifdef TRACY_ENABLE
+#include <tracy/Tracy.hpp>
+#endif
+
 #include "../Components/PlayerPossessedComponent.h"
 #include "../Events/BallCountChangedEvent.h"
 #include "../Events/RequestBallCountEvent.h"
@@ -15,6 +19,7 @@
 #include <Systems/PhysicsSystem.h>
 #include <Systems/ScreenBounceSystem.h>
 #include <Themes/Nord.h>
+#include <chrono>
 #include <random>
 
 #include <Components/DrawableComponent.h>
@@ -28,6 +33,9 @@ BouncingBallScene::BouncingBallScene(ResourceManager& resourceManager, EventMana
 
 void BouncingBallScene::Initialize()
 {
+    LOG_DEBUG("(BouncingBallScene:Initialize): Pre-allocate memory for entities");
+    ReserveEntities(BouncingBallConstants::BALL_COUNT + 10);
+
     // Create a background
     auto background = std::make_unique<sf::RectangleShape>();
     background->setSize(sf::Vector2f{ApplicationConfiguration::WINDOW_SIZE});
@@ -39,7 +47,13 @@ void BouncingBallScene::Initialize()
 
     AddEntity(std::move(backgroundEntity));
 
-    CreateBalls(100);
+    const auto start = std::chrono::high_resolution_clock::now();
+    CreateBalls(BouncingBallConstants::BALL_COUNT);
+    const auto end = std::chrono::high_resolution_clock::now();
+    const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    LOG_DEBUG(std::format("CreateBalls({}) took {} microseconds", BouncingBallConstants::BALL_COUNT, duration.count()));
+
+    EmitBallCountChangedEvent();
 
     // --- Add the systems ---
     AddSystem(std::make_unique<PhysicsSystem>(PhysicsConstants::GRAVITY_DOWN, PhysicsConstants::PIXELS_PER_CENTIMETER));
@@ -71,8 +85,7 @@ void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::R
         auto entity = CreateBallEntity(sf::Vector2f(_throwStartPos), sf::Vector2f{0.f, 0.f});
         entity->AddComponent<PlayerPossessedComponent>({});
         AddEntity(std::move(entity));
-        // Emit an event to notify the UI that the ball count has changed.
-        GetEventManager().Emit<BallCountChangedEvent>({.count = static_cast<int>(GetEntities().size() - 1)}, this);
+        EmitBallCountChangedEvent();
     }
     else if (const auto* mouseMoved = event->getIf<sf::Event::MouseMoved>())
     {
@@ -101,7 +114,7 @@ void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::R
             player->RemoveComponent<PlayerPossessedComponent>();
             player->AddComponent<PhysicsComponent>(
                 {.velocity = sf::Vector2f(delta.x, delta.y) * PhysicsConstants::PIXELS_PER_CENTIMETER,
-                 .damping = PhysicsConstants::DEFAULT_DAMPING}
+                 .damping = PhysicsConstants::NO_DAMPING}
             );
 
             if (auto* transform = player->GetComponent<TransformComponent>())
@@ -138,6 +151,7 @@ void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::R
             }
 
             CreateBalls(numberOfBalls);
+            EmitBallCountChangedEvent();
         }
     }
 }
@@ -149,10 +163,16 @@ void BouncingBallScene::IncreaseGravity()
 {
 }
 
+void BouncingBallScene::EmitBallCountChangedEvent()
+{
+    GetEventManager().Emit<BallCountChangedEvent>({.count = static_cast<int>(GetEntities().size() - 1)}, this);
+}
+
 void BouncingBallScene::ResetSimulation()
 {
     ClearEntitiesWithComponent<PhysicsComponent>();
-    CreateBalls(100);
+    CreateBalls(BouncingBallConstants::BALL_COUNT);
+    EmitBallCountChangedEvent();
 }
 
 void BouncingBallScene::ToggleGravity()
@@ -163,6 +183,7 @@ void BouncingBallScene::ToggleGravity()
 
 void BouncingBallScene::CreateBalls(const int numberOfBalls = 100)
 {
+    ZoneScopedN("BouncingBallScene::CreateBalls");
     // Create balls
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -186,8 +207,6 @@ void BouncingBallScene::CreateBalls(const int numberOfBalls = 100)
         const sf::Vector2f velocity =
             {velX(gen) * PhysicsConstants::PIXELS_PER_CENTIMETER, velY(gen) * PhysicsConstants::PIXELS_PER_CENTIMETER};
         AddEntity(std::move(CreateBallEntity(position, velocity)));
-        // Emit an event to notify the UI that the ball count has changed.
-        GetEventManager().Emit<BallCountChangedEvent>({.count = static_cast<int>(GetEntities().size() - 1)}, this);
     }
 }
 
@@ -203,7 +222,7 @@ std::unique_ptr<Entity> BouncingBallScene::CreateBallEntity(const sf::Vector2f p
     auto ballEntity = std::make_unique<Entity>(GenerateId());
     ballEntity->AddComponent<DrawableComponent>({.drawable = std::move(ball)});
     ballEntity->AddComponent<TransformComponent>({.position = position});
-    ballEntity->AddComponent<PhysicsComponent>({.velocity = velocity, .damping = PhysicsConstants::DEFAULT_DAMPING});
+    ballEntity->AddComponent<PhysicsComponent>({.velocity = velocity, .damping = PhysicsConstants::NO_DAMPING});
 
     return ballEntity;
 }

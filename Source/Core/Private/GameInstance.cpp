@@ -1,7 +1,9 @@
 // Copyright (c) Eric Jeker 2025.
+#ifdef TRACY_ENABLE
+#include <tracy/Tracy.hpp>
+#endif
 
 #include "GameInstance.h"
-
 #include "Gameplay/GameController.h"
 #include "Logger.h"
 #include "Managers/SceneManager.h"
@@ -29,11 +31,14 @@ void GameInstance::Run(sf::RenderWindow& renderWindow)
         HandleEvents(renderWindow);
         Update(deltaTime);
         Render(renderWindow);
+
+        FrameMark;
     }
 }
 
 void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
 {
+    ZoneScoped;
     while (const auto event = renderWindow.pollEvent())
     {
         if (event->is<sf::Event::Closed>())
@@ -49,12 +54,14 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
 
 void GameInstance::Update(const float deltaTime)
 {
+    ZoneScoped;
     GetGameService().Get<GameController>().Update(deltaTime);
     GetGameService().Get<SceneManager>().Update(deltaTime);
 }
 
 void GameInstance::Render(sf::RenderWindow& renderWindow)
 {
+    ZoneScoped;
     renderWindow.clear();
     GetGameService().Get<SceneManager>().Render(renderWindow);
     renderWindow.display();

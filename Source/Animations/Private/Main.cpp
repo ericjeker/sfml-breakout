@@ -1,5 +1,9 @@
 // Copyright (c) Eric Jeker 2025.
 
+#ifdef TRACY_ENABLE
+#include <tracy/Tracy.hpp>
+#endif
+
 #include "Animations.h"
 #include "ApplicationConfiguration.h"
 #include "GameInstance.h"
@@ -19,6 +23,8 @@
  */
 int main()
 {
+    ZoneScoped;
+
     // Create the window mode
     const sf::VideoMode mode(ApplicationConfiguration::WINDOW_SIZE);
 
@@ -38,6 +44,7 @@ int main()
     renderWindow.setVerticalSyncEnabled(ApplicationConfiguration::IS_VSYNC);
 
     // Initialize the different managers
+    LOG_DEBUG("(Main::main): Initializing the GameService");
     auto gameService = std::make_unique<GameService>();
     gameService->Register<sf::RenderWindow>(renderWindow);
     gameService->Register<ResourceManager>(std::make_unique<ResourceManager>());

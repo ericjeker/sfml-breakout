@@ -1,5 +1,15 @@
 include(FetchContent)
 
+# --- Tracy Profiler ---
+FetchContent_Declare(tracy
+        GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+        GIT_TAG v0.12.2
+        GIT_SHALLOW ON
+        EXCLUDE_FROM_ALL
+        SYSTEM
+)
+FetchContent_MakeAvailable(tracy)
+
 # --- SFML ---
 FetchContent_Declare(SFML
         GIT_REPOSITORY https://github.com/SFML/SFML.git
@@ -35,4 +45,5 @@ target_link_libraries(Vendor INTERFACE
         SFML::System
         nlohmann_json::nlohmann_json
         yaml-cpp
+        Tracy::TracyClient
 )

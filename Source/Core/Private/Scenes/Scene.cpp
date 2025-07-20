@@ -1,8 +1,11 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Scenes/Scene.h"
+#ifdef TRACY_ENABLE
+#include <tracy/Tracy.hpp>
+#endif
 
 #include "Logger.h"
+#include "Scenes/Scene.h"
 
 Scene::Scene(ResourceManager& resourceManager, EventManager& eventManager)
     : _eventManager(eventManager)
@@ -30,6 +33,8 @@ void Scene::Update(const float deltaTime)
 
     for (const auto& system : _systems)
     {
+        ZoneScoped;
+        ZoneName(std::string("Scene::Update -> " + std::string(typeid(*system).name())).c_str(), strlen(typeid(*system).name()) + 26);
         for (const auto& entity : GetEntities())
         {
             system->Update(entity, deltaTime);
@@ -46,6 +51,8 @@ void Scene::Render(sf::RenderWindow& window)
 
     for (const auto& system : _systems)
     {
+        ZoneScoped;
+        ZoneName(std::string("Scene::Render -> " + std::string(typeid(*system).name())).c_str(), strlen(typeid(*system).name()) + 26);
         for (const auto& entity : GetEntities())
         {
             system->Render(entity, window);
@@ -118,6 +125,11 @@ int Scene::GenerateId()
 {
     static int id = 0;
     return ++id;
+}
+
+void Scene::ReserveEntities(const int count)
+{
+    _entities.reserve(count);
 }
 
 void Scene::AddEntity(std::unique_ptr<Entity> entity)

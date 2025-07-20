@@ -11,7 +11,7 @@ namespace ApplicationConfiguration
 constexpr auto WINDOW_TITLE = "Animation System";
 constexpr sf::Vector2u WINDOW_SIZE = {1920, 1080};
 constexpr auto WINDOW_STYLE = sf::Style::Close;
-constexpr auto WINDOW_STATE = sf::State::Fullscreen;
+constexpr auto WINDOW_STATE = sf::State::Windowed;
 constexpr bool IS_FULL_SCREEN = false;
 
 constexpr unsigned int FRAMES_PER_SECOND = 60;

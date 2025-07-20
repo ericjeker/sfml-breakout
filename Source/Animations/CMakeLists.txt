@@ -1,3 +1,8 @@
+# --- Options and Configurations ---
+option(TRACY_ENABLE "Enable Tracy profiler" ON)
+option(TRACY_VERBOSE "Enable Tracy verbose output" ON)
+
+# --- Sources Files
 set(SOURCE_FILES
         Private/Animations.cpp
         Private/Main.cpp
@@ -22,5 +27,19 @@ add_executable(Animations)
 target_sources(Animations PRIVATE ${SOURCE_FILES})
 target_include_directories(AnimationsLibrary PRIVATE Private)
 target_link_libraries(Animations PRIVATE Vendor Core AnimationsLibrary)
+
+# --- Add Compile Definitions ---
+
 # Enable debug mode if we are in the debug build
 target_compile_definitions(Animations PRIVATE $<$<CONFIG:Debug>:DEBUG>)
+
+# --- Tracy Configuration ---
+if(TRACY_ENABLE)
+    target_compile_definitions(Animations PRIVATE TRACY_ENABLE)
+    target_compile_definitions(AnimationsLibrary PRIVATE TRACY_ENABLE)
+
+    if(TRACY_VERBOSE)
+        target_compile_definitions(Animations PRIVATE TRACY_VERBOSE)
+        target_compile_definitions(AnimationsLibrary PRIVATE TRACY_VERBOSE)
+    endif()
+endif()

@@ -54,7 +54,7 @@ public:
 
     // --- Entity Management ---
     static int GenerateId();
-
+    void ReserveEntities(int count);
     void AddEntity(std::unique_ptr<Entity> entity);
     void RemoveEntity(int id);
     [[nodiscard]] Entity* GetEntity(int id) const;
