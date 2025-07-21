@@ -23,6 +23,8 @@
  * A container for all the Entities, lights, cameras, and other elements
  * that make up a level or a screen (like a menu).
  *
+ * TODO: Consider CRTP for Scene creation
+ *
  * Scene should contain only thing related to a Scene, and not a game state as a single game state
  * can load multiple scenes.
  */
@@ -52,13 +54,39 @@ public:
     void SetName(const std::string& name);
     void SetPath(const std::string& path);
 
-    // --- Entity Management ---
+    // --- Entity Management ------------------------------------------------------------------------------------------
+
     static int GenerateId();
-    void ReserveEntities(int count);
     void AddEntity(std::unique_ptr<Entity> entity);
     void RemoveEntity(int id);
     [[nodiscard]] Entity* GetEntity(int id) const;
+
+    template <typename T>
+    [[nodiscard]] Entity* GetEntityWithComponent()
+    {
+        const auto it = std::find_if(
+            std::begin(_entities),
+            std::end(_entities),
+            [](const std::unique_ptr<Entity>& entity) { return entity->HasComponent<T>(); }
+        );
+
+        return it != std::end(_entities) ? static_cast<Entity*>(it->get()) : nullptr;
+    };
+
+    // --- Entity Management : Batch Processing ---
+
+    void ReserveEntities(int count);
     std::vector<std::unique_ptr<Entity>>& GetEntities();
+
+    // TODO: Allow to query only specific entities
+    template <typename T>
+    std::vector<std::unique_ptr<Entity>>& GetEntitiesWithComponent()
+    {
+        return _entities;
+    }
+    // TODO: Batch add and remove
+    void AddEntities(std::vector<std::unique_ptr<Entity>>&& entities);
+    void RemoveEntities(const std::vector<int>& ids);
     void ClearEntities();
 
     template <typename T>
@@ -73,18 +101,6 @@ public:
             std::end(_entities)
         );
     }
-
-    template <typename T>
-    [[nodiscard]] Entity* GetEntityWithComponent()
-    {
-        const auto it = std::find_if(
-            std::begin(_entities),
-            std::end(_entities),
-            [](const std::unique_ptr<Entity>& entity) { return entity->HasComponent<T>(); }
-        );
-
-        return it != std::end(_entities) ? static_cast<Entity*>(it->get()) : nullptr;
-    };
 
     // --- System Management ---
     void AddSystem(std::unique_ptr<System> system);
@@ -112,7 +128,11 @@ private:
     bool _isLoaded = false;
     bool _isPaused = false;
 
+    // TODO: Right now, entities are structures, this is not good for cache performance
     std::vector<std::unique_ptr<Entity>> _entities;
+
+    // TODO: Organize systems by type (Update vs Render)
+    // TODO: System should register a component mask and receive only the required entities
     std::vector<std::unique_ptr<System>> _systems;
 
     EventManager& _eventManager;

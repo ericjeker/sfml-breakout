@@ -32,6 +32,9 @@ void GameInstance::Run(sf::RenderWindow& renderWindow)
         Update(deltaTime);
         Render(renderWindow);
 
+        // Process deferred events at the end of the frame
+        GetGameService().Get<EventManager>().ProcessDeferredEvents();
+
         FrameMark;
     }
 }

@@ -4,7 +4,7 @@
 
 #include "../Components/DebugComponent.h"
 #include "../Events/BallCountChangedEvent.h"
-#include "../Events/RequestBallCountEvent.h"
+#include "../Events/BallCountRequestedEvent.h"
 #include "../Systems/FpsSystem.h"
 #include "Components/DrawableComponent.h"
 #include "Components/TransformComponent.h"
@@ -52,7 +52,7 @@ void DebugScene::Initialize()
 
     // To ensure we get the ball count after initialization, we request it; this is because the other scene might
     // have already sent the initial ball count event.
-    eventManager.Emit<RequestBallCountEvent>({}, this);
+    eventManager.Emit<BallCountRequestedEvent>({}, this);
 }
 
 void DebugScene::Update(const float deltaTime)

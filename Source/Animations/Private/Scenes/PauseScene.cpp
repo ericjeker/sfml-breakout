@@ -2,6 +2,11 @@
 
 #include "PauseScene.h"
 
+#include "../Components/BoundingBoxComponent.h"
+#include "../Components/EventComponent.h"
+#include "../Events/ExitGameRequestedEvent.h"
+#include "../Events/ResumeGameRequestedEvent.h"
+#include "../Systems/EventSystem.h"
 #include "ApplicationConfiguration.h"
 
 #include <SFML/Graphics/Font.hpp>
@@ -15,6 +20,7 @@
 #include <Components/DrawableComponent.h>
 #include <Components/TransformComponent.h>
 
+
 PauseScene::PauseScene(ResourceManager& resourceManager, EventManager& eventManager)
     : Scene(resourceManager, eventManager)
 {
@@ -24,7 +30,7 @@ void PauseScene::Initialize()
 {
     LOG_DEBUG("(PauseScene:Initialize)");
 
-    // -- Overlay --
+    // --- Overlay ---
     auto background = std::make_unique<sf::RectangleShape>(sf::Vector2f{ApplicationConfiguration::WINDOW_SIZE});
     auto backgroundColor = NordTheme::PolarNight1;
     backgroundColor.a = 127;
@@ -35,21 +41,65 @@ void PauseScene::Initialize()
     backgroundEntity->AddComponent<TransformComponent>({});
     AddEntity(std::move(backgroundEntity));
 
-    // -- Add Pause Text --
-    const auto font = GetResourceManager().GetResource<sf::Font>("Orbitron-Regular");
-    auto text = std::make_unique<sf::Text>(*font, "Pause Scene");
-    text->setFillColor(NordTheme::SnowStorm3);
-    text->setOrigin(text->getLocalBounds().size / 2.f);
-
+    // --- Add Pause Text ---
     const float centerX = ApplicationConfiguration::WINDOW_SIZE.x / 2;
     const float centerY = ApplicationConfiguration::WINDOW_SIZE.y / 2;
 
+    const auto fontRegular = GetResourceManager().GetResource<sf::Font>("Orbitron-Regular");
+    const auto fontBold = GetResourceManager().GetResource<sf::Font>("Orbitron-Bold");
+
+    auto pauseText = std::make_unique<sf::Text>(*fontBold, "Pause Scene", 60.f);
+    pauseText->setFillColor(NordTheme::SnowStorm3);
+    pauseText->setOrigin(pauseText->getLocalBounds().size / 2.f);
+    AddEntity(std::move(CreateTextEntity(std::move(pauseText), {centerX, centerY - 200})));
+
+    auto resumeText = std::make_unique<sf::Text>(*fontRegular, "Resume", 36.f);
+    resumeText->setFillColor(NordTheme::SnowStorm3);
+    resumeText->setOrigin(resumeText->getLocalBounds().size / 2.f);
+    AddEntity(
+        std::move(CreateButtonEntity(
+            std::move(resumeText),
+            {centerX, centerY},
+            [this]() { GetEventManager().EmitDeferred<ResumeGameRequestedEvent>({}, this); }
+        ))
+    );
+
+    auto exitText = std::make_unique<sf::Text>(*fontRegular, "Exit", 28.f);
+    exitText->setFillColor(NordTheme::SnowStorm3);
+    exitText->setOrigin(exitText->getLocalBounds().size / 2.f);
+    AddEntity(
+        std::move(CreateButtonEntity(
+            std::move(exitText),
+            {centerX, centerY + 100},
+            [this]() { GetEventManager().EmitDeferred<ExitGameRequestedEvent>({}, this); }
+        ))
+    );
+
+    // --- Add the Systems ---
+    AddSystem(std::make_unique<EventSystem>());
+    AddSystem(std::make_unique<DrawableRenderer>());
+}
+
+std::unique_ptr<Entity> PauseScene::CreateTextEntity(std::unique_ptr<sf::Text> text, const sf::Vector2f position)
+{
     auto entity = std::make_unique<Entity>(GenerateId());
     entity->AddComponent<DrawableComponent>({.drawable = std::move(text)});
-    entity->AddComponent<TransformComponent>({.position = {centerX, centerY}});
+    entity->AddComponent<TransformComponent>({.position = position});
 
-    AddEntity(std::move(entity));
+    return entity;
+}
 
-    // -- Add the Systems --
-    AddSystem(std::make_unique<DrawableRenderer>());
+std::unique_ptr<Entity> PauseScene::CreateButtonEntity(
+    std::unique_ptr<sf::Text> text,
+    const sf::Vector2f position,
+    const std::function<void()>& callback
+)
+{
+    auto entity = std::make_unique<Entity>(GenerateId());
+    entity->AddComponent<TransformComponent>({.position = position});
+    entity->AddComponent<EventComponent>({.callback = callback});
+    entity->AddComponent<BoundingBoxComponent>({.bounds = text->getGlobalBounds()});
+    entity->AddComponent<DrawableComponent>({.drawable = std::move(text)});
+
+    return entity;
 }

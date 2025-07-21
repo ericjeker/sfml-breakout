@@ -67,13 +67,18 @@ void Scene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow&
         return;
     }
 
-    // for (const auto& system : _systems)
-    // {
-    //     for (const auto& entity : GetEntities())
-    //     {
-    //         system->HandleEvent(entity, event, renderWindow);
-    //     }
-    // }
+    for (const auto& system : _systems)
+    {
+        ZoneScoped;
+        ZoneName(
+            std::string("Scene::HandleEvent -> " + std::string(typeid(*system).name())).c_str(),
+            strlen(typeid(*system).name()) + 26
+        );
+        for (const auto& entity : GetEntities())
+        {
+            system->HandleEvent(entity, event, renderWindow);
+        }
+    }
 }
 
 bool Scene::IsLoaded() const
@@ -127,11 +132,6 @@ int Scene::GenerateId()
     return ++id;
 }
 
-void Scene::ReserveEntities(const int count)
-{
-    _entities.reserve(count);
-}
-
 void Scene::AddEntity(std::unique_ptr<Entity> entity)
 {
     _entities.push_back(std::move(entity));
@@ -157,9 +157,22 @@ Entity* Scene::GetEntity(const int id) const
     return nullptr;
 }
 
+void Scene::ReserveEntities(const int count)
+{
+    _entities.reserve(count);
+}
+
 std::vector<std::unique_ptr<Entity>>& Scene::GetEntities()
 {
     return _entities;
+}
+
+void Scene::AddEntities(std::vector<std::unique_ptr<Entity>>&& entities)
+{
+}
+
+void Scene::RemoveEntities(const std::vector<int>& ids)
+{
 }
 
 void Scene::ClearEntities()

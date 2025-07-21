@@ -5,7 +5,7 @@
 #define REQUESTBALLCOUNTEVENT_H
 
 
-struct RequestBallCountEvent
+struct BallCountRequestedEvent
 {
 };
 

@@ -27,6 +27,7 @@
 ## Bugs / Improvements
 
 - [x] ScreenBouncing doesn't account for drawable size
+- [x] Integrate Tracy for profiling
 - [ ] MainMenuState contains everything, it should be a game selector with a FSM
 
 ## Clean Code
@@ -76,7 +77,6 @@
 
 - [x] Simple physics simulation with a ball bouncing around the screen
 - Tests: Basic rendering, animation system, collision detection with screen boundaries
-- Great for showcasing smooth movement and your animation framework
 
 #### Visual Enhancements
 

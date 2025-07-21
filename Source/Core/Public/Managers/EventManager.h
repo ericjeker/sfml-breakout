@@ -4,23 +4,12 @@
 #ifndef EVENTMANAGER_H
 #define EVENTMANAGER_H
 
+#include <Logger.h>
 #include <functional>
 #include <map>
 #include <string>
 #include <typeindex>
 #include <vector>
-
-// Examples:
-struct PlayerDiedEvent
-{
-    int playerId;
-    float x, y;
-};
-struct ScoreChangedEvent
-{
-    int newScore;
-    int oldScore;
-};
 
 template <typename T>
 using EventListener = std::function<void(const T& event, void* sender)>;
@@ -30,6 +19,22 @@ class EventManager
 public:
     EventManager() = default;
     ~EventManager() = default;
+
+    using TypeErasedListener = std::function<void(const void* eventData, void* sender)>;
+    using TypeErasedEvent = std::function<void(void* sender)>;
+
+    // Structure to hold deferred event information
+    struct DeferredEvent
+    {
+        std::type_index eventType;
+        std::function<void()> eventExecutor;
+
+        DeferredEvent(std::type_index type, std::function<void()> executor)
+            : eventType(type)
+            , eventExecutor(std::move(executor))
+        {
+        }
+    };
 
     template <typename T>
     void Subscribe(EventListener<T> listener)
@@ -62,6 +67,8 @@ public:
     {
         const std::type_index typeIndex(typeid(T));
 
+        LOG_DEBUG("(EventManager::Emit): Emitting event: " + std::string(typeid(T).name()));
+
         if (!_listeners.contains(typeIndex))
         {
             return;
@@ -73,9 +80,35 @@ public:
         }
     }
 
+    template <typename T>
+    void EmitDeferred(const T& event, void* sender)
+    {
+        const std::type_index typeIndex(typeid(T));
+
+        LOG_DEBUG("(EventManager::EmitDeferred): Queueing event: " + std::string(typeid(T).name()));
+
+        // Create a copy of the event and capture it in the lambda
+        T eventCopy = event;
+        auto eventExecutor = [this, eventCopy, sender]() mutable { this->Emit(eventCopy, sender); };
+
+        _deferredEvents.emplace_back(typeIndex, std::move(eventExecutor));
+    }
+
+    void ProcessDeferredEvents()
+    {
+        // Process all deferred events
+        for (auto& deferredEvent : _deferredEvents)
+        {
+            deferredEvent.eventExecutor();
+        }
+
+        // Clear the deferred events after processing
+        _deferredEvents.clear();
+    }
+
 private:
-    using TypeErasedListener = std::function<void(const void* eventData, void* sender)>;
     std::map<std::type_index, std::vector<TypeErasedListener>> _listeners;
+    std::vector<DeferredEvent> _deferredEvents;
 };
 
 

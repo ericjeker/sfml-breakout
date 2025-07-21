@@ -2,6 +2,8 @@
 
 #include "MainMenuState.h"
 
+#include "../Events/ExitGameRequestedEvent.h"
+#include "../Events/ResumeGameRequestedEvent.h"
 #include "../Scenes/BouncingBallScene.h"
 #include "../Scenes/DebugScene.h"
 #include "../Scenes/DemoScene.h"
@@ -28,12 +30,18 @@ void MainMenuState::Enter()
     LOG_DEBUG("(MainMenuState::Enter): Loading BouncingBallScene");
     GetGameService().Get<SceneManager>().LoadScene<BouncingBallScene>(SceneLoadMode::Single);
     GetGameService().Get<SceneManager>().LoadScene<DebugScene>(SceneLoadMode::Additive);
+
+    // --- Add the Listeners ---
+    GetGameService().Get<EventManager>().Subscribe<ResumeGameRequestedEvent>(_resumeGameListener);
+    GetGameService().Get<EventManager>().Subscribe<ExitGameRequestedEvent>(_exitGameListener);
 }
 
 void MainMenuState::Exit()
 {
     LOG_DEBUG("(MainMenuState::Exit)");
     GetGameService().Get<SceneManager>().CleanUp();
+    // GetGameService().Get<EventManager>().Unsubscribe<ResumeGameRequestedEvent>(_resumeGameListener);
+    // GetGameService().Get<EventManager>().Unsubscribe<ExitGameRequestedEvent>(_exitGameListener);
 }
 
 void MainMenuState::Update(float deltaTime)

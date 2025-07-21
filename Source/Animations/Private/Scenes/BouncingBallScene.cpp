@@ -8,7 +8,7 @@
 
 #include "../Components/PlayerPossessedComponent.h"
 #include "../Events/BallCountChangedEvent.h"
-#include "../Events/RequestBallCountEvent.h"
+#include "../Events/BallCountRequestedEvent.h"
 #include "../Systems/CleanUpSystem.h"
 
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -62,8 +62,8 @@ void BouncingBallScene::Initialize()
     AddSystem(std::make_unique<DrawableRenderer>());
 
     // --- Add event listeners ---
-    GetEventManager().Subscribe<RequestBallCountEvent>(
-        [this](const RequestBallCountEvent& event, void* sender)
+    GetEventManager().Subscribe<BallCountRequestedEvent>(
+        [this](const BallCountRequestedEvent& event, void* sender)
         { GetEventManager().Emit<BallCountChangedEvent>({.count = static_cast<int>(GetEntities().size() - 1)}, this); }
     );
 }
@@ -114,7 +114,7 @@ void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::R
             player->RemoveComponent<PlayerPossessedComponent>();
             player->AddComponent<PhysicsComponent>(
                 {.velocity = sf::Vector2f(delta.x, delta.y) * PhysicsConstants::PIXELS_PER_CENTIMETER,
-                 .damping = PhysicsConstants::NO_DAMPING}
+                 .damping = PhysicsConstants::DEFAULT_DAMPING}
             );
 
             if (auto* transform = player->GetComponent<TransformComponent>())
@@ -222,7 +222,7 @@ std::unique_ptr<Entity> BouncingBallScene::CreateBallEntity(const sf::Vector2f p
     auto ballEntity = std::make_unique<Entity>(GenerateId());
     ballEntity->AddComponent<DrawableComponent>({.drawable = std::move(ball)});
     ballEntity->AddComponent<TransformComponent>({.position = position});
-    ballEntity->AddComponent<PhysicsComponent>({.velocity = velocity, .damping = PhysicsConstants::NO_DAMPING});
+    ballEntity->AddComponent<PhysicsComponent>({.velocity = velocity, .damping = PhysicsConstants::DEFAULT_DAMPING});
 
     return ballEntity;
 }
