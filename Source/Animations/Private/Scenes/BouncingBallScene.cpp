@@ -13,7 +13,7 @@
 
 #include <SFML/Graphics/RectangleShape.hpp>
 
-#include <ApplicationConfiguration.h>
+#include <Configuration.h>
 #include <PhysicsConstants.h>
 #include <Systems/DrawableRenderer.h>
 #include <Systems/PhysicsSystem.h>
@@ -38,7 +38,7 @@ void BouncingBallScene::Initialize()
 
     // Create a background
     auto background = std::make_unique<sf::RectangleShape>();
-    background->setSize(sf::Vector2f{ApplicationConfiguration::WINDOW_SIZE});
+    background->setSize(sf::Vector2f{Configuration::WINDOW_SIZE});
     background->setFillColor(NordTheme::Frost1);
 
     auto backgroundEntity = std::make_unique<Entity>(GenerateId());
@@ -47,17 +47,13 @@ void BouncingBallScene::Initialize()
 
     AddEntity(std::move(backgroundEntity));
 
-    const auto start = std::chrono::high_resolution_clock::now();
+    // --- Create LOTTA balls ---
     CreateBalls(BouncingBallConstants::BALL_COUNT);
-    const auto end = std::chrono::high_resolution_clock::now();
-    const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    LOG_DEBUG(std::format("CreateBalls({}) took {} microseconds", BouncingBallConstants::BALL_COUNT, duration.count()));
-
     EmitBallCountChangedEvent();
 
     // --- Add the systems ---
     AddSystem(std::make_unique<PhysicsSystem>(PhysicsConstants::GRAVITY_DOWN, PhysicsConstants::PIXELS_PER_CENTIMETER));
-    AddSystem(std::make_unique<ScreenBounceSystem>(ApplicationConfiguration::WINDOW_SIZE));
+    AddSystem(std::make_unique<ScreenBounceSystem>(Configuration::WINDOW_SIZE));
     AddSystem(std::make_unique<CleanUpSystem>());
     AddSystem(std::make_unique<DrawableRenderer>());
 
@@ -70,8 +66,6 @@ void BouncingBallScene::Initialize()
 
 void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
 {
-    Scene::HandleEvent(event, window);
-
     if (!IsLoaded() || IsPaused())
     {
         return;
@@ -124,7 +118,7 @@ void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::R
         }
     }
     // --- Handle the keyboard events ---
-    else if (auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+    else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
     {
         if (keyPressed->scancode == sf::Keyboard::Scan::G)
         {
@@ -187,8 +181,8 @@ void BouncingBallScene::CreateBalls(const int numberOfBalls = 100)
     // Create balls
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> distX(0.f, ApplicationConfiguration::WINDOW_SIZE.x);
-    std::uniform_real_distribution<float> distY(0.f, ApplicationConfiguration::WINDOW_SIZE.y);
+    std::uniform_real_distribution<float> distX(0.f, Configuration::WINDOW_SIZE.x);
+    std::uniform_real_distribution<float> distY(0.f, Configuration::WINDOW_SIZE.y);
     std::uniform_real_distribution<float> velX(-100.f, 100.f);
     std::uniform_real_distribution<float> velY(-100.f, 100.f);
 

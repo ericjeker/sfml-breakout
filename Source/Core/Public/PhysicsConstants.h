@@ -4,7 +4,7 @@
 #ifndef PHYSICSCONSTANTS_H
 #define PHYSICSCONSTANTS_H
 
-#include "ApplicationConfiguration.h"
+#include "Configuration.h"
 
 #include <SFML/System/Vector2.hpp>
 
@@ -23,7 +23,7 @@ constexpr float NO_DAMPING = 1.f;
 constexpr float DEFAULT_BALL_RADIUS = 8.f;
 
 // Consider that the height of the screen is 2 meters (200 cm) high
-constexpr float PIXELS_PER_CENTIMETER = ApplicationConfiguration::WINDOW_SIZE.y / 200.f;
+constexpr float PIXELS_PER_CENTIMETER = Configuration::WINDOW_SIZE.y / 200.f;
 
 }
 

@@ -2,16 +2,12 @@
 
 #include "DebugScene.h"
 
-#include "../Components/DebugComponent.h"
-#include "../Events/BallCountChangedEvent.h"
-#include "../Events/BallCountRequestedEvent.h"
-#include "../Systems/FpsSystem.h"
-#include "Components/DrawableComponent.h"
-#include "Components/TransformComponent.h"
-#include "Systems/DrawableRenderer.h"
-#include "Themes/Nord.h"
+#include <Systems/DrawableRenderer.h>
+#include <Themes/Nord.h>
 
-#include <cmath>
+#include <Components/DrawableComponent.h>
+#include <Components/TransformComponent.h>
+
 
 DebugScene::DebugScene(ResourceManager& resourceManager, EventManager& eventManager)
     : Scene(resourceManager, eventManager)
@@ -28,31 +24,10 @@ void DebugScene::Initialize()
     fpsEntity->AddComponent<DrawableComponent>({.drawable = std::move(fpsText)});
     fpsEntity->AddComponent<TransformComponent>({.position = {5.f, 5.f}});
 
-    auto ballCountText = std::make_unique<sf::Text>(*font, "Ball count: ", 10);
-    ballCountText->setFillColor(NordTheme::SnowStorm3);
-
-    auto ballCountEntity = std::make_unique<Entity>(_ballCountEntityId);
-    ballCountEntity->AddComponent<DrawableComponent>({.drawable = std::move(ballCountText)});
-    ballCountEntity->AddComponent<TransformComponent>({.position = {5.f, 20.f}});
-
     AddEntity(std::move(fpsEntity));
-    AddEntity(std::move(ballCountEntity));
 
     // --- Systems ---
     AddSystem(std::make_unique<DrawableRenderer>());
-
-    // --- Listeners ---
-    auto& eventManager = GetEventManager();
-    eventManager.Subscribe<BallCountChangedEvent>(
-        [this](const BallCountChangedEvent& event, void* sender)
-        {
-            _ballCount = event.count;
-        }
-    );
-
-    // To ensure we get the ball count after initialization, we request it; this is because the other scene might
-    // have already sent the initial ball count event.
-    eventManager.Emit<BallCountRequestedEvent>({}, this);
 }
 
 void DebugScene::Update(const float deltaTime)
@@ -69,12 +44,6 @@ void DebugScene::Update(const float deltaTime)
         }
 
         sinceLastUpdate = 0.f;
-    }
-
-    const auto* ballCountComponent = GetEntity(_ballCountEntityId)->GetComponent<DrawableComponent>();
-    if (auto* ballCountDrawable = dynamic_cast<sf::Text*>(ballCountComponent->drawable.get()))
-    {
-        ballCountDrawable->setString("Ball count: " + std::to_string(_ballCount));
     }
 
     Scene::Update(deltaTime);

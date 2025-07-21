@@ -14,6 +14,7 @@
 struct DrawableComponent final : Component
 {
     std::unique_ptr<sf::Drawable> drawable;
+    bool isVisible = true;
 };
 
 

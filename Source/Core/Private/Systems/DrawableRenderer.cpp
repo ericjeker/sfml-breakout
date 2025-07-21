@@ -12,7 +12,7 @@ void DrawableRenderer::Render(const std::unique_ptr<Entity>& entity, sf::RenderW
     const auto* transform = entity->GetComponent<TransformComponent>();
     const auto* drawable = entity->GetComponent<DrawableComponent>();
 
-    if (!transform || !drawable)
+    if (!transform || !drawable || !drawable->isVisible || !drawable->drawable)
     {
         return;
     }

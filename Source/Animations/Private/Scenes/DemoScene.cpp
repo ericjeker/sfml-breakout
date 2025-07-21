@@ -2,10 +2,10 @@
 
 #include "DemoScene.h"
 
-#include "ApplicationConfiguration.h"
 #include "Components/AnimationComponent.h"
 #include "Components/DrawableComponent.h"
 #include "Components/TransformComponent.h"
+#include "Configuration.h"
 #include "Logger.h"
 #include "Systems/AnimationSystem.h"
 #include "Systems/DrawableRenderer.h"
@@ -23,7 +23,7 @@ void DemoScene::Initialize()
     LOG_DEBUG("(DemoScene:Initialize)");
     Scene::Initialize();
 
-    auto background = std::make_unique<sf::RectangleShape>(sf::Vector2f{ApplicationConfiguration::WINDOW_SIZE});
+    auto background = std::make_unique<sf::RectangleShape>(sf::Vector2f{Configuration::WINDOW_SIZE});
     background->setFillColor(NordTheme::Frost1);
     background->setPosition({0.f, 0.f});
 

@@ -16,10 +16,7 @@ public:
 
 private:
     int _fpsEntityId{GenerateId()};
-    int _ballCountEntityId{GenerateId()};
-
     int _fps{0};
-    int _ballCount{0};
 };
 
 

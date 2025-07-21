@@ -7,7 +7,6 @@
 #include "../Events/ExitGameRequestedEvent.h"
 #include "../Events/ResumeGameRequestedEvent.h"
 #include "../Systems/EventSystem.h"
-#include "ApplicationConfiguration.h"
 
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -19,6 +18,7 @@
 
 #include <Components/DrawableComponent.h>
 #include <Components/TransformComponent.h>
+#include <Configuration.h>
 
 
 PauseScene::PauseScene(ResourceManager& resourceManager, EventManager& eventManager)
@@ -31,7 +31,7 @@ void PauseScene::Initialize()
     LOG_DEBUG("(PauseScene:Initialize)");
 
     // --- Overlay ---
-    auto background = std::make_unique<sf::RectangleShape>(sf::Vector2f{ApplicationConfiguration::WINDOW_SIZE});
+    auto background = std::make_unique<sf::RectangleShape>(sf::Vector2f{Configuration::WINDOW_SIZE});
     auto backgroundColor = NordTheme::PolarNight1;
     backgroundColor.a = 127;
     background->setFillColor(backgroundColor);
@@ -42,8 +42,8 @@ void PauseScene::Initialize()
     AddEntity(std::move(backgroundEntity));
 
     // --- Add Pause Text ---
-    const float centerX = ApplicationConfiguration::WINDOW_SIZE.x / 2;
-    const float centerY = ApplicationConfiguration::WINDOW_SIZE.y / 2;
+    const float centerX = Configuration::WINDOW_SIZE.x / 2;
+    const float centerY = Configuration::WINDOW_SIZE.y / 2;
 
     const auto fontRegular = GetResourceManager().GetResource<sf::Font>("Orbitron-Regular");
     const auto fontBold = GetResourceManager().GetResource<sf::Font>("Orbitron-Bold");

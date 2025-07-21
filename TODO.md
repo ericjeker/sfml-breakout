@@ -5,11 +5,11 @@
 - [x] ServiceLocator
 - [x] SceneManager
 - [x] EventSystem
-- [ ] CommandRegistry, CommandSystem
 - [ ] AudioManager
 - [ ] CameraManager, CameraSystem, Scrolling, Culling (?)
-- [ ] UIManager, GraphScene, SceneNode
 - [ ] Reusable ObjectPool
+- [ ] CommandRegistry, CommandSystem
+- [ ] UIManager, GraphScene, SceneNode
 
 ## Features
 
@@ -22,17 +22,18 @@
   - [ ] Behaviors (State Machine, Behavior Tree)
   - [ ] Possession
 - [ ] AnimationSystem, SpriteAnimations
-- [ ] ParticleSystem, ShaderEffects
+- [ ] ParticleSystem
+- [ ] ShaderEffects
 
 ## Bugs / Improvements
 
 - [x] ScreenBouncing doesn't account for drawable size
 - [x] Integrate Tracy for profiling
-- [ ] MainMenuState contains everything, it should be a game selector with a FSM
+- [ ] MainMenuState contains everything, it should be a game selector with an FSM
 
 ## Clean Code
 
-- [ ] Remove magic numbers in BouncingBallScene (radius, gravity, etc.)
+- [x] Remove magic numbers in BouncingBallScene (radius, gravity, etc.)
 - [ ] Error handling can certainly be improved everywhere
 
 

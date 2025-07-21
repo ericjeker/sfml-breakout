@@ -4,8 +4,8 @@
 #include <tracy/Tracy.hpp>
 #endif
 
+#include "Configuration.h"
 #include "Animations.h"
-#include "ApplicationConfiguration.h"
 #include "GameInstance.h"
 #include "Gameplay/GameController.h"
 #include "Managers/GameService.h"
@@ -26,22 +26,22 @@ int main()
     ZoneScoped;
 
     // Create the window mode
-    const sf::VideoMode mode(ApplicationConfiguration::WINDOW_SIZE);
+    const sf::VideoMode mode(Configuration::WINDOW_SIZE);
 
     // Enable anti-aliasing
     sf::ContextSettings settings;
-    settings.antiAliasingLevel = ApplicationConfiguration::ANTI_ALIASING_LEVEL;
+    settings.antiAliasingLevel = Configuration::ANTI_ALIASING_LEVEL;
 
     auto renderWindow = sf::RenderWindow(
         mode,
-        ApplicationConfiguration::WINDOW_TITLE,
-        ApplicationConfiguration::WINDOW_STYLE,
-        ApplicationConfiguration::WINDOW_STATE,
+        Configuration::WINDOW_TITLE,
+        Configuration::WINDOW_STYLE,
+        Configuration::WINDOW_STATE,
         settings
     );
 
-    renderWindow.setFramerateLimit(ApplicationConfiguration::FRAMES_PER_SECOND);
-    renderWindow.setVerticalSyncEnabled(ApplicationConfiguration::IS_VSYNC);
+    renderWindow.setFramerateLimit(Configuration::FRAMES_PER_SECOND);
+    renderWindow.setVerticalSyncEnabled(Configuration::IS_VSYNC);
 
     // Initialize the different managers
     LOG_DEBUG("(Main::main): Initializing the GameService");

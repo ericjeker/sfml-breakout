@@ -5,7 +5,7 @@
 
 #include <SFML/System/Vector2.hpp>
 
-namespace ApplicationConfiguration
+namespace Configuration
 {
 
 constexpr auto WINDOW_TITLE = "Animation System";

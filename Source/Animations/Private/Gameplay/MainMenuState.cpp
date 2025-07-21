@@ -4,12 +4,12 @@
 
 #include "../Events/ExitGameRequestedEvent.h"
 #include "../Events/ResumeGameRequestedEvent.h"
-#include "../Scenes/BouncingBallScene.h"
 #include "../Scenes/DebugScene.h"
 #include "../Scenes/DemoScene.h"
 #include "../Scenes/PauseScene.h"
 #include "Logger.h"
 #include "Managers/SceneManager.h"
+#include "MiniRtsScene.h"
 
 MainMenuState::MainMenuState(GameService& gameService)
     : GameState(gameService)
@@ -19,7 +19,7 @@ MainMenuState::MainMenuState(GameService& gameService)
     auto& eventManager = GetGameService().Get<EventManager>();
 
     LOG_DEBUG("(MainMenuState::MainMenuState): Adding scenes to the SceneManager");
-    sceneManager.AddScene<BouncingBallScene>(std::make_unique<BouncingBallScene>(resourceManager, eventManager));
+    sceneManager.AddScene<MiniRtsScene>(std::make_unique<MiniRtsScene>(resourceManager, eventManager));
     sceneManager.AddScene<DemoScene>(std::make_unique<DemoScene>(resourceManager, eventManager));
     sceneManager.AddScene<PauseScene>(std::make_unique<PauseScene>(resourceManager, eventManager));
     sceneManager.AddScene<DebugScene>(std::make_unique<DebugScene>(resourceManager, eventManager));
@@ -27,8 +27,8 @@ MainMenuState::MainMenuState(GameService& gameService)
 
 void MainMenuState::Enter()
 {
-    LOG_DEBUG("(MainMenuState::Enter): Loading BouncingBallScene");
-    GetGameService().Get<SceneManager>().LoadScene<BouncingBallScene>(SceneLoadMode::Single);
+    LOG_DEBUG("(MainMenuState::Enter): Loading MiniRtsScene");
+    GetGameService().Get<SceneManager>().LoadScene<MiniRtsScene>(SceneLoadMode::Single);
     GetGameService().Get<SceneManager>().LoadScene<DebugScene>(SceneLoadMode::Additive);
 
     // --- Add the Listeners ---
@@ -54,7 +54,7 @@ void MainMenuState::HandleEvent(const std::optional<sf::Event>& event, sf::Rende
 
     if (event->is<sf::Event::FocusLost>())
     {
-        sceneManager.GetScene<BouncingBallScene>().Pause();
+        sceneManager.GetScene<MiniRtsScene>().Pause();
         sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
         _isPaused = true;
     }
@@ -68,12 +68,12 @@ void MainMenuState::HandleEvent(const std::optional<sf::Event>& event, sf::Rende
             if (_isPaused)
             {
                 sceneManager.UnloadScene<PauseScene>();
-                sceneManager.GetScene<BouncingBallScene>().Resume();
+                sceneManager.GetScene<MiniRtsScene>().Resume();
                 _isPaused = false;
             }
             else
             {
-                sceneManager.GetScene<BouncingBallScene>().Pause();
+                sceneManager.GetScene<MiniRtsScene>().Pause();
                 sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
                 _isPaused = true;
             }
