@@ -30,12 +30,13 @@
 - [x] ScreenBouncing doesn't account for drawable size
 - [x] Integrate Tracy for profiling
 - [ ] MainMenuState contains everything, it should be a game selector with an FSM
+- [ ] Use namespaces to encapsulate modules?
 
 ## Clean Code
 
 - [x] Remove magic numbers in BouncingBallScene (radius, gravity, etc.)
 - [ ] Error handling can certainly be improved everywhere
-
+- [ ] Clarify and Refactor the include statements
 
 ## General Optimizations
 

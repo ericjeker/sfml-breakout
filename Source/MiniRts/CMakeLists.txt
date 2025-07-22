@@ -1,5 +1,7 @@
 set(SOURCE_FILES
         Private/Scenes/MiniRtsScene.cpp
+        Private/Systems/MovementSystem.cpp
+        Private/Systems/DrawSelection.cpp
 )
 
 add_library(MiniRts)
