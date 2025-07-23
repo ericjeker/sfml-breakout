@@ -51,8 +51,7 @@ void MiniRtsScene::HandleEvent(const std::optional<sf::Event>& event, sf::Render
     {
         return;
     }
-
-    // TODO: Escape or Click in empty space deselect units
+    // TODO: Escape deselect units
 
     // TODO: Click on a selectable entity select it
 

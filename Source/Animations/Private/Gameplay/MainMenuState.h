@@ -6,6 +6,7 @@
 
 #include "../Events/ExitGameRequestedEvent.h"
 #include "../Events/ResumeGameRequestedEvent.h"
+#include "../Scenes/BouncingBallFlecsScene.h"
 #include "../Scenes/PauseScene.h"
 #include "Gameplay/GameState.h"
 #include "Managers/GameService.h"
@@ -31,7 +32,7 @@ private:
     EventListener<ResumeGameRequestedEvent> _resumeGameListener = [this](const ResumeGameRequestedEvent& event, void* sender)
     {
         GetGameService().Get<SceneManager>().UnloadScene<PauseScene>();
-        GetGameService().Get<SceneManager>().GetScene<MiniRtsScene>().Resume();
+        GetGameService().Get<SceneManager>().GetScene<BouncingBallFlecsScene>().Resume();
         _isPaused = false;
     };
 

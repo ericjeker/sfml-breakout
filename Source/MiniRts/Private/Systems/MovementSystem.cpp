@@ -33,3 +33,4 @@ void MovementSystem::Update(const std::unique_ptr<Entity>& entity, const float d
         entity->RemoveComponent<MoveToOrderComponent>();
     }
 }
+

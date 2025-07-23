@@ -9,12 +9,12 @@
 namespace BouncingBallConstants
 {
 
-constexpr int BALL_COUNT = 500;
+constexpr int BALL_COUNT = 50;
 
 }
 
-
-class BouncingBallScene final : public Scene {
+class BouncingBallScene final : public Scene
+{
 public:
     BouncingBallScene(ResourceManager& resourceManager, EventManager& eventManager);
 
@@ -31,6 +31,7 @@ public:
 
 
     void EmitBallCountChangedEvent();
+
 private:
     sf::Vector2i _throwStartPos;
 };
