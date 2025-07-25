@@ -13,11 +13,6 @@
 
 #include <SFML/Graphics/RectangleShape.hpp>
 
-DemoScene::DemoScene(ResourceManager& resourceManager, EventManager& eventManager)
-    : Scene(resourceManager, eventManager)
-{
-}
-
 void DemoScene::Initialize()
 {
     LOG_DEBUG("(DemoScene:Initialize)");

@@ -16,10 +16,6 @@
 constexpr int BALL_COUNT = 50;
 
 
-BouncingBallFlecsScene::BouncingBallFlecsScene(ResourceManager& resourceManager, EventManager& eventManager)
-    : Scene(resourceManager, eventManager)
-{
-}
 
 void BouncingBallFlecsScene::Initialize()
 {

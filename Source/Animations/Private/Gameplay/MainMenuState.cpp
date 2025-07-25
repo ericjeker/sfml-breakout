@@ -10,38 +10,35 @@
 #include "Logger.h"
 #include "Managers/SceneManager.h"
 
-MainMenuState::MainMenuState(GameService& gameService)
-    : GameState(gameService)
+MainMenuState::MainMenuState()
 {
-    auto& sceneManager = GetGameService().Get<SceneManager>();
-    auto& resourceManager = GetGameService().Get<ResourceManager>();
-    auto& eventManager = GetGameService().Get<EventManager>();
+    auto& sceneManager = GameService::Get<SceneManager>();
 
     LOG_DEBUG("(MainMenuState::MainMenuState): Adding scenes to the SceneManager");
-    sceneManager.AddScene<BouncingBallFlecsScene>(std::make_unique<BouncingBallFlecsScene>(resourceManager, eventManager));
-    sceneManager.AddScene<MiniRtsScene>(std::make_unique<MiniRtsScene>(resourceManager, eventManager));
-    sceneManager.AddScene<DemoScene>(std::make_unique<DemoScene>(resourceManager, eventManager));
-    sceneManager.AddScene<PauseScene>(std::make_unique<PauseScene>(resourceManager, eventManager));
-    sceneManager.AddScene<DebugScene>(std::make_unique<DebugScene>(resourceManager, eventManager));
+    sceneManager.AddScene<BouncingBallFlecsScene>(std::make_unique<BouncingBallFlecsScene>());
+    sceneManager.AddScene<MiniRtsScene>(std::make_unique<MiniRtsScene>());
+    sceneManager.AddScene<DemoScene>(std::make_unique<DemoScene>());
+    sceneManager.AddScene<PauseScene>(std::make_unique<PauseScene>());
+    sceneManager.AddScene<DebugScene>(std::make_unique<DebugScene>());
 }
 
 void MainMenuState::Enter()
 {
     LOG_DEBUG("(MainMenuState::Enter): Loading BouncingBallFlecsScene");
-    GetGameService().Get<SceneManager>().LoadScene<BouncingBallFlecsScene>(SceneLoadMode::Single);
-    GetGameService().Get<SceneManager>().LoadScene<DebugScene>(SceneLoadMode::Additive);
+    GameService::Get<SceneManager>().LoadScene<BouncingBallFlecsScene>(SceneLoadMode::Single);
+    GameService::Get<SceneManager>().LoadScene<DebugScene>(SceneLoadMode::Additive);
 
     // --- Add the Listeners ---
-    GetGameService().Get<EventManager>().Subscribe<ResumeGameRequestedEvent>(_resumeGameListener);
-    GetGameService().Get<EventManager>().Subscribe<ExitGameRequestedEvent>(_exitGameListener);
+    GameService::Get<EventManager>().Subscribe<ResumeGameRequestedEvent>(_resumeGameListener);
+    GameService::Get<EventManager>().Subscribe<ExitGameRequestedEvent>(_exitGameListener);
 }
 
 void MainMenuState::Exit()
 {
     LOG_DEBUG("(MainMenuState::Exit)");
-    GetGameService().Get<SceneManager>().CleanUp();
-    // GetGameService().Get<EventManager>().Unsubscribe<ResumeGameRequestedEvent>(_resumeGameListener);
-    // GetGameService().Get<EventManager>().Unsubscribe<ExitGameRequestedEvent>(_exitGameListener);
+    GameService::Get<SceneManager>().CleanUp();
+    // GameService::Get<EventManager>().Unsubscribe<ResumeGameRequestedEvent>(_resumeGameListener);
+    // GameService::Get<EventManager>().Unsubscribe<ExitGameRequestedEvent>(_exitGameListener);
 }
 
 void MainMenuState::Update(float deltaTime)
@@ -50,7 +47,7 @@ void MainMenuState::Update(float deltaTime)
 
 void MainMenuState::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
 {
-    auto& sceneManager = GetGameService().Get<SceneManager>();
+    auto& sceneManager = GameService::Get<SceneManager>();
 
     if (event->is<sf::Event::FocusLost>())
     {

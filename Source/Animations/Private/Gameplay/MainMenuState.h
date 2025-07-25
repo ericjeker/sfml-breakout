@@ -8,6 +8,7 @@
 #include "../Events/ResumeGameRequestedEvent.h"
 #include "../Scenes/BouncingBallFlecsScene.h"
 #include "../Scenes/PauseScene.h"
+#include "GameInstance.h"
 #include "Gameplay/GameState.h"
 #include "Managers/GameService.h"
 #include "Managers/SceneManager.h"
@@ -17,7 +18,7 @@
 class MainMenuState final : public GameState
 {
 public:
-    explicit MainMenuState(GameService& gameService);
+    MainMenuState();
     ~MainMenuState() override = default;
 
     void Enter() override;
@@ -31,12 +32,12 @@ private:
 
     EventListener<ResumeGameRequestedEvent> _resumeGameListener = [this](const ResumeGameRequestedEvent& event, void* sender)
     {
-        GetGameService().Get<SceneManager>().UnloadScene<PauseScene>();
-        GetGameService().Get<SceneManager>().GetScene<BouncingBallFlecsScene>().Resume();
+        GameService::Get<SceneManager>().UnloadScene<PauseScene>();
+        GameService::Get<SceneManager>().GetScene<BouncingBallFlecsScene>().Resume();
         _isPaused = false;
     };
 
     EventListener<ExitGameRequestedEvent> _exitGameListener = [this](const ExitGameRequestedEvent& event, void* sender)
-    { GetGameService().Get<sf::RenderWindow>().close(); };
+    { GameService::Get<GameInstance>().RequestExit(); };
 };
 #endif

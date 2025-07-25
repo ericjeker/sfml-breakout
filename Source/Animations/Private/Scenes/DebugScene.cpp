@@ -2,6 +2,8 @@
 
 #include "DebugScene.h"
 
+#include "Managers/GameService.h"
+
 #include <Systems/DrawableRenderer.h>
 #include <Themes/Nord.h>
 
@@ -9,14 +11,9 @@
 #include <Components/TransformComponent.h>
 
 
-DebugScene::DebugScene(ResourceManager& resourceManager, EventManager& eventManager)
-    : Scene(resourceManager, eventManager)
-{
-}
-
 void DebugScene::Initialize()
 {
-    const auto font = GetResourceManager().GetResource<sf::Font>("Orbitron-Bold");
+    const auto font = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Bold");
     auto fpsText = std::make_unique<sf::Text>(*font, "FPS: ", 10);
     fpsText->setFillColor(NordTheme::SnowStorm3);
 

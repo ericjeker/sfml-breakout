@@ -2,6 +2,3 @@
 
 #include "Managers/GameService.h"
 
-GameService::GameService()
-{
-}

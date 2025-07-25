@@ -31,7 +31,7 @@
 class Scene
 {
 public:
-    Scene(ResourceManager& resourceManager, EventManager& eventManager);
+    Scene() = default;
     virtual ~Scene() = default;
 
     virtual void Initialize();
@@ -117,10 +117,6 @@ public:
         return it != std::end(_systems) ? static_cast<T*>(it->get()) : nullptr;
     }
 
-    // --- Accessors for child classes ---
-    [[nodiscard]] EventManager& GetEventManager() const;
-    [[nodiscard]] ResourceManager& GetResourceManager() const;
-
 private:
     std::string _name;
     std::string _path;
@@ -134,9 +130,6 @@ private:
     // TODO: Organize systems by type (Update vs Render)
     // TODO: System should register a component mask and receive only the required entities
     std::vector<std::unique_ptr<System>> _systems;
-
-    EventManager& _eventManager;
-    ResourceManager& _resourceManager;
 };
 
 #endif

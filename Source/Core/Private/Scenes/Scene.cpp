@@ -7,11 +7,6 @@
 #include "Logger.h"
 #include "Scenes/Scene.h"
 
-Scene::Scene(ResourceManager& resourceManager, EventManager& eventManager)
-    : _eventManager(eventManager)
-    , _resourceManager(resourceManager)
-{
-}
 
 void Scene::Initialize()
 {
@@ -183,14 +178,4 @@ void Scene::ClearEntities()
 void Scene::AddSystem(std::unique_ptr<System> system)
 {
     _systems.push_back(std::move(system));
-}
-
-EventManager& Scene::GetEventManager() const
-{
-    return _eventManager;
-}
-
-ResourceManager& Scene::GetResourceManager() const
-{
-    return _resourceManager;
 }

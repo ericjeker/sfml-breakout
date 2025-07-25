@@ -9,7 +9,7 @@
 class PauseScene final : public Scene
 {
 public:
-    PauseScene(ResourceManager& resourceManager, EventManager& eventManager);
+    PauseScene() = default;
     void Initialize() override;
 
 private:

@@ -19,11 +19,6 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 
 
-MiniRtsScene::MiniRtsScene(ResourceManager& resourceManager, EventManager& eventManager)
-    : Scene(resourceManager, eventManager)
-{
-}
-
 void MiniRtsScene::Initialize()
 {
     AddBackground();

@@ -16,7 +16,8 @@
 class MiniRtsScene final : public Scene
 {
 public:
-    MiniRtsScene(ResourceManager& resourceManager, EventManager& eventManager);
+    MiniRtsScene() = default;
+
     void Initialize() override;
     void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
 

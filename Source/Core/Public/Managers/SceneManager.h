@@ -28,7 +28,7 @@ enum class SceneLoadMode
 class SceneManager
 {
 public:
-    explicit SceneManager(ResourceManager& resourceManager);
+    SceneManager() = default;
     ~SceneManager() = default;
 
     template <typename T>
@@ -108,8 +108,6 @@ public:
 private:
     std::unordered_map<std::type_index, std::unique_ptr<Scene>> _scenes;
     std::vector<std::type_index> _sceneOrder;
-
-    ResourceManager& _resourceManager;
 };
 
 

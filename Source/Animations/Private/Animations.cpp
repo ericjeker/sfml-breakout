@@ -10,9 +10,9 @@
 void Animations::Initialize()
 {
     LOG_DEBUG("(Animations::Initialization): Load Resources");
-    GetGameService().Get<ResourceManager>().LoadResourcesFromManifest("Assets/Manifest.json");
+    GameService::Get<ResourceManager>().LoadResourcesFromManifest("Assets/Manifest.json");
     LOG_DEBUG("(Animations::Initialization): Load the Main Menu State");
-    GetGameService().Get<GameController>().ChangeState(std::make_unique<MainMenuState>(GetGameService()));
+    GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>());
 }
 
 void Animations::Shutdown()

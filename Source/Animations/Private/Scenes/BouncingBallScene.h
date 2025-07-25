@@ -16,7 +16,7 @@ constexpr int BALL_COUNT = 50;
 class BouncingBallScene final : public Scene
 {
 public:
-    BouncingBallScene(ResourceManager& resourceManager, EventManager& eventManager);
+    BouncingBallScene() = default;
 
     void Initialize() override;
     void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;

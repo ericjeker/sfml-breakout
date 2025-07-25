@@ -10,7 +10,8 @@
 class DebugScene final : public Scene
 {
 public:
-    DebugScene(ResourceManager& resourceManager, EventManager& eventManager);
+    DebugScene() = default;
+
     void Initialize() override;
     void Update(float deltaTime) override;
 

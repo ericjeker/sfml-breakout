@@ -10,10 +10,10 @@
 #include "../Events/BallCountChangedEvent.h"
 #include "../Events/BallCountRequestedEvent.h"
 #include "../Systems/CleanUpSystem.h"
+#include "Managers/GameService.h"
 
 #include <SFML/Graphics/RectangleShape.hpp>
 
-#include <Configuration.h>
 #include <PhysicsConstants.h>
 #include <Systems/DrawableRenderer.h>
 #include <Systems/PhysicsSystem.h>
@@ -25,11 +25,7 @@
 #include <Components/DrawableComponent.h>
 #include <Components/PhysicsComponent.h>
 #include <Components/TransformComponent.h>
-
-BouncingBallScene::BouncingBallScene(ResourceManager& resourceManager, EventManager& eventManager)
-    : Scene(resourceManager, eventManager)
-{
-}
+#include <Configuration.h>
 
 void BouncingBallScene::Initialize()
 {
@@ -58,9 +54,12 @@ void BouncingBallScene::Initialize()
     AddSystem(std::make_unique<DrawableRenderer>());
 
     // --- Add event listeners ---
-    GetEventManager().Subscribe<BallCountRequestedEvent>(
+    GameService::Get<EventManager>().Subscribe<BallCountRequestedEvent>(
         [this](const BallCountRequestedEvent& event, void* sender)
-        { GetEventManager().Emit<BallCountChangedEvent>({.count = static_cast<int>(GetEntities().size() - 1)}, this); }
+        {
+            GameService::Get<EventManager>()
+                .Emit<BallCountChangedEvent>({.count = static_cast<int>(GetEntities().size() - 1)}, this);
+        }
     );
 }
 
@@ -159,7 +158,7 @@ void BouncingBallScene::IncreaseGravity()
 
 void BouncingBallScene::EmitBallCountChangedEvent()
 {
-    GetEventManager().Emit<BallCountChangedEvent>({.count = static_cast<int>(GetEntities().size() - 1)}, this);
+    GameService::Get<EventManager>().Emit<BallCountChangedEvent>({.count = static_cast<int>(GetEntities().size() - 1)}, this);
 }
 
 void BouncingBallScene::ResetSimulation()

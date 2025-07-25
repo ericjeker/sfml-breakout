@@ -4,11 +4,6 @@
 
 #include "Logger.h"
 
-GameState::GameState(GameService& gameService)
-    : _gameService(gameService)
-{
-}
-
 void GameState::Pause()
 {
     LOG_DEBUG("(GameState::Pause)");
@@ -24,9 +19,4 @@ void GameState::Resume()
 bool GameState::IsPaused() const
 {
     return _paused;
-}
-
-GameService& GameState::GetGameService() const
-{
-    return _gameService;
 }

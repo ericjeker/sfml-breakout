@@ -54,7 +54,7 @@ struct GravitySettings {
 class BouncingBallFlecsScene final : public Scene
 {
 public:
-    BouncingBallFlecsScene(ResourceManager& resourceManager, EventManager& eventManager);
+    BouncingBallFlecsScene() = default;
 
     void Initialize() override;
     void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
@@ -73,4 +73,4 @@ private:
 };
 
 
-#endif //BOUNCINGBALLFLECSSCENE_H
+#endif

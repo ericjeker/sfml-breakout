@@ -7,6 +7,7 @@
 #include "../Events/ExitGameRequestedEvent.h"
 #include "../Events/ResumeGameRequestedEvent.h"
 #include "../Systems/EventSystem.h"
+#include "Managers/GameService.h"
 
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -21,10 +22,6 @@
 #include <Configuration.h>
 
 
-PauseScene::PauseScene(ResourceManager& resourceManager, EventManager& eventManager)
-    : Scene(resourceManager, eventManager)
-{
-}
 
 void PauseScene::Initialize()
 {
@@ -45,8 +42,8 @@ void PauseScene::Initialize()
     const float centerX = Configuration::WINDOW_SIZE.x / 2;
     const float centerY = Configuration::WINDOW_SIZE.y / 2;
 
-    const auto fontRegular = GetResourceManager().GetResource<sf::Font>("Orbitron-Regular");
-    const auto fontBold = GetResourceManager().GetResource<sf::Font>("Orbitron-Bold");
+    const auto fontRegular = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Regular");
+    const auto fontBold = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Bold");
 
     auto pauseText = std::make_unique<sf::Text>(*fontBold, "Pause Scene", 60.f);
     pauseText->setFillColor(NordTheme::SnowStorm3);
@@ -60,7 +57,7 @@ void PauseScene::Initialize()
         std::move(CreateButtonEntity(
             std::move(resumeText),
             {centerX, centerY},
-            [this]() { GetEventManager().EmitDeferred<ResumeGameRequestedEvent>({}, this); }
+            [this]() { GameService::Get<EventManager>().EmitDeferred<ResumeGameRequestedEvent>({}, this); }
         ))
     );
 
@@ -71,7 +68,7 @@ void PauseScene::Initialize()
         std::move(CreateButtonEntity(
             std::move(exitText),
             {centerX, centerY + 100},
-            [this]() { GetEventManager().EmitDeferred<ExitGameRequestedEvent>({}, this); }
+            [this]() { GameService::Get<EventManager>().EmitDeferred<ExitGameRequestedEvent>({}, this); }
         ))
     );
 

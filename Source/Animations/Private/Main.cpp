@@ -14,6 +14,7 @@
 
 #include <SFML/Graphics.hpp>
 
+
 /**
  * Entry point of the application. Initializes the necessary components, configures
  * the rendering window, and starts the main application loop.
@@ -43,20 +44,23 @@ int main()
     renderWindow.setFramerateLimit(Configuration::FRAMES_PER_SECOND);
     renderWindow.setVerticalSyncEnabled(Configuration::IS_VSYNC);
 
-    // Initialize the different managers
-    LOG_DEBUG("(Main::main): Initializing the GameService");
-    auto gameService = std::make_unique<GameService>();
-    gameService->Register<sf::RenderWindow>(renderWindow);
-    gameService->Register<ResourceManager>(std::make_unique<ResourceManager>());
-    gameService->Register<SceneManager>(std::make_unique<SceneManager>(gameService->Get<ResourceManager>()));
-    gameService->Register<GameController>(std::make_unique<GameController>());
-    gameService->Register<EventManager>(std::make_unique<EventManager>());
+    GameService::Initialize();
+    // We register the SFML window as a reference, so it's easy to access it
+    GameService::Register<sf::RenderWindow>(renderWindow);
+    GameService::Register<ResourceManager>(std::make_unique<ResourceManager>());
+    GameService::Register<SceneManager>(std::make_unique<SceneManager>());
+    GameService::Register<GameController>(std::make_unique<GameController>());
+    GameService::Register<EventManager>(std::make_unique<EventManager>());
     // TODO: NetworkManager
     // TODO: AudioManager
 
     // Create the game instance
     LOG_DEBUG("(Main::main): Creating the GameInstance");
-    Animations animations(std::move(gameService));
+    Animations animations{};
+
+    // Register the game instance as a service
+    GameService::Register<GameInstance>(animations);
+
     animations.Initialize();
     animations.Run(renderWindow);
     animations.Shutdown();

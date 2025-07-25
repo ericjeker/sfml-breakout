@@ -11,13 +11,9 @@
 
 #include <ranges>
 
-SceneManager::SceneManager(ResourceManager& resourceManager)
-    : _resourceManager(resourceManager)
-{
-}
-
 void SceneManager::CleanUp()
 {
+    ZoneScopedN("SceneManager::CleanUp");
     for (const auto& scene : _scenes | std::views::values)
     {
         scene->Shutdown();

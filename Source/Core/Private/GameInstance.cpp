@@ -8,18 +8,12 @@
 #include "Logger.h"
 #include "Managers/SceneManager.h"
 
-GameInstance::GameInstance(std::unique_ptr<GameService> gameService)
-    : _gameService(std::move(gameService))
-{
-    LOG_DEBUG("(GameInstance::GameInstance)");
-}
-
 void GameInstance::Run(sf::RenderWindow& renderWindow)
 {
-    // Start the main loop
-    sf::Clock clock;
     LOG_DEBUG("(GameInstance::Run): Starting game loop");
-    while (renderWindow.isOpen())
+
+    sf::Clock clock;
+    while (renderWindow.isOpen() && !ShouldExit())
     {
         static int frameCount = 0;
         frameCount++;
@@ -33,9 +27,15 @@ void GameInstance::Run(sf::RenderWindow& renderWindow)
         Render(renderWindow);
 
         // Process deferred events at the end of the frame
-        GetGameService().Get<EventManager>().ProcessDeferredEvents();
+        GameService::Get<EventManager>().ProcessDeferredEvents();
 
         FrameMark;
+    }
+
+    LOG_DEBUG("(GameInstance::Run): Game loop ended");
+    if (renderWindow.isOpen())
+    {
+        renderWindow.close();
     }
 }
 
@@ -50,27 +50,32 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
         }
 
         // We delegate the event to the game controller
-        GetGameService().Get<GameController>().HandleEvent(event, renderWindow);
-        GetGameService().Get<SceneManager>().HandleEvent(event, renderWindow);
+        GameService::Get<GameController>().HandleEvent(event, renderWindow);
+        GameService::Get<SceneManager>().HandleEvent(event, renderWindow);
     }
 }
 
 void GameInstance::Update(const float deltaTime)
 {
     ZoneScoped;
-    GetGameService().Get<GameController>().Update(deltaTime);
-    GetGameService().Get<SceneManager>().Update(deltaTime);
+    GameService::Get<GameController>().Update(deltaTime);
+    GameService::Get<SceneManager>().Update(deltaTime);
 }
 
 void GameInstance::Render(sf::RenderWindow& renderWindow)
 {
     ZoneScoped;
     renderWindow.clear();
-    GetGameService().Get<SceneManager>().Render(renderWindow);
+    GameService::Get<SceneManager>().Render(renderWindow);
     renderWindow.display();
 }
 
-GameService& GameInstance::GetGameService() const
+void GameInstance::RequestExit()
 {
-    return *_gameService;
+    _shouldExit = true;
+}
+
+bool GameInstance::ShouldExit() const
+{
+    return _shouldExit;
 }
