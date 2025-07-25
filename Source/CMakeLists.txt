@@ -1,6 +1,6 @@
 add_subdirectory(Core)
 add_subdirectory(Animations)
-add_subdirectory(MiniRts)
+#add_subdirectory(MiniRts)
 
 # --- Testing Setup ---
 

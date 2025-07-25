@@ -8,6 +8,7 @@
 namespace Configuration
 {
 
+
 constexpr auto WINDOW_TITLE = "Animation System";
 constexpr sf::Vector2u WINDOW_SIZE = {1920, 1080};
 constexpr auto WINDOW_STYLE = sf::Style::Close;
@@ -18,4 +19,5 @@ constexpr unsigned int FRAMES_PER_SECOND = 60;
 constexpr bool IS_VSYNC = true;
 constexpr unsigned int ANTI_ALIASING_LEVEL = 4;
 
-} // namespace ApplicationConfiguration
+
+}

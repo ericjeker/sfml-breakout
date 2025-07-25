@@ -11,7 +11,7 @@
 namespace PhysicsConstants
 {
 
-// Gravity values
+// Gravity values (our world use centimeters and seconds)
 constexpr float EARTH_GRAVITY = 981.f; // cm/s²
 constexpr sf::Vector2f GRAVITY_DOWN = {0.f, EARTH_GRAVITY};
 constexpr sf::Vector2f GRAVITY_UP = {0.f, -EARTH_GRAVITY};

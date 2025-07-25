@@ -15,65 +15,16 @@ void Scene::Initialize()
 void Scene::Shutdown()
 {
     LOG_DEBUG("(Scene:Shutdown)");
-    _entities.clear();
-    _systems.clear();
 }
 
 void Scene::Update(const float deltaTime)
 {
-    if (!IsLoaded() || IsPaused())
-    {
-        return;
-    }
-
-    for (const auto& system : _systems)
-    {
-        ZoneScoped;
-        ZoneName(std::string("Scene::Update -> " + std::string(typeid(*system).name())).c_str(), strlen(typeid(*system).name()) + 26);
-        for (const auto& entity : GetEntities())
-        {
-            system->Update(entity, deltaTime);
-        }
-    }
+    // Progress of the world by one tick.
+    GetWorld().progress(deltaTime);
 }
 
-void Scene::Render(sf::RenderWindow& window)
+void Scene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
 {
-    if (!IsLoaded())
-    {
-        return;
-    }
-
-    for (const auto& system : _systems)
-    {
-        ZoneScoped;
-        ZoneName(std::string("Scene::Render -> " + std::string(typeid(*system).name())).c_str(), strlen(typeid(*system).name()) + 26);
-        for (const auto& entity : GetEntities())
-        {
-            system->Render(entity, window);
-        }
-    }
-}
-
-void Scene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow)
-{
-    if (!IsLoaded() || IsPaused())
-    {
-        return;
-    }
-
-    for (const auto& system : _systems)
-    {
-        ZoneScoped;
-        ZoneName(
-            std::string("Scene::HandleEvent -> " + std::string(typeid(*system).name())).c_str(),
-            strlen(typeid(*system).name()) + 26
-        );
-        for (const auto& entity : GetEntities())
-        {
-            system->HandleEvent(entity, event, renderWindow);
-        }
-    }
 }
 
 bool Scene::IsLoaded() const
@@ -121,61 +72,12 @@ void Scene::SetPath(const std::string& path)
     _path = path;
 }
 
-int Scene::GenerateId()
+flecs::world& Scene::GetWorld()
 {
-    static int id = 0;
-    return ++id;
+    return _world;
 }
 
-void Scene::AddEntity(std::unique_ptr<Entity> entity)
+const flecs::world& Scene::GetWorld() const
 {
-    _entities.push_back(std::move(entity));
-}
-
-void Scene::RemoveEntity(const int id)
-{
-    _entities.erase(
-        std::remove_if(_entities.begin(), _entities.end(), [&](const auto& entity) { return entity->GetId() == id; })
-    );
-}
-
-Entity* Scene::GetEntity(const int id) const
-{
-    for (auto& entity : _entities)
-    {
-        if (entity->GetId() == id)
-        {
-            return entity.get();
-        }
-    }
-
-    return nullptr;
-}
-
-void Scene::ReserveEntities(const int count)
-{
-    _entities.reserve(count);
-}
-
-std::vector<std::unique_ptr<Entity>>& Scene::GetEntities()
-{
-    return _entities;
-}
-
-void Scene::AddEntities(std::vector<std::unique_ptr<Entity>>&& entities)
-{
-}
-
-void Scene::RemoveEntities(const std::vector<int>& ids)
-{
-}
-
-void Scene::ClearEntities()
-{
-    _entities.clear();
-}
-
-void Scene::AddSystem(std::unique_ptr<System> system)
-{
-    _systems.push_back(std::move(system));
+    return _world;
 }

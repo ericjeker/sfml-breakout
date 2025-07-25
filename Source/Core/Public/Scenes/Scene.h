@@ -4,19 +4,13 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "Entity.h"
-#include "Managers/EventManager.h"
-#include "Managers/ResourceManager.h"
-#include "Systems/System.h"
-
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include <SFML/Window/Event.hpp>
 
-#include <memory>
+#include <flecs.h>
 #include <optional>
 #include <string>
-#include <vector>
 
 
 /**
@@ -37,7 +31,7 @@ public:
     virtual void Initialize();
     virtual void Shutdown();
     virtual void Update(float deltaTime);
-    virtual void Render(sf::RenderWindow& window);
+    virtual void Render(sf::RenderWindow& window) = 0;
     virtual void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window);
 
     // -- Scene States --
@@ -54,82 +48,18 @@ public:
     void SetName(const std::string& name);
     void SetPath(const std::string& path);
 
-    // --- Entity Management ------------------------------------------------------------------------------------------
-
-    static int GenerateId();
-    void AddEntity(std::unique_ptr<Entity> entity);
-    void RemoveEntity(int id);
-    [[nodiscard]] Entity* GetEntity(int id) const;
-
-    template <typename T>
-    [[nodiscard]] Entity* GetEntityWithComponent()
-    {
-        const auto it = std::find_if(
-            std::begin(_entities),
-            std::end(_entities),
-            [](const std::unique_ptr<Entity>& entity) { return entity->HasComponent<T>(); }
-        );
-
-        return it != std::end(_entities) ? static_cast<Entity*>(it->get()) : nullptr;
-    };
-
-    // --- Entity Management : Batch Processing ---
-
-    void ReserveEntities(int count);
-    std::vector<std::unique_ptr<Entity>>& GetEntities();
-
-    // TODO: Allow to query only specific entities
-    template <typename T>
-    std::vector<std::unique_ptr<Entity>>& GetEntitiesWithComponent()
-    {
-        return _entities;
-    }
-    // TODO: Batch add and remove
-    void AddEntities(std::vector<std::unique_ptr<Entity>>&& entities);
-    void RemoveEntities(const std::vector<int>& ids);
-    void ClearEntities();
-
-    template <typename T>
-    void ClearEntitiesWithComponent()
-    {
-        _entities.erase(
-            std::remove_if(
-                std::begin(_entities),
-                std::end(_entities),
-                [this](const std::unique_ptr<Entity>& entity) { return entity->HasComponent<T>(); }
-            ),
-            std::end(_entities)
-        );
-    }
-
-    // --- System Management ---
-    void AddSystem(std::unique_ptr<System> system);
-
-    template <typename T>
-    [[nodiscard]] T* GetSystem()
-    {
-        const auto it = std::find_if(
-            std::begin(_systems),
-            std::end(_systems),
-            [](const std::unique_ptr<System>& system) { return dynamic_cast<T*>(system.get()) != nullptr; }
-        );
-
-        return it != std::end(_systems) ? static_cast<T*>(it->get()) : nullptr;
-    }
+    flecs::world& GetWorld();
+    const flecs::world& GetWorld() const;
 
 private:
     std::string _name;
     std::string _path;
 
+    // Flecs entities for singletons
+    flecs::world _world{};
+
     bool _isLoaded = false;
     bool _isPaused = false;
-
-    // TODO: Right now, entities are structures, this is not good for cache performance
-    std::vector<std::unique_ptr<Entity>> _entities;
-
-    // TODO: Organize systems by type (Update vs Render)
-    // TODO: System should register a component mask and receive only the required entities
-    std::vector<std::unique_ptr<System>> _systems;
 };
 
 #endif

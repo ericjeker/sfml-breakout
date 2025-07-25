@@ -5,7 +5,7 @@
 #define RESUMEGAMEREQUESTEDEVENT_H
 
 
-struct ResumeGameRequestedEvent
+struct RequestGameResume
 {
 
 };

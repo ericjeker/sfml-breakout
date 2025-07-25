@@ -4,10 +4,11 @@
 #include <tracy/Tracy.hpp>
 #endif
 
-#include "Configuration.h"
 #include "Animations.h"
+#include "Configuration.h"
 #include "GameInstance.h"
 #include "Gameplay/GameController.h"
+#include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
 #include "Managers/SceneManager.h"

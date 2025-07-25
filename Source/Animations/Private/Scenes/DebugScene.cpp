@@ -3,45 +3,46 @@
 #include "DebugScene.h"
 
 #include "Managers/GameService.h"
+#include "Managers/ResourceManager.h"
 
-#include <Systems/DrawableRenderer.h>
 #include <Themes/Nord.h>
-
-#include <Components/DrawableComponent.h>
-#include <Components/TransformComponent.h>
-
 
 void DebugScene::Initialize()
 {
+    const auto ecsWorld = GetWorld();
+
+    // --- Resources ---
     const auto font = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Bold");
     auto fpsText = std::make_unique<sf::Text>(*font, "FPS: ", 10);
     fpsText->setFillColor(NordTheme::SnowStorm3);
 
-    auto fpsEntity = std::make_unique<Entity>(_fpsEntityId);
-    fpsEntity->AddComponent<DrawableComponent>({.drawable = std::move(fpsText)});
-    fpsEntity->AddComponent<TransformComponent>({.position = {5.f, 5.f}});
-
-    AddEntity(std::move(fpsEntity));
+    // --- Entities ---
+    ecsWorld.entity("Fps").set<Transform>({.position = {5.f, 5.f}}).set<TextRenderable>({.text = std::move(fpsText)});
 
     // --- Systems ---
-    AddSystem(std::make_unique<DrawableRenderer>());
+    ecsWorld.system<Transform, TextRenderable>().each(ProcessText);
 }
 
-void DebugScene::Update(const float deltaTime)
+void DebugScene::Render(sf::RenderWindow& window)
+{
+    GetWorld().each([&](const TextRenderable& textRenderable) { window.draw(*textRenderable.text); });
+}
+
+void DebugScene::ProcessText(const flecs::iter& it, size_t, const Transform& t, const TextRenderable& textRenderable)
 {
     static float sinceLastUpdate = 0.f;
-
+    static int frameCount = 0;
+    const float deltaTime = it.world().delta_time();
     sinceLastUpdate += deltaTime;
+    frameCount++;
+
     if (sinceLastUpdate >= .3f)
     {
-        const auto* fpsComponent = GetEntity(_fpsEntityId)->GetComponent<DrawableComponent>();
-        if (auto* fpsDrawable = dynamic_cast<sf::Text*>(fpsComponent->drawable.get()))
-        {
-            fpsDrawable->setString("FPS: " + std::to_string(static_cast<int>(1.f / deltaTime)));
-        }
-
+        const float averageFps = frameCount / sinceLastUpdate;
+        textRenderable.text->setString("FPS: " + std::to_string(static_cast<int>(averageFps)));
         sinceLastUpdate = 0.f;
+        frameCount = 0;
     }
 
-    Scene::Update(deltaTime);
+    textRenderable.text->setPosition(t.position);
 }

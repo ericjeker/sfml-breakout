@@ -5,7 +5,7 @@
 #define EXITREQUESTEDEVENT_H
 
 
-struct ExitGameRequestedEvent
+struct RequestGameExit
 {
 
 };

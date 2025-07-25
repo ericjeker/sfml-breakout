@@ -1,17 +1,29 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef BOUNCINGBALLSCENE_H
-#define BOUNCINGBALLSCENE_H
+#ifndef BOUNCINGBALLFLECSSCENE_H
+#define BOUNCINGBALLFLECSSCENE_H
 
+#include "Components/RigidBody.h"
+#include "Components/Transform.h"
+#include "Components/Velocity.h"
 #include "Scenes/Scene.h"
 
-namespace BouncingBallConstants
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
+
+#include <flecs.h>
+
+
+struct BallRenderable
 {
+    std::unique_ptr<sf::CircleShape> shape;
+};
 
-constexpr int BALL_COUNT = 50;
-
-}
+struct BackgroundRenderable
+{
+    std::unique_ptr<sf::RectangleShape> shape;
+};
 
 class BouncingBallScene final : public Scene
 {
@@ -20,20 +32,12 @@ public:
 
     void Initialize() override;
     void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
-
-    void DecreaseGravity();
-    void IncreaseGravity();
-    void ResetSimulation();
-    void ToggleGravity();
-
-    void CreateBalls(int numberOfBalls);
-    static std::unique_ptr<Entity> CreateBallEntity(sf::Vector2f position, sf::Vector2f velocity);
-
-
-    void EmitBallCountChangedEvent();
+    void Render(sf::RenderWindow& window) override;
 
 private:
-    sf::Vector2i _throwStartPos;
+    void CreateBalls(int count);
+    static void ProcessScreenBounce(const flecs::iter& it, size_t, Transform& t, Velocity& v);
+    static void ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p);
 };
 
 

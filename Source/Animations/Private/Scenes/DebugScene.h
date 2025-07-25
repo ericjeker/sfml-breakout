@@ -4,6 +4,8 @@
 #ifndef DEBUGSCENE_H
 #define DEBUGSCENE_H
 
+#include "Components/TextRenderable.h"
+#include "Components/Transform.h"
 #include "Scenes/Scene.h"
 
 
@@ -13,11 +15,8 @@ public:
     DebugScene() = default;
 
     void Initialize() override;
-    void Update(float deltaTime) override;
-
-private:
-    int _fpsEntityId{GenerateId()};
-    int _fps{0};
+    void Render(sf::RenderWindow& window) override;
+    static void ProcessText(const flecs::iter& it, size_t, const Transform& t, const TextRenderable& textRenderable);
 };
 
 

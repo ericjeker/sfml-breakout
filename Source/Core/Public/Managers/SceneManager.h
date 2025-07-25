@@ -10,6 +10,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include <memory>
+#include <typeindex>
 
 
 enum class SceneLoadMode
@@ -45,6 +46,9 @@ public:
 
         _sceneOrder.push_back(typeIndex);
         _scenes[typeIndex] = std::move(scene);
+
+        // Initialize the scene
+        _scenes[typeIndex]->Initialize();
     }
 
     template <typename T>
@@ -62,7 +66,6 @@ public:
         if (it != _scenes.end() && !it->second->IsLoaded())
         {
             LOG_DEBUG("(SceneManager): Loading scene " + std::string(typeid(T).name()) + ".");
-            it->second->Initialize();
             it->second->SetLoaded(true);
         }
     }
@@ -74,7 +77,6 @@ public:
         auto it = _scenes.find(std::type_index(typeid(T)));
         if (it != _scenes.end() && it->second->IsLoaded())
         {
-            it->second->Shutdown();
             it->second->SetLoaded(false);
         }
     }

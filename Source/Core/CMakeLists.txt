@@ -1,24 +1,9 @@
-set(SOURCE_FILES
-        Private/Logger.cpp
-        Private/GameInstance.cpp
-        Private/Gameplay/GameController.cpp
-        Private/Gameplay/GameState.cpp
-        Private/Managers/EventManager.cpp
-        Private/Managers/GameService.cpp
-        Private/Managers/FileManager.cpp
-        Private/Managers/ResourceManager.cpp
-        Private/Managers/SceneManager.cpp
-        Private/Scenes/Entity.cpp
-        Private/Scenes/Scene.cpp
-        Private/Systems/AnimationSystem.cpp
-        Private/Systems/DrawableRenderer.cpp
-        Private/Systems/PhysicsSystem.cpp
-        Private/Systems/ScreenBounceSystem.cpp
-        Private/Systems/System.cpp
-)
+# --- Sources Files
+file(GLOB_RECURSE SOURCE_FILES Private/*.cpp)
+file(GLOB_RECURSE HEADER_FILES Private/*.h)
 
 add_library(Core)
-target_sources(Core PRIVATE ${SOURCE_FILES})
+target_sources(Core PRIVATE ${SOURCE_FILES} ${HEADER_FIELS})
 target_include_directories(Core PUBLIC Public)
 target_include_directories(Core PRIVATE Private)
 target_link_libraries(Core PRIVATE Vendor)

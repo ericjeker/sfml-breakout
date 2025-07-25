@@ -16,8 +16,8 @@ void SceneManager::CleanUp()
     ZoneScopedN("SceneManager::CleanUp");
     for (const auto& scene : _scenes | std::views::values)
     {
-        scene->Shutdown();
         scene->SetLoaded(false);
+        scene->Shutdown();
     }
 }
 
@@ -26,6 +26,11 @@ void SceneManager::Update(const float deltaTime)
     ZoneScopedN("SceneManager::Update");
     for (const auto& scene : _scenes | std::views::values)
     {
+        if (!scene->IsLoaded() || scene->IsPaused())
+        {
+            continue;
+        }
+
         scene->Update(deltaTime);
     }
 }
@@ -47,6 +52,11 @@ void SceneManager::HandleEvent(const std::optional<sf::Event>& event, sf::Render
     ZoneScopedN("SceneManager::HandleEvent");
     for (const auto& scene : _scenes | std::views::values)
     {
+        if (!scene->IsLoaded())
+        {
+            continue;
+        }
+
         scene->HandleEvent(event, renderWindow);
     }
 }

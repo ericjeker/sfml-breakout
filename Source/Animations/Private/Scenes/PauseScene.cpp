@@ -2,30 +2,31 @@
 
 #include "PauseScene.h"
 
-#include "../Components/BoundingBoxComponent.h"
-#include "../Components/EventComponent.h"
-#include "../Events/ExitGameRequestedEvent.h"
-#include "../Events/ResumeGameRequestedEvent.h"
-#include "../Systems/EventSystem.h"
+#include "../Events/RequestGameExit.h"
+#include "../Events/RequestGameResume.h"
+#include "BouncingBallScene.h"
+#include "Managers/EventManager.h"
 #include "Managers/GameService.h"
+#include "Managers/ResourceManager.h"
 
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Text.hpp>
 
 #include <Logger.h>
-#include <Systems/DrawableRenderer.h>
 #include <Themes/Nord.h>
 
-#include <Components/DrawableComponent.h>
-#include <Components/TransformComponent.h>
+#include <Components/TextRenderable.h>
+#include <Components/Transform.h>
 #include <Configuration.h>
-
 
 
 void PauseScene::Initialize()
 {
     LOG_DEBUG("(PauseScene:Initialize)");
+    constexpr float centerX = Configuration::WINDOW_SIZE.x / 2;
+    constexpr float centerY = Configuration::WINDOW_SIZE.y / 2;
+    const auto ecsWorld = GetWorld();
 
     // --- Overlay ---
     auto background = std::make_unique<sf::RectangleShape>(sf::Vector2f{Configuration::WINDOW_SIZE});
@@ -33,70 +34,101 @@ void PauseScene::Initialize()
     backgroundColor.a = 127;
     background->setFillColor(backgroundColor);
 
-    auto backgroundEntity = std::make_unique<Entity>(GenerateId());
-    backgroundEntity->AddComponent<DrawableComponent>({.drawable = std::move(background)});
-    backgroundEntity->AddComponent<TransformComponent>({});
-    AddEntity(std::move(backgroundEntity));
+    ecsWorld.entity()
+        .set<BackgroundRenderable>({std::move(background)})
+        .set<Transform>({.position = {0.f, 0.f}, .scale = {1.f, 1.f}, .rotation = 0.f});
 
     // --- Add Pause Text ---
-    const float centerX = Configuration::WINDOW_SIZE.x / 2;
-    const float centerY = Configuration::WINDOW_SIZE.y / 2;
-
     const auto fontRegular = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Regular");
     const auto fontBold = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Bold");
 
     auto pauseText = std::make_unique<sf::Text>(*fontBold, "Pause Scene", 60.f);
     pauseText->setFillColor(NordTheme::SnowStorm3);
     pauseText->setOrigin(pauseText->getLocalBounds().size / 2.f);
-    AddEntity(std::move(CreateTextEntity(std::move(pauseText), {centerX, centerY - 200})));
+    CreateTextEntity(std::move(pauseText), {centerX, centerY - 200});
 
+    // --- Add Resume Text ---
     auto resumeText = std::make_unique<sf::Text>(*fontRegular, "Resume", 36.f);
     resumeText->setFillColor(NordTheme::SnowStorm3);
     resumeText->setOrigin(resumeText->getLocalBounds().size / 2.f);
-    AddEntity(
-        std::move(CreateButtonEntity(
-            std::move(resumeText),
-            {centerX, centerY},
-            [this]() { GameService::Get<EventManager>().EmitDeferred<ResumeGameRequestedEvent>({}, this); }
-        ))
+    CreateButtonEntity(
+        std::move(resumeText),
+        {centerX, centerY},
+        [this]() { GameService::Get<EventManager>().EmitDeferred<RequestGameResume>({}, this); }
     );
 
+    // --- Add Exit Text ---
     auto exitText = std::make_unique<sf::Text>(*fontRegular, "Exit", 28.f);
     exitText->setFillColor(NordTheme::SnowStorm3);
     exitText->setOrigin(exitText->getLocalBounds().size / 2.f);
-    AddEntity(
-        std::move(CreateButtonEntity(
-            std::move(exitText),
-            {centerX, centerY + 100},
-            [this]() { GameService::Get<EventManager>().EmitDeferred<ExitGameRequestedEvent>({}, this); }
-        ))
+    CreateButtonEntity(
+        std::move(exitText),
+        {centerX, centerY + 100},
+        [this]() { GameService::Get<EventManager>().EmitDeferred<RequestGameExit>({}, this); }
     );
 
     // --- Add the Systems ---
-    AddSystem(std::make_unique<EventSystem>());
-    AddSystem(std::make_unique<DrawableRenderer>());
+    GetWorld().system<Transform, BackgroundRenderable>().each(ProcessBackground);
+    GetWorld().system<Transform, TextRenderable>().each(ProcessText);
 }
 
-std::unique_ptr<Entity> PauseScene::CreateTextEntity(std::unique_ptr<sf::Text> text, const sf::Vector2f position)
-{
-    auto entity = std::make_unique<Entity>(GenerateId());
-    entity->AddComponent<DrawableComponent>({.drawable = std::move(text)});
-    entity->AddComponent<TransformComponent>({.position = position});
 
-    return entity;
+void PauseScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
+{
+    if (!IsLoaded() || IsPaused())
+    {
+        return;
+    }
+
+    if (auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>())
+    {
+        if (mousePressed->button != sf::Mouse::Button::Left)
+        {
+            return;
+        }
+
+        const sf::Vector2<float> mousePosition(mousePressed->position);
+
+        LOG_DEBUG("(PauseScene::HandleEvent): Handle click");
+
+        GetWorld().each(
+            [&](const TextRenderable& textRenderable, const EventTrigger& eventTrigger)
+            {
+                if (textRenderable.text->getGlobalBounds().contains(mousePosition))
+                {
+                    eventTrigger.callback();
+                }
+            }
+        );
+    }
 }
 
-std::unique_ptr<Entity> PauseScene::CreateButtonEntity(
-    std::unique_ptr<sf::Text> text,
-    const sf::Vector2f position,
-    const std::function<void()>& callback
-)
+void PauseScene::Render(sf::RenderWindow& window)
 {
-    auto entity = std::make_unique<Entity>(GenerateId());
-    entity->AddComponent<TransformComponent>({.position = position});
-    entity->AddComponent<EventComponent>({.callback = callback});
-    entity->AddComponent<BoundingBoxComponent>({.bounds = text->getGlobalBounds()});
-    entity->AddComponent<DrawableComponent>({.drawable = std::move(text)});
+    GetWorld().each([&](const BackgroundRenderable& bg) { window.draw(*bg.shape); });
+    GetWorld().each([&](const TextRenderable& textRenderable) { window.draw(*textRenderable.text); });
+}
 
-    return entity;
+void PauseScene::CreateTextEntity(std::unique_ptr<sf::Text> text, const sf::Vector2f position)
+{
+    GetWorld().entity().set<Transform>({.position = position}).set<TextRenderable>({.text = std::move(text)});
+}
+
+void PauseScene::CreateButtonEntity(std::unique_ptr<sf::Text> text, const sf::Vector2f position, const std::function<void()>& callback)
+{
+    GetWorld()
+        .entity()
+        .set<Transform>({.position = position})
+        .set<TextRenderable>({.text = std::move(text)})
+        .set<EventTrigger>({.callback = callback});
+}
+
+void PauseScene::ProcessText(const Transform& t, const TextRenderable& textRenderable)
+{
+    textRenderable.text->setPosition(t.position);
+}
+
+void PauseScene::ProcessBackground(const Transform& t, const BackgroundRenderable& bg)
+{
+    bg.shape->setPosition(t.position);
 }
