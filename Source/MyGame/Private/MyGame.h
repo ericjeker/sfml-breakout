@@ -1,13 +1,13 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#ifndef MYGAME_H
+#define MYGAME_H
 
 #include "GameInstance.h"
 
 
-class Animations final : public GameInstance
+class MyGame final : public GameInstance
 {
 public:
     using GameInstance::GameInstance;

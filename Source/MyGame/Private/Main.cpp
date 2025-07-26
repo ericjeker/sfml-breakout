@@ -4,7 +4,6 @@
 #include <tracy/Tracy.hpp>
 #endif
 
-#include "Animations.h"
 #include "Configuration.h"
 #include "GameInstance.h"
 #include "Gameplay/GameController.h"
@@ -12,6 +11,7 @@
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
 #include "Managers/SceneManager.h"
+#include "MyGame.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -57,14 +57,14 @@ int main()
 
     // Create the game instance
     LOG_DEBUG("(Main::main): Creating the GameInstance");
-    Animations animations{};
+    MyGame gameInstance{};
 
     // Register the game instance as a service
-    GameService::Register<GameInstance>(animations);
+    GameService::Register<GameInstance>(gameInstance);
 
-    animations.Initialize();
-    animations.Run(renderWindow);
-    animations.Shutdown();
+    gameInstance.Initialize();
+    gameInstance.Run(renderWindow);
+    gameInstance.Shutdown();
     LOG_DEBUG("(Main::main): Bye bye!");
 
     return 0;

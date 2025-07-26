@@ -32,7 +32,7 @@ file(
 )
 
 # --- Installation Rules ---
-install(TARGETS Animations
+install(TARGETS MyGame
     RUNTIME DESTINATION bin  # For .exe/.dll
     LIBRARY DESTINATION lib  # For .lib
     ARCHIVE DESTINATION lib  # For .a

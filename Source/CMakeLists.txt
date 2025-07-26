@@ -1,5 +1,5 @@
 add_subdirectory(Core)
-add_subdirectory(Animations)
+add_subdirectory(MyGame)
 #add_subdirectory(MiniRts)
 
 # --- Testing Setup ---
