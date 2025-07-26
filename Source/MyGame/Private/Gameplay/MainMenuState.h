@@ -26,7 +26,7 @@ public:
     void Exit() override;
 
     void Update(float deltaTime) override;
-    void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
+    void HandleEvent(const std::optional<sf::Event>& event) override;
 
 private:
     bool _isPaused = false;

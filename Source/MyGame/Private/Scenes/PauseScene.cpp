@@ -5,20 +5,19 @@
 #include "../Events/RequestGameExit.h"
 #include "../Events/RequestGameResume.h"
 #include "BouncingBallScene.h"
+#include "Components/EventTrigger.h"
+#include "Components/TextRenderable.h"
+#include "Components/Transform/Transform.h"
+#include "Configuration.h"
+#include "Logger.h"
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
+#include "Themes/Nord.h"
 
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Text.hpp>
-
-#include <Logger.h>
-#include <Themes/Nord.h>
-
-#include <Components/TextRenderable.h>
-#include <Components/Transform.h>
-#include <Configuration.h>
 
 
 void PauseScene::Initialize()
@@ -73,7 +72,7 @@ void PauseScene::Initialize()
 }
 
 
-void PauseScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
+void PauseScene::HandleEvent(const std::optional<sf::Event>& event)
 {
     if (!IsLoaded() || IsPaused())
     {

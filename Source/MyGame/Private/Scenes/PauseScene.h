@@ -4,18 +4,12 @@
 #ifndef PAUSESCENE_H
 #define PAUSESCENE_H
 
-#include "BouncingBallScene.h"
+#include "../Components/BackgroundRenderable.h"
 #include "Components/TextRenderable.h"
-#include "Components/Transform.h"
+#include "Components/Transform/Transform.h"
 #include "Scenes/Scene.h"
 
 #include <SFML/Graphics/Text.hpp>
-
-
-struct EventTrigger
-{
-    std::function<void()> callback;
-};
 
 
 class PauseScene final : public Scene
@@ -24,7 +18,7 @@ public:
     PauseScene() = default;
 
     void Initialize() override;
-    void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
+    void HandleEvent(const std::optional<sf::Event>& event) override;
     void Render(sf::RenderWindow& window) override;
 
 private:

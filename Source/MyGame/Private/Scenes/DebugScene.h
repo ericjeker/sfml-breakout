@@ -4,8 +4,8 @@
 #ifndef DEBUGSCENE_H
 #define DEBUGSCENE_H
 
+#include "../../../Core/Public/Components/Transform/Transform.h"
 #include "Components/TextRenderable.h"
-#include "Components/Transform.h"
 #include "Scenes/Scene.h"
 
 

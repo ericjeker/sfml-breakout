@@ -4,6 +4,7 @@
 #include <tracy/Tracy.hpp>
 #endif
 
+#include "Components/RenderTarget.h"
 #include "Configuration.h"
 #include "GameInstance.h"
 #include "Gameplay/GameController.h"
@@ -15,6 +16,13 @@
 
 #include <SFML/Graphics.hpp>
 
+#include <flecs.h>
+
+
+struct Gravity
+{
+    double value;
+};
 
 /**
  * Entry point of the application. Initializes the necessary components, configures
@@ -34,16 +42,15 @@ int main()
     sf::ContextSettings settings;
     settings.antiAliasingLevel = Configuration::ANTI_ALIASING_LEVEL;
 
-    auto renderWindow = sf::RenderWindow(
-        mode,
-        Configuration::WINDOW_TITLE,
-        Configuration::WINDOW_STYLE,
-        Configuration::WINDOW_STATE,
-        settings
-    );
+    auto renderWindow = sf::RenderWindow(mode, Configuration::WINDOW_TITLE, Configuration::WINDOW_STYLE, Configuration::WINDOW_STATE, settings);
 
     renderWindow.setFramerateLimit(Configuration::FRAMES_PER_SECOND);
     renderWindow.setVerticalSyncEnabled(Configuration::IS_VSYNC);
+
+    // Create the global ECS world
+    const flecs::world world;
+    world.set<RenderTarget>({&renderWindow});
+    world.set<Gravity>(Gravity{9.81});
 
     GameService::Initialize();
     // We register the SFML window as a reference, so it's easy to access it
@@ -57,7 +64,7 @@ int main()
 
     // Create the game instance
     LOG_DEBUG("(Main::main): Creating the GameInstance");
-    MyGame gameInstance{};
+    MyGame gameInstance{world};
 
     // Register the game instance as a service
     GameService::Register<GameInstance>(gameInstance);

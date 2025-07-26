@@ -28,11 +28,11 @@ public:
     Scene() = default;
     virtual ~Scene() = default;
 
-    virtual void Initialize();
+    virtual void Initialize() = 0;
     virtual void Shutdown();
     virtual void Update(float deltaTime);
     virtual void Render(sf::RenderWindow& window) = 0;
-    virtual void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window);
+    virtual void HandleEvent(const std::optional<sf::Event>& event);
 
     // -- Scene States --
     [[nodiscard]] bool IsLoaded() const;

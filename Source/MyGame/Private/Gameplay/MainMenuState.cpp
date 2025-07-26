@@ -43,7 +43,7 @@ void MainMenuState::Update(float deltaTime)
 {
 }
 
-void MainMenuState::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
+void MainMenuState::HandleEvent(const std::optional<sf::Event>& event)
 {
     auto& sceneManager = GameService::Get<SceneManager>();
 

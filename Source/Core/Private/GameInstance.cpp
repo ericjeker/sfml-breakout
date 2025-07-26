@@ -7,7 +7,13 @@
 #include "Gameplay/GameController.h"
 #include "Logger.h"
 #include "Managers/EventManager.h"
+#include "Managers/GameService.h"
 #include "Managers/SceneManager.h"
+
+GameInstance::GameInstance(flecs::world world)
+    : _world(world)
+{
+}
 
 void GameInstance::Run(sf::RenderWindow& renderWindow)
 {
@@ -25,7 +31,7 @@ void GameInstance::Run(sf::RenderWindow& renderWindow)
         //                              -> SceneManager -> Scene -> Systems -> Components
         HandleEvents(renderWindow);
         Update(deltaTime);
-        Render(renderWindow);
+        // Render(renderWindow);
 
         // Process deferred events at the end of the frame
         GameService::Get<EventManager>().ProcessDeferredEvents();
@@ -47,12 +53,12 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
     {
         if (event->is<sf::Event::Closed>())
         {
-            renderWindow.close();
+            RequestExit();
         }
 
         // We delegate the event to the game controller
-        GameService::Get<GameController>().HandleEvent(event, renderWindow);
-        GameService::Get<SceneManager>().HandleEvent(event, renderWindow);
+        GameService::Get<GameController>().HandleEvent(event);
+        GameService::Get<SceneManager>().HandleEvent(event);
     }
 }
 

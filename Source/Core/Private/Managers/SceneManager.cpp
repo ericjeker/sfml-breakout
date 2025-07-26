@@ -47,7 +47,7 @@ void SceneManager::Render(sf::RenderWindow& window)
     }
 }
 
-void SceneManager::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow)
+void SceneManager::HandleEvent(const std::optional<sf::Event>& event)
 {
     ZoneScopedN("SceneManager::HandleEvent");
     for (const auto& scene : _scenes | std::views::values)
@@ -57,6 +57,6 @@ void SceneManager::HandleEvent(const std::optional<sf::Event>& event, sf::Render
             continue;
         }
 
-        scene->HandleEvent(event, renderWindow);
+        scene->HandleEvent(event);
     }
 }

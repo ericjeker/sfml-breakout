@@ -6,11 +6,13 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
+#include <flecs.h>
+
 
 class GameInstance
 {
 public:
-    GameInstance() = default;
+    GameInstance(flecs::world world);
     virtual ~GameInstance() = default;
 
     virtual void Initialize() = 0;
@@ -26,6 +28,7 @@ public:
 
 private:
     bool _shouldExit = false;
+    flecs::world _world;
 };
 
 

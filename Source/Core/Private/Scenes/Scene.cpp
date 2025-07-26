@@ -8,10 +8,6 @@
 #include "Scenes/Scene.h"
 
 
-void Scene::Initialize()
-{
-}
-
 void Scene::Shutdown()
 {
     LOG_DEBUG("(Scene:Shutdown)");
@@ -23,7 +19,7 @@ void Scene::Update(const float deltaTime)
     GetWorld().progress(deltaTime);
 }
 
-void Scene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
+void Scene::HandleEvent(const std::optional<sf::Event>& event)
 {
 }
 

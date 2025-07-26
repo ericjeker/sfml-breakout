@@ -6,8 +6,11 @@
 #include <tracy/Tracy.hpp>
 #endif
 
-#include "Components/GravitySettings.h"
+#include "Components/Physics/GravitySettings.h"
+#include "Components/Physics/RigidBody.h"
+#include "Components/RenderTarget.h"
 #include "Configuration.h"
+#include "Managers/GameService.h"
 #include "PhysicsConstants.h"
 #include "Themes/Nord.h"
 
@@ -18,30 +21,42 @@ constexpr int BALL_COUNT = 200;
 
 void BouncingBallScene::Initialize()
 {
-    auto backgroundDrawable = std::make_unique<sf::RectangleShape>();
-    backgroundDrawable->setSize(sf::Vector2f{Configuration::WINDOW_SIZE});
-    backgroundDrawable->setFillColor(NordTheme::Frost1);
-
     const auto ecsWorld = GetWorld();
 
-    ecsWorld.entity()
-        .set<BackgroundRenderable>({std::move(backgroundDrawable)})
-        .set<Transform>({.position = {0.f, 0.f}, .scale = {1.f, 1.f}, .rotation = 0.f});
+    ecsWorld.set<RenderTarget>({&GameService::Get<sf::RenderWindow>()});
 
     ecsWorld.set<GravitySettings>(
         {.gravity = PhysicsConstants::NO_GRAVITY, .pixelsPerCentimeter = PhysicsConstants::PIXELS_PER_CENTIMETER}
     );
 
-
     // --- Create LOTTA balls ---
     CreateBalls(BALL_COUNT);
 
     // --- Add systems ---
-    ecsWorld.system<Transform, Velocity, RigidBody>().each(ProcessPhysics);
-    ecsWorld.system<Transform, Velocity>().each(ProcessScreenBounce);
+    ecsWorld.system<Transform, Velocity, RigidBody>("ProcessPhysics").each(ProcessPhysics);
+    ecsWorld.system<Transform, Velocity>("ProcessScreenBounce").each(ProcessScreenBounce);
+    ecsWorld.system("ClearWindow")
+        .kind(flecs::PreStore)
+        .run(
+            [](const flecs::iter& it)
+            {
+                auto [window] = it.world().get<RenderTarget>();
+                window->clear(NordTheme::Frost1);
+            }
+        );
+    ecsWorld.system<Transform, BallRenderable>("RenderBalls").kind(flecs::OnStore).each(RenderBalls);
+    ecsWorld.system("DisplayWindow")
+        .kind(flecs::OnStore)
+        .run(
+            [](const flecs::iter& it)
+            {
+                auto [window] = it.world().get<RenderTarget>();
+                window->display();
+            }
+        );
 }
 
-void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
+void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) const
 {
     if (!IsLoaded() || IsPaused())
     {
@@ -129,28 +144,6 @@ void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::R
 
 void BouncingBallScene::Render(sf::RenderWindow& window)
 {
-    if (!IsLoaded())
-        return;
-
-    const auto ecsWorld = GetWorld();
-
-    // Render background
-    ecsWorld.each(
-        [&](const Transform& t, const BackgroundRenderable& bg)
-        {
-            bg.shape->setPosition(t.position);
-            window.draw(*bg.shape);
-        }
-    );
-
-    // Render balls
-    ecsWorld.each(
-        [&](const Transform& t, const BallRenderable& ball)
-        {
-            ball.shape->setPosition(t.position);
-            window.draw(*ball.shape);
-        }
-    );
 }
 
 void BouncingBallScene::CreateBalls(const int count)
@@ -224,4 +217,11 @@ void BouncingBallScene::ProcessPhysics(const flecs::iter& it, size_t, Transform&
 
     v.velocity *= p.damping;
     t.position += v.velocity * it.delta_time();
+}
+
+void BouncingBallScene::RenderBalls(const flecs::iter& it, size_t, const Transform& t, const BallRenderable& b)
+{
+    auto [window] = it.world().get<RenderTarget>();
+    b.shape->setPosition(t.position);
+    window->draw(*b.shape);
 }
