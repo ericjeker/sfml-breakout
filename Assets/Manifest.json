@@ -25,6 +25,16 @@
           "path": "Assets/Music/8mm.ogg"
         }
       ]
+    },
+    {
+      "name": "Shader",
+      "assets": [
+        {
+          "name": "blur",
+          "type": "shader",
+          "path": "Assets/Shaders/glow.frag"
+        }
+      ]
     }
   ]
 }

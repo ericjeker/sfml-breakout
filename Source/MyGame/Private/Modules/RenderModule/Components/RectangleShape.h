@@ -9,7 +9,7 @@
 #include <memory>
 
 
-struct BackgroundRenderable
+struct RectangleShape
 {
     std::unique_ptr<sf::RectangleShape> shape;
 };

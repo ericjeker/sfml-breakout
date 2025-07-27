@@ -8,7 +8,7 @@
 
 #include <memory>
 
-struct BallRenderable
+struct CircleShape
 {
     std::unique_ptr<sf::CircleShape> shape;
 };

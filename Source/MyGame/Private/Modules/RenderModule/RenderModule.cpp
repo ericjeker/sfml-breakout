@@ -2,8 +2,8 @@
 
 #include "RenderModule.h"
 
-#include "Components/BackgroundRenderable.h"
-#include "Components/BallRenderable.h"
+#include "Components/CircleShape.h"
+#include "Components/RectangleShape.h"
 #include "Components/TextRenderable.h"
 #include "Managers/GameService.h"
 
@@ -13,13 +13,13 @@
 namespace
 {
 
-void RenderBackground(const BackgroundRenderable& bg)
+void RenderRectangleShape(const RectangleShape& bg)
 {
     auto& window = GameService::Get<sf::RenderWindow>();
     window.draw(*bg.shape);
 }
 
-void RenderBalls(const BallRenderable& ball)
+void RenderCircleShape(const CircleShape& ball)
 {
     auto& window = GameService::Get<sf::RenderWindow>();
     window.draw(*ball.shape);
@@ -38,12 +38,12 @@ namespace RenderModule
 
 RenderModule::RenderModule(flecs::world& world)
 {
-    world.component<BackgroundRenderable>();
-    world.component<BallRenderable>();
+    world.component<RectangleShape>();
+    world.component<CircleShape>();
     world.component<TextRenderable>();
 
-    world.system<const BackgroundRenderable>("BackgroundRenderable").kind(flecs::OnStore).each(RenderBackground);
-    world.system<const BallRenderable>("BallRenderable").kind(flecs::OnStore).each(RenderBalls);
+    world.system<const RectangleShape>("RectangleShape").kind(flecs::OnStore).each(RenderRectangleShape);
+    world.system<const CircleShape>("CircleShape").kind(flecs::OnStore).each(RenderCircleShape);
     world.system<const TextRenderable>("TextRenderable").kind(flecs::OnStore).each(RenderText);
 }
 

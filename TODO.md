@@ -8,16 +8,19 @@
 - [x] AudioManager
 - [ ] CameraManager, CameraSystem, Scrolling, Culling (?)
 - [ ] Reusable ObjectPool
-- [ ] CommandRegistry, CommandSystem
-- [ ] UIManager, GraphScene, SceneNode
+- [ ] CommandRegistry, CommandSystem, Controllers
+  - Right now there is no abstraction between the SFML events and the action, so we cannot map
+    them to different keys or actions. There is no notion of AIController or NetworkController either.
+- [ ] UIManager, GraphScene, SceneNode (this is handled by Flecs)
 
 ## Features
 
-- [ ] Entity, Component, System Factories
 - [ ] Load scenes, entities, components, systems from serialized files
 - [ ] CollisionSystem with collision shape (circle, rectangle)
 - [ ] SpatialPartitioning (grid)
 - [ ] SpriteRenderer
+  - [ ] TileMap
+  - [ ] SpriteAnimation
 - [ ] ControllerSystem (PlayerController, AIController, NetworkController)
   - [ ] Behaviors (State Machine, Behavior Tree)
   - [ ] Possession
@@ -27,10 +30,10 @@
 
 ## Bugs / Improvements
 
-- [x] ScreenBouncing doesn't account for drawable size
+- [ ] ScreenBouncing doesn't account for drawable size
 - [x] Integrate Tracy for profiling
-- [ ] MainMenuState contains everything, it should be a game selector with an FSM
-- [ ] Use namespaces to encapsulate modules?
+- [x] MainMenuState contains everything, it should be a game selector with an FSM
+- [x] Use namespaces to encapsulate modules?
 
 ## Clean Code
 
@@ -42,24 +45,23 @@
 
 ### 1. Rendering Optimizations
 
-- Batch rendering: Instead of drawing each ball individually, use `sf::VertexArray` or `sf::VertexBuffer` to draw
-  multiple balls in a single draw call
-- Culling: Only render balls that are visible on screen
-- Sprite batching: Use texture atlases and batch similar sprites together
+- [ ] Batch rendering: Instead of drawing each entity individually, use `sf::VertexArray` or `sf::VertexBuffer` to draw multiple entities in a single draw call
+- [ ] Culling: Only render what is visible on screen
+- [ ] Sprite batching: Use texture atlases and batch similar sprites together
+
+### 2. Resourcement Management
+
+- [ ] Right now the assets have to be unique across all bundles, ideally they should be accessible using BundleName::AssetName
 
 ### 2. Physics Optimizations
 
 - Spatial partitioning: Use a spatial hash grid, quadtree, or broad-phase collision detection
-- Object pooling: Reuse ball objects instead of creating/destroying them
-- Fixed timestep: Use a fixed timestep for physics calculations to improve consistency
+- Object pooling: Reuse entity objects instead of creating/destroying them
 
-### 3. ECS Optimizations
+### 3. Flecs Optimizations
 
-- Component data layout: Use Structure of Arrays (SoA) instead of Array of Structures (AoS) for better cache
-  locality
-- System batching: Process components in batches to improve cache efficiency
-- Memory alignment: Ensure components are properly aligned in memory using a ComponentManager
-- Filter entities: Systems should not loop all the entities/components, only the one they need
+- Create modules instead of individual scenes, each scene can be a module
+- Have a single world handling everything so that the game state can be stored in it too
 
 ### 4. SFML-Specific Optimizations
 

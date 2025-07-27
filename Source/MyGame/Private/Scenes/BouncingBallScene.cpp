@@ -6,9 +6,9 @@
 #include <tracy/Tracy.hpp>
 #endif
 
+#include "../Modules/RenderModule/Components/CircleShape.h"
+#include "../Modules/RenderModule/Components/RectangleShape.h"
 #include "../Modules/RenderModule/RenderModule.h"
-#include "../Modules/RenderModule/Components/BackgroundRenderable.h"
-#include "../Modules/RenderModule/Components/BallRenderable.h"
 #include "Components/GravitySettings.h"
 #include "Configuration.h"
 #include "Managers/GameService.h"
@@ -39,13 +39,13 @@ void BouncingBallScene::Initialize()
     backgroundDrawable->setSize(sf::Vector2f{Configuration::WINDOW_SIZE});
     backgroundDrawable->setFillColor(NordTheme::Frost1);
 
-    ecsWorld.entity().set<BackgroundRenderable>({std::move(backgroundDrawable)}).set<Transform>({});
+    ecsWorld.entity().set<RectangleShape>({std::move(backgroundDrawable)}).set<Transform>({});
 
     // --- Create LOTTA balls ---
     CreateBalls(BALL_COUNT);
 
     // --- Add systems ---
-    ecsWorld.system<Transform, Velocity, RigidBody, BallRenderable>().each(ProcessPhysics);
+    ecsWorld.system<Transform, Velocity, RigidBody, CircleShape>().each(ProcessPhysics);
     ecsWorld.system<Transform, Velocity>().each(ProcessScreenBounce);
 }
 
@@ -164,7 +164,7 @@ void BouncingBallScene::CreateBalls(const int count)
             .set<Transform>({.position = position})
             .set<Velocity>({velocity})
             .set<RigidBody>({.damping = PhysicsConstants::NO_DAMPING})
-            .set<BallRenderable>({std::move(ballShape)});
+            .set<CircleShape>({std::move(ballShape)});
     }
 }
 
@@ -193,7 +193,7 @@ void BouncingBallScene::ProcessScreenBounce(const flecs::iter& it, size_t, Trans
     }
 }
 
-void BouncingBallScene::ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p, const BallRenderable& ball)
+void BouncingBallScene::ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p, const CircleShape& ball)
 {
     // Physics system
     if (auto [gravity, pixelsPerCentimeter, enabled] = it.world().get<GravitySettings>(); enabled)

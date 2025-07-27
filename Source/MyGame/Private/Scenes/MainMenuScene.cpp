@@ -32,7 +32,7 @@ void MainMenuScene::Initialize()
     backgroundDrawable->setSize(sf::Vector2f{Configuration::WINDOW_SIZE});
     backgroundDrawable->setFillColor(NordTheme::Frost1);
 
-    ecsWorld.entity().set<BackgroundRenderable>({std::move(backgroundDrawable)}).set<Transform>({});
+    ecsWorld.entity().set<RectangleShape>({std::move(backgroundDrawable)}).set<Transform>({});
 
     // --- Add Title ---
     const auto fontRegular = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Regular");
@@ -119,7 +119,7 @@ void MainMenuScene::ProcessText(const Transform& t, const TextRenderable& textRe
     textRenderable.text->setPosition(t.position);
 }
 
-void MainMenuScene::ProcessBackground(const Transform& t, const BackgroundRenderable& bg)
+void MainMenuScene::ProcessBackground(const Transform& t, const RectangleShape& bg)
 {
     bg.shape->setPosition(t.position);
 }

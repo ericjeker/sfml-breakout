@@ -40,7 +40,7 @@ void PauseScene::Initialize()
     background->setFillColor(backgroundColor);
 
     ecsWorld.entity()
-        .set<BackgroundRenderable>({std::move(background)})
+        .set<RectangleShape>({std::move(background)})
         .set<Transform>({.position = {0.f, 0.f}, .scale = {1.f, 1.f}, .rotation = 0.f});
 
     // --- Add Pause Text ---
@@ -73,7 +73,7 @@ void PauseScene::Initialize()
     );
 
     // --- Add the Systems ---
-    GetWorld().system<Transform, BackgroundRenderable>().each(ProcessBackground);
+    GetWorld().system<Transform, RectangleShape>().each(ProcessBackground);
     GetWorld().system<Transform, TextRenderable>().each(ProcessText);
 }
 
@@ -126,7 +126,7 @@ void PauseScene::ProcessText(const Transform& t, const TextRenderable& textRende
     textRenderable.text->setPosition(t.position);
 }
 
-void PauseScene::ProcessBackground(const Transform& t, const BackgroundRenderable& bg)
+void PauseScene::ProcessBackground(const Transform& t, const RectangleShape& bg)
 {
     bg.shape->setPosition(t.position);
 }

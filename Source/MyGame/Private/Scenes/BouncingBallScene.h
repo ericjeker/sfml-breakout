@@ -4,7 +4,7 @@
 #ifndef BOUNCINGBALLFLECSSCENE_H
 #define BOUNCINGBALLFLECSSCENE_H
 
-#include "../Modules/RenderModule/Components/BallRenderable.h"
+#include "../Modules/RenderModule/Components/CircleShape.h"
 #include "Components/RigidBody.h"
 #include "Components/Transform.h"
 #include "Components/Velocity.h"
@@ -22,7 +22,7 @@ public:
 private:
     void CreateBalls(int count);
     static void ProcessScreenBounce(const flecs::iter& it, size_t, Transform& t, Velocity& v);
-    static void ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p, const BallRenderable& ball);
+    static void ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p, const CircleShape& ball);
 };
 
 
