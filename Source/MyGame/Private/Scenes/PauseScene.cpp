@@ -2,9 +2,8 @@
 
 #include "PauseScene.h"
 
-#include "../Events/RequestGameExit.h"
 #include "../Events/RequestGameResume.h"
-#include "BouncingBallScene.h"
+#include "../Events/RequestReturnToMainMenu.h"
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
@@ -16,6 +15,7 @@
 #include <Logger.h>
 #include <Themes/Nord.h>
 
+#include <Components/EventTrigger.h>
 #include <Components/TextRenderable.h>
 #include <Components/Transform.h>
 #include <Configuration.h>
@@ -47,7 +47,7 @@ void PauseScene::Initialize()
     pauseText->setOrigin(pauseText->getLocalBounds().size / 2.f);
     CreateTextEntity(std::move(pauseText), {centerX, centerY - 200});
 
-    // --- Add Resume Text ---
+    // --- Add Resume Button ---
     auto resumeText = std::make_unique<sf::Text>(*fontRegular, "Resume", 36.f);
     resumeText->setFillColor(NordTheme::SnowStorm3);
     resumeText->setOrigin(resumeText->getLocalBounds().size / 2.f);
@@ -57,14 +57,14 @@ void PauseScene::Initialize()
         [this]() { GameService::Get<EventManager>().EmitDeferred<RequestGameResume>({}, this); }
     );
 
-    // --- Add Exit Text ---
+    // --- Add Exit Button ---
     auto exitText = std::make_unique<sf::Text>(*fontRegular, "Exit", 28.f);
     exitText->setFillColor(NordTheme::SnowStorm3);
     exitText->setOrigin(exitText->getLocalBounds().size / 2.f);
     CreateButtonEntity(
         std::move(exitText),
         {centerX, centerY + 100},
-        [this]() { GameService::Get<EventManager>().EmitDeferred<RequestGameExit>({}, this); }
+        [this]() { GameService::Get<EventManager>().EmitDeferred<RequestReturnToMainMenu>({}, this); }
     );
 
     // --- Add the Systems ---

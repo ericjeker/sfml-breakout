@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef PAUSESCENE_H
-#define PAUSESCENE_H
+#ifndef MAINMENUSCENE_H
+#define MAINMENUSCENE_H
 
 #include "../Components/BackgroundRenderable.h"
 #include "Components/TextRenderable.h"
@@ -11,13 +11,9 @@
 
 #include <SFML/Graphics/Text.hpp>
 
-
-
-class PauseScene final : public Scene
+class MainMenuScene final : public Scene
 {
 public:
-    PauseScene() = default;
-
     void Initialize() override;
     void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
     void Render(sf::RenderWindow& window) override;

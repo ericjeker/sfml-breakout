@@ -20,3 +20,7 @@ bool GameState::IsPaused() const
 {
     return _paused;
 }
+
+void GameState::Update(float deltaTime)
+{
+}

@@ -4,8 +4,6 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
-#include "Managers/GameService.h"
-
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 
@@ -25,7 +23,7 @@ public:
     virtual void Resume();
     [[nodiscard]] bool IsPaused() const;
 
-    virtual void Update(float deltaTime) = 0;
+    virtual void Update(float deltaTime);
     virtual void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow) = 0;
 
 private:

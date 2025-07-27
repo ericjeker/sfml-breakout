@@ -41,14 +41,33 @@ public:
 
         if (_scenes.contains(typeIndex))
         {
-            throw std::runtime_error("Scene already exists");
+            // The scene already exists, we simply return and don't initialize it
+            return;
         }
 
         _sceneOrder.push_back(typeIndex);
         _scenes[typeIndex] = std::move(scene);
-
-        // Initialize the scene
         _scenes[typeIndex]->Initialize();
+    }
+
+    template <typename T>
+    void RemoveScene()
+    {
+        static_assert(std::is_base_of_v<Scene, T>, "T must inherit from Scene");
+        const std::type_index typeIndex(typeid(T));
+
+        if (!_scenes.contains(typeIndex))
+        {
+            return;
+        }
+
+        if (_scenes[typeIndex]->IsLoaded())
+        {
+            _scenes[typeIndex]->Shutdown();
+        }
+
+        _scenes.erase(typeIndex);
+        std::erase(_sceneOrder, typeIndex);
     }
 
     template <typename T>
@@ -58,14 +77,14 @@ public:
 
         if (mode == SceneLoadMode::Single)
         {
-            LOG_DEBUG("(SceneManager): Cleaning up for loading in Single mode.");
-            CleanUp();
+            LOG_DEBUG("(SceneManager::LoadScene): Cleaning up for loading in Single mode.");
+            UnloadAll();
         }
 
         auto it = _scenes.find(std::type_index(typeid(T)));
         if (it != _scenes.end() && !it->second->IsLoaded())
         {
-            LOG_DEBUG("(SceneManager): Loading scene " + std::string(typeid(T).name()) + ".");
+            LOG_DEBUG("(SceneManager::LoadScene): Loading scene " + std::string(typeid(T).name()) + ".");
             it->second->SetLoaded(true);
         }
     }
@@ -78,6 +97,7 @@ public:
         if (it != _scenes.end() && it->second->IsLoaded())
         {
             it->second->SetLoaded(false);
+            it->second->Shutdown();
         }
     }
 
@@ -101,7 +121,7 @@ public:
      * It is primarily used for unloading all active scenes when transitioning between different configurations
      * or when loading new scenes in `Single` load mode.
      */
-    void CleanUp();
+    void UnloadAll();
 
     void Update(float deltaTime);
     void Render(sf::RenderWindow& window);

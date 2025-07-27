@@ -6,10 +6,13 @@
 #include <tracy/Tracy.hpp>
 #endif
 
+#include "../Components/BackgroundRenderable.h"
 #include "Components/GravitySettings.h"
 #include "Configuration.h"
 #include "PhysicsConstants.h"
 #include "Themes/Nord.h"
+
+#include <SFML/Graphics/RectangleShape.hpp>
 
 #include <random>
 
@@ -31,7 +34,6 @@ void BouncingBallScene::Initialize()
     ecsWorld.set<GravitySettings>(
         {.gravity = PhysicsConstants::NO_GRAVITY, .pixelsPerCentimeter = PhysicsConstants::PIXELS_PER_CENTIMETER}
     );
-
 
     // --- Create LOTTA balls ---
     CreateBalls(BALL_COUNT);

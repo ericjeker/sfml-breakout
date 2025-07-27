@@ -7,6 +7,7 @@
 #include "Gameplay/GameController.h"
 #include "Logger.h"
 #include "Managers/EventManager.h"
+#include "Managers/GameService.h"
 #include "Managers/SceneManager.h"
 
 void GameInstance::Run(sf::RenderWindow& renderWindow)

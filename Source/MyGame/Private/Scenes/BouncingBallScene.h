@@ -10,7 +10,6 @@
 #include "Scenes/Scene.h"
 
 #include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
 
 #include <flecs.h>
 
@@ -18,11 +17,6 @@
 struct BallRenderable
 {
     std::unique_ptr<sf::CircleShape> shape;
-};
-
-struct BackgroundRenderable
-{
-    std::unique_ptr<sf::RectangleShape> shape;
 };
 
 class BouncingBallScene final : public Scene

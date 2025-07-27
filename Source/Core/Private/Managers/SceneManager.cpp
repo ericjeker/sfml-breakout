@@ -7,13 +7,12 @@
 
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Graphics/Text.hpp>
 
 #include <ranges>
 
-void SceneManager::CleanUp()
+void SceneManager::UnloadAll()
 {
-    ZoneScopedN("SceneManager::CleanUp");
+    ZoneScopedN("SceneManager::UnloadAll");
     for (const auto& scene : _scenes | std::views::values)
     {
         scene->SetLoaded(false);
@@ -52,7 +51,7 @@ void SceneManager::HandleEvent(const std::optional<sf::Event>& event, sf::Render
     ZoneScopedN("SceneManager::HandleEvent");
     for (const auto& scene : _scenes | std::views::values)
     {
-        if (!scene->IsLoaded())
+        if (!scene->IsLoaded() || scene->IsPaused())
         {
             continue;
         }
