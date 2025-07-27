@@ -20,7 +20,6 @@
 class MyGame final : public GameInstance
 {
 public:
-    using GameInstance::GameInstance;
     void Initialize() override;
     void Shutdown() override;
 

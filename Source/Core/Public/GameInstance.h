@@ -16,10 +16,9 @@ public:
     virtual void Initialize() = 0;
     virtual void Shutdown() = 0;
 
-    void Run(sf::RenderWindow& renderWindow);
-    void HandleEvents(sf::RenderWindow& renderWindow);
-    void Update(float deltaTime);
-    void Render(sf::RenderWindow& renderWindow);
+    void Run(sf::RenderWindow& renderWindow) const;
+    static void HandleEvents(sf::RenderWindow& renderWindow);
+    static void Update(float deltaTime);
 
     void RequestExit();
     [[nodiscard]] bool ShouldExit() const;

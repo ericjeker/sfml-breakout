@@ -5,11 +5,13 @@
 #endif
 
 #include "Logger.h"
+#include "Managers/GameService.h"
 #include "Scenes/Scene.h"
 
 
 void Scene::Initialize()
 {
+    LOG_DEBUG("(Scene:Initialize)");
 }
 
 void Scene::Shutdown()
@@ -45,11 +47,13 @@ bool Scene::IsPaused() const
 void Scene::Pause()
 {
     _isPaused = true;
+    _world.entity(flecs::OnUpdate).disable();
 }
 
 void Scene::Resume()
 {
     _isPaused = false;
+    _world.entity(flecs::OnUpdate).enable();
 }
 
 const std::string& Scene::GetName() const

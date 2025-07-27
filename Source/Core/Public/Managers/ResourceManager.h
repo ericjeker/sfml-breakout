@@ -19,49 +19,52 @@
 class ResourceManager
 {
 public:
-	ResourceManager() = default;
-	~ResourceManager() = default;
+    ResourceManager() = default;
+    ~ResourceManager() = default;
 
-	void LoadResourcesFromManifest(const std::string& manifestPath);
-	void UnloadResource(const std::string& name);
-	void CleanUp();
+    void LoadResourcesFromManifest(const std::string& manifestPath);
+    void UnloadResource(const std::string& name);
+    void CleanUp();
 
-	template <typename T>
-	std::shared_ptr<T> GetResource(const std::string& name)
-	{
-		const auto it = _resources.find(name);
-		if (it != _resources.end())
-		{
-			// Get the resource from _resources
-			std::shared_ptr<T>* value = std::get_if<std::shared_ptr<T>>(&it->second);
+    template <typename T>
+    std::shared_ptr<T> GetResource(const std::string& name)
+    {
+        const auto it = _resources.find(name);
+        if (it == _resources.end())
+        {
+            LOG_ERROR("Resource " + name + " not found.");
+            return nullptr;
+        }
 
-			if (value == nullptr)
-			{
-				LOG_ERROR("Resource " + name + " not found.");
-				return nullptr;
-			}
+        // Get the resource from _resources
+        std::shared_ptr<T>* value = std::get_if<std::shared_ptr<T>>(&it->second);
 
-			return *value;
-		}
+        if (value == nullptr)
+        {
+            LOG_ERROR("Resource " + name + " not found.");
+            return nullptr;
+        }
 
-		LOG_ERROR("Resource " + name + " not found.");
-		return nullptr;
-	}
+        return *value;
+    }
 
-	/** Templates are evaluated at compile time, so they need to be defined here */
-	template <typename T>
-	void SetResource(const std::string& name, std::shared_ptr<T> resource)
-	{
-		_resources[name] = std::move(resource);
-	}
+    template <typename T>
+    void SetResource(const std::string& name, std::shared_ptr<T> resource)
+    {
+        _resources[name] = std::move(resource);
+    }
 
 private:
-	using ResourceVariant =
-		std::variant<std::shared_ptr<sf::RenderTexture>, std::shared_ptr<sf::Font>, std::shared_ptr<sf::Texture>,
-					 std::shared_ptr<sf::Shader>, std::shared_ptr<sf::Sprite>, std::shared_ptr<sf::Text>,
-					 std::shared_ptr<sf::CircleShape>>;
+    using ResourceVariant = std::variant<
+        std::shared_ptr<sf::RenderTexture>,
+        std::shared_ptr<sf::Font>,
+        std::shared_ptr<sf::Texture>,
+        std::shared_ptr<sf::Shader>,
+        std::shared_ptr<sf::Sprite>,
+        std::shared_ptr<sf::Text>,
+        std::shared_ptr<sf::CircleShape>>;
 
-	std::unordered_map<std::string, ResourceVariant> _resources;
+    std::unordered_map<std::string, ResourceVariant> _resources;
 };
 
 #endif

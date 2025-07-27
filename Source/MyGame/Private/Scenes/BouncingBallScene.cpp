@@ -9,6 +9,7 @@
 #include "../Components/BackgroundRenderable.h"
 #include "Components/GravitySettings.h"
 #include "Configuration.h"
+#include "Managers/GameService.h"
 #include "PhysicsConstants.h"
 #include "Themes/Nord.h"
 
@@ -16,20 +17,20 @@
 
 #include <random>
 
-constexpr int BALL_COUNT = 200;
+constexpr int BALL_COUNT = 2000;
 
 
 void BouncingBallScene::Initialize()
 {
+    Scene::Initialize();
+
     auto backgroundDrawable = std::make_unique<sf::RectangleShape>();
     backgroundDrawable->setSize(sf::Vector2f{Configuration::WINDOW_SIZE});
     backgroundDrawable->setFillColor(NordTheme::Frost1);
 
     const auto ecsWorld = GetWorld();
 
-    ecsWorld.entity()
-        .set<BackgroundRenderable>({std::move(backgroundDrawable)})
-        .set<Transform>({.position = {0.f, 0.f}, .scale = {1.f, 1.f}, .rotation = 0.f});
+    ecsWorld.entity().set<BackgroundRenderable>({std::move(backgroundDrawable)}).set<Transform>({});
 
     ecsWorld.set<GravitySettings>(
         {.gravity = PhysicsConstants::NO_GRAVITY, .pixelsPerCentimeter = PhysicsConstants::PIXELS_PER_CENTIMETER}
@@ -39,8 +40,10 @@ void BouncingBallScene::Initialize()
     CreateBalls(BALL_COUNT);
 
     // --- Add systems ---
-    ecsWorld.system<Transform, Velocity, RigidBody>().each(ProcessPhysics);
+    ecsWorld.system<Transform, Velocity, RigidBody, BallRenderable>().each(ProcessPhysics);
     ecsWorld.system<Transform, Velocity>().each(ProcessScreenBounce);
+    ecsWorld.system<BackgroundRenderable>().kind(flecs::OnStore).each(RenderBackground);
+    ecsWorld.system<BallRenderable>().kind(flecs::OnStore).each(RenderBalls);
 }
 
 void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
@@ -129,32 +132,6 @@ void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::R
     // }
 }
 
-void BouncingBallScene::Render(sf::RenderWindow& window)
-{
-    if (!IsLoaded())
-        return;
-
-    const auto ecsWorld = GetWorld();
-
-    // Render background
-    ecsWorld.each(
-        [&](const Transform& t, const BackgroundRenderable& bg)
-        {
-            bg.shape->setPosition(t.position);
-            window.draw(*bg.shape);
-        }
-    );
-
-    // Render balls
-    ecsWorld.each(
-        [&](const Transform& t, const BallRenderable& ball)
-        {
-            ball.shape->setPosition(t.position);
-            window.draw(*ball.shape);
-        }
-    );
-}
-
 void BouncingBallScene::CreateBalls(const int count)
 {
     ZoneScopedN("BouncingBallScene::CreateBalls");
@@ -213,17 +190,29 @@ void BouncingBallScene::ProcessScreenBounce(const flecs::iter& it, size_t, Trans
     }
 }
 
-void BouncingBallScene::ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p)
+void BouncingBallScene::ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p, const BallRenderable& ball)
 {
-    auto gravitySettings = it.world().get<GravitySettings>();
-
     // Physics system
-    if (gravitySettings.enabled)
+    if (auto [gravity, pixelsPerCentimeter, enabled] = it.world().get<GravitySettings>(); enabled)
     {
-        v.velocity.x += gravitySettings.gravity.x * gravitySettings.pixelsPerCentimeter * it.delta_time();
-        v.velocity.y += gravitySettings.gravity.y * gravitySettings.pixelsPerCentimeter * it.delta_time();
+        v.velocity.x += gravity.x * pixelsPerCentimeter * it.delta_time();
+        v.velocity.y += gravity.y * pixelsPerCentimeter * it.delta_time();
     }
 
     v.velocity *= p.damping;
     t.position += v.velocity * it.delta_time();
+
+    ball.shape->setPosition(t.position);
+}
+
+void BouncingBallScene::RenderBackground(const BackgroundRenderable& bg)
+{
+    auto& window = GameService::Get<sf::RenderWindow>();
+    window.draw(*bg.shape);
+}
+
+void BouncingBallScene::RenderBalls(const BallRenderable& ball)
+{
+    auto& window = GameService::Get<sf::RenderWindow>();
+    window.draw(*ball.shape);
 }

@@ -124,7 +124,6 @@ public:
     void UnloadAll();
 
     void Update(float deltaTime);
-    void Render(sf::RenderWindow& window);
     void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow);
 
 private:

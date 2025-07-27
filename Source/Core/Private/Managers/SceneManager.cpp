@@ -13,8 +13,9 @@
 void SceneManager::UnloadAll()
 {
     ZoneScopedN("SceneManager::UnloadAll");
-    for (const auto& scene : _scenes | std::views::values)
+    for (const auto& typeIdx : _sceneOrder)
     {
+        const auto& scene = _scenes.at(typeIdx);
         scene->SetLoaded(false);
         scene->Shutdown();
     }
@@ -23,9 +24,10 @@ void SceneManager::UnloadAll()
 void SceneManager::Update(const float deltaTime)
 {
     ZoneScopedN("SceneManager::Update");
-    for (const auto& scene : _scenes | std::views::values)
+    for (const auto& typeIdx : _sceneOrder)
     {
-        if (!scene->IsLoaded() || scene->IsPaused())
+        const auto& scene = _scenes.at(typeIdx);
+        if (!scene->IsLoaded())
         {
             continue;
         }
@@ -34,23 +36,12 @@ void SceneManager::Update(const float deltaTime)
     }
 }
 
-void SceneManager::Render(sf::RenderWindow& window)
-{
-    ZoneScopedN("SceneManager::Render");
-    for (const auto& typeIndex : _sceneOrder)
-    {
-        if (const auto& scene = _scenes[typeIndex]; scene->IsLoaded())
-        {
-            scene->Render(window);
-        }
-    }
-}
-
 void SceneManager::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow)
 {
     ZoneScopedN("SceneManager::HandleEvent");
-    for (const auto& scene : _scenes | std::views::values)
+    for (const auto& typeIdx : _sceneOrder)
     {
+        const auto& scene = _scenes.at(typeIdx);
         if (!scene->IsLoaded() || scene->IsPaused())
         {
             continue;

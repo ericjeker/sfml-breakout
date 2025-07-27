@@ -10,7 +10,7 @@
 #include "Managers/GameService.h"
 #include "Managers/SceneManager.h"
 
-void GameInstance::Run(sf::RenderWindow& renderWindow)
+void GameInstance::Run(sf::RenderWindow& renderWindow) const
 {
     LOG_DEBUG("(GameInstance::Run): Starting game loop");
 
@@ -25,8 +25,10 @@ void GameInstance::Run(sf::RenderWindow& renderWindow)
         // Call Hierarchy: GameInstance -> GameController -> GameState
         //                              -> SceneManager -> Scene -> Systems -> Components
         HandleEvents(renderWindow);
+
+        renderWindow.clear();
         Update(deltaTime);
-        Render(renderWindow);
+        renderWindow.display();
 
         // Process deferred events at the end of the frame
         GameService::Get<EventManager>().ProcessDeferredEvents();
@@ -62,14 +64,6 @@ void GameInstance::Update(const float deltaTime)
     ZoneScoped;
     GameService::Get<GameController>().Update(deltaTime);
     GameService::Get<SceneManager>().Update(deltaTime);
-}
-
-void GameInstance::Render(sf::RenderWindow& renderWindow)
-{
-    ZoneScoped;
-    renderWindow.clear();
-    GameService::Get<SceneManager>().Render(renderWindow);
-    renderWindow.display();
 }
 
 void GameInstance::RequestExit()

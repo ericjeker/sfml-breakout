@@ -17,9 +17,12 @@
 
 void MainMenuScene::Initialize()
 {
+    Scene::Initialize();
+
     LOG_DEBUG("(MainMenuScene:Initialize)");
     constexpr float centerX = Configuration::WINDOW_SIZE.x / 2;
     constexpr float centerY = Configuration::WINDOW_SIZE.y / 2;
+
     const auto ecsWorld = GetWorld();
 
     // --- Add Title ---
@@ -52,6 +55,7 @@ void MainMenuScene::Initialize()
     );
 
     GetWorld().system<Transform, TextRenderable>().each(ProcessText);
+    GetWorld().system<TextRenderable>().kind(flecs::OnStore).each(RenderText);
 }
 
 void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
@@ -84,11 +88,6 @@ void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event, sf::Rende
     }
 }
 
-void MainMenuScene::Render(sf::RenderWindow& window)
-{
-    GetWorld().each([&](const TextRenderable& textRenderable) { window.draw(*textRenderable.text); });
-}
-
 void MainMenuScene::CreateTextEntity(std::unique_ptr<sf::Text> text, sf::Vector2f position)
 {
     GetWorld().entity().set<Transform>({.position = position}).set<TextRenderable>({.text = std::move(text)});
@@ -115,4 +114,10 @@ void MainMenuScene::ProcessText(const Transform& t, const TextRenderable& textRe
 void MainMenuScene::ProcessBackground(const Transform& t, const BackgroundRenderable& bg)
 {
     bg.shape->setPosition(t.position);
+}
+
+void MainMenuScene::RenderText(const TextRenderable& textRenderable)
+{
+    auto& window = GameService::Get<sf::RenderWindow>();
+    window.draw(*textRenderable.text);
 }

@@ -23,6 +23,8 @@
 
 void PauseScene::Initialize()
 {
+    Scene::Initialize();
+
     LOG_DEBUG("(PauseScene:Initialize)");
     constexpr float centerX = Configuration::WINDOW_SIZE.x / 2;
     constexpr float centerY = Configuration::WINDOW_SIZE.y / 2;
@@ -70,8 +72,9 @@ void PauseScene::Initialize()
     // --- Add the Systems ---
     GetWorld().system<Transform, BackgroundRenderable>().each(ProcessBackground);
     GetWorld().system<Transform, TextRenderable>().each(ProcessText);
+    GetWorld().system<BackgroundRenderable>().kind(flecs::OnStore).each(RenderBackground);
+    GetWorld().system<TextRenderable>().kind(flecs::OnStore).each(RenderText);
 }
-
 
 void PauseScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
 {
@@ -103,12 +106,6 @@ void PauseScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWi
     }
 }
 
-void PauseScene::Render(sf::RenderWindow& window)
-{
-    GetWorld().each([&](const BackgroundRenderable& bg) { window.draw(*bg.shape); });
-    GetWorld().each([&](const TextRenderable& textRenderable) { window.draw(*textRenderable.text); });
-}
-
 void PauseScene::CreateTextEntity(std::unique_ptr<sf::Text> text, const sf::Vector2f position)
 {
     GetWorld().entity().set<Transform>({.position = position}).set<TextRenderable>({.text = std::move(text)});
@@ -131,4 +128,16 @@ void PauseScene::ProcessText(const Transform& t, const TextRenderable& textRende
 void PauseScene::ProcessBackground(const Transform& t, const BackgroundRenderable& bg)
 {
     bg.shape->setPosition(t.position);
+}
+
+void PauseScene::RenderBackground(const BackgroundRenderable& bg)
+{
+    auto& window = GameService::Get<sf::RenderWindow>();
+    window.draw(*bg.shape);
+}
+
+void PauseScene::RenderText(const TextRenderable& textRenderable)
+{
+    auto& window = GameService::Get<sf::RenderWindow>();
+    window.draw(*textRenderable.text);
 }

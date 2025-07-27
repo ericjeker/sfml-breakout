@@ -4,6 +4,7 @@
 #ifndef BOUNCINGBALLFLECSSCENE_H
 #define BOUNCINGBALLFLECSSCENE_H
 
+#include "../Components/BackgroundRenderable.h"
 #include "Components/RigidBody.h"
 #include "Components/Transform.h"
 #include "Components/Velocity.h"
@@ -22,16 +23,15 @@ struct BallRenderable
 class BouncingBallScene final : public Scene
 {
 public:
-    BouncingBallScene() = default;
-
     void Initialize() override;
     void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
-    void Render(sf::RenderWindow& window) override;
 
 private:
     void CreateBalls(int count);
     static void ProcessScreenBounce(const flecs::iter& it, size_t, Transform& t, Velocity& v);
-    static void ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p);
+    static void ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p, const BallRenderable& ball);
+    static void RenderBackground(const BackgroundRenderable& bg);
+    static void RenderBalls(const BallRenderable& ball);
 };
 
 

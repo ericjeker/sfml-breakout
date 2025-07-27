@@ -12,10 +12,8 @@
 class DebugScene final : public Scene
 {
 public:
-    DebugScene() = default;
-
     void Initialize() override;
-    void Render(sf::RenderWindow& window) override;
+    static void RenderText(const TextRenderable& textRenderable);
     static void ProcessText(const flecs::iter& it, size_t, const Transform& t, const TextRenderable& textRenderable);
 };
 

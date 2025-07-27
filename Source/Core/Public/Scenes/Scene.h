@@ -31,7 +31,6 @@ public:
     virtual void Initialize();
     virtual void Shutdown();
     virtual void Update(float deltaTime);
-    virtual void Render(sf::RenderWindow& window) = 0;
     virtual void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window);
 
     // -- Scene States --
