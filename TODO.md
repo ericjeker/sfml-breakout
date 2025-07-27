@@ -34,6 +34,7 @@
 - [x] Integrate Tracy for profiling
 - [x] MainMenuState contains everything, it should be a game selector with an FSM
 - [x] Use namespaces to encapsulate modules?
+- [ ] I should not use `auto` everywhere, especially not when type clarity is important
 
 ## Clean Code
 

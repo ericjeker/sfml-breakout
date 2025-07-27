@@ -9,14 +9,13 @@ file(GLOB_RECURSE HEADER_FILES Private/*.h)
 # --- Create the main library ---
 add_library(MyGameLibrary)
 target_sources(MyGameLibrary PRIVATE ${SOURCE_FILES} ${HEADER_FILES})
-target_include_directories(MyGameLibrary PUBLIC Public)
 target_include_directories(MyGameLibrary PRIVATE Private)
 target_link_libraries(MyGameLibrary PRIVATE Vendor Core)
 
 # --- Create the main executable ---
 add_executable(MyGame)
 target_sources(MyGame PRIVATE ${SOURCE_FILES})
-target_include_directories(MyGameLibrary PRIVATE Private)
+target_include_directories(MyGame PRIVATE Private)
 target_link_libraries(MyGame PRIVATE Vendor Core MyGameLibrary)
 
 # --- Add Compile Definitions ---

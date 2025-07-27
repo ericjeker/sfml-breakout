@@ -4,8 +4,8 @@
 
 #include "Events/NavigateToMainMenu.h"
 #include "Events/StartGame.h"
-#include "Gameplay/GameController.h"
-#include "Gameplay/MainMenuState.h"
+#include "GameStates/GameController.h"
+#include "GameStates/MainMenu/MainMenuState.h"
 #include "Logger.h"
 #include "Managers/AudioManager.h"
 #include "Managers/ResourceManager.h"

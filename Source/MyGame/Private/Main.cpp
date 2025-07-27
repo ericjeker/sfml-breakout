@@ -6,7 +6,7 @@
 
 #include "Configuration.h"
 #include "GameInstance.h"
-#include "Gameplay/GameController.h"
+#include "GameStates/GameController.h"
 #include "Managers/AudioManager.h"
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"

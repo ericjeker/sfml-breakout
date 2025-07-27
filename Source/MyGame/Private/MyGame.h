@@ -8,9 +8,9 @@
 #include "Events/NavigateToMainMenu.h"
 #include "Events/StartGame.h"
 #include "GameInstance.h"
-#include "Gameplay/GameController.h"
-#include "Gameplay/GameplayState.h"
-#include "Gameplay/MainMenuState.h"
+#include "GameStates/GameController.h"
+#include "GameStates/Gameplay/GameplayState.h"
+#include "GameStates/MainMenu/MainMenuState.h"
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 

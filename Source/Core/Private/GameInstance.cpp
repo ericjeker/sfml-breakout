@@ -3,8 +3,8 @@
 #include <tracy/Tracy.hpp>
 #endif
 
+#include "../Public/GameStates/GameController.h"
 #include "GameInstance.h"
-#include "Gameplay/GameController.h"
 #include "Logger.h"
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
