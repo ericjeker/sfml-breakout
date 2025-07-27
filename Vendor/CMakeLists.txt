@@ -53,6 +53,7 @@ target_link_libraries(Vendor INTERFACE
         SFML::Graphics
         SFML::Window
         SFML::System
+        SFML::Audio
         nlohmann_json::nlohmann_json
         yaml-cpp
         Tracy::TracyClient

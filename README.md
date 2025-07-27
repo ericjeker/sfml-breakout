@@ -1,20 +1,16 @@
 # SFML Sandbox: Animations
 
-A new SFML Sandbox to try different architectures for a game engine.
+A new SFML Sandbox to try different architectures for a game engine. This time, I integrate with Flecs. Each scene has
+their own Flecs World to manage their own entities. As Flecs was not introduced on day 1 I couldn't easily make a single
+world for everything, but I am slowly moving toward that.
 
 ## Call Hierarchy
 
 ```
-GameInstance -> GameController -> GameState
-                               -> SceneManager -> Scene -> Systems
-                                                        -> Entities -> Components
+GameInstance -> GameStateManager -> GameState
+                                 -> SceneManager -> Scene -> Flecs World -> Systems
+                                                                         -> Entities -> Components
 ```
-
-## ECS-Lite
-
-The Scene holds entities in an ECS-lite architecture. Entities (`Entity`) contain Components. Scene contains Systems.
-But the "Lite" comes from the fact that there is no query system. The systems always receive all the entities and
-they can check for each of them if they have a given component.
 
 ## Game Instance
 
@@ -25,12 +21,12 @@ It is also where the game loop is started (`Run()`), and the root of the call hi
 
 The `GameInstance` also holds the instance of the Window where everything will be drawn.
 
-## GameController
+## GameStateManager
 
 Responsible for handling the game flow using a Stack State Pattern holding different GameStates. Multiple game states can
 be active at the same time using a push/pop system.
 
-The GameController also manages the global game state that persists across all GameStates.
+The GameStateManager also manages the global game state that persists across all GameStates.
 
 ## GameState
 
@@ -49,8 +45,11 @@ Responsible for loading and unloading scenes and keeping track of the current lo
 scenes in two different modes: single or additive. `Single` mode cleans up the previously loaded scenes before loading
 the new scene. `Additive` loads the new scene on top of the previous one as to create an overlay system.
 
-## Scene / ECSScene / UIScene / CinematicScene
+## Scene
 
-A scene is a cohesive set of game objects (entities) or UI Elements that can be handled with an ECS system or
-a UI Manager.
+A scene is a cohesive set of game objects (entities) handled by a Flecs world.
+
+## Copyrights & Credits
+
+Music by Karl Casey @ [White Bat Audio](https://www.youtube.com/@WhiteBatAudio)
 

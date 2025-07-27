@@ -37,7 +37,9 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
             {
                 if (!asset.contains("name") || !asset.contains("path") || !asset.contains("type"))
                 {
-                    LOG_ERROR("(ResourceManager::LoadResourcesFromManifest): Asset does not contain a name, path, or type");
+                    LOG_ERROR(
+                        "(ResourceManager::LoadResourcesFromManifest): Asset does not contain a name, path, or type"
+                    );
                     continue;
                 }
 
@@ -47,7 +49,7 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
 
                 LOG_INFO("(ResourceManager::LoadResourcesFromManifest): Loading asset: " + assetName);
 
-                if (assetType != "audio" && assetType != "texture" && assetType != "font")
+                if (assetType != "music" && assetType != "sound" && assetType != "texture" && assetType != "font")
                 {
                     LOG_ERROR("(ResourceManager::LoadResourcesFromManifest): Invalid asset type: " + assetType);
                     continue;
@@ -61,7 +63,19 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
                 else if (assetType == "texture")
                 {
                 }
-                else if (assetType == "audio")
+                else if (assetType == "music")
+                {
+                    const auto music = std::make_shared<sf::Music>();
+                    if (!music->openFromFile(assetPath))
+                    {
+                        LOG_ERROR(
+                            "(ResourceManager::LoadResourcesFromManifest): Error loading music (" + assetName +
+                            ") from : " + assetPath
+                        );
+                    }
+                    SetResource<sf::Music>(assetName, music);
+                }
+                else if (assetType == "sound")
                 {
                 }
             }
@@ -71,7 +85,10 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
         LOG_ERROR("(ResourceManager::LoadResourcesFromManifest): Failed to parse manifest file: " + std::string(e.what()));
     } catch (const std::exception& e)
     {
-        LOG_ERROR("(ResourceManager::LoadResourcesFromManifest): An error occurred while loading the manifest file: " + std::string(e.what()));
+        LOG_ERROR(
+            "(ResourceManager::LoadResourcesFromManifest): An error occurred while loading the manifest file: " +
+            std::string(e.what())
+        );
     }
 }
 

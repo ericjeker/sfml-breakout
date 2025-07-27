@@ -15,6 +15,16 @@
           "path": "Assets/Fonts/Orbitron/Orbitron-Regular.ttf"
         }
       ]
+    },
+    {
+      "name": "Music",
+      "assets": [
+        {
+          "name": "8mm",
+          "type": "music",
+          "path": "Assets/Music/8mm.ogg"
+        }
+      ]
     }
   ]
 }

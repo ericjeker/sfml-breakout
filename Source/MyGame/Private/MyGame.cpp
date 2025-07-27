@@ -5,9 +5,9 @@
 #include "Events/NavigateToMainMenu.h"
 #include "Events/StartGame.h"
 #include "Gameplay/GameController.h"
-#include "Gameplay/GameplayState.h"
 #include "Gameplay/MainMenuState.h"
 #include "Logger.h"
+#include "Managers/AudioManager.h"
 #include "Managers/ResourceManager.h"
 
 void MyGame::Initialize()
@@ -16,6 +16,9 @@ void MyGame::Initialize()
     GameService::Get<ResourceManager>().LoadResourcesFromManifest("Assets/Manifest.json");
     LOG_DEBUG("(MyGame::Initialization): Load the Main Menu State");
     GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>());
+
+    // --- Start the main theme ---
+    GameService::Get<AudioManager>().PlayMusic("8mm");
 
     // --- Add event listeners ---
     GameService::Get<EventManager>().Subscribe<ExitGame>(_exitGameListener);
@@ -26,4 +29,5 @@ void MyGame::Initialize()
 void MyGame::Shutdown()
 {
     LOG_DEBUG("(MyGame::Shutdown)");
+    GameService::Get<AudioManager>().StopMusic();
 }

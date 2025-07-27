@@ -5,7 +5,7 @@
 - [x] ServiceLocator
 - [x] SceneManager
 - [x] EventSystem
-- [ ] AudioManager
+- [x] AudioManager
 - [ ] CameraManager, CameraSystem, Scrolling, Culling (?)
 - [ ] Reusable ObjectPool
 - [ ] CommandRegistry, CommandSystem

@@ -31,7 +31,7 @@ void RenderText(const TextRenderable& text)
     window.draw(*text.text);
 }
 
-} // namespace
+}
 
 namespace RenderModule
 {
@@ -47,4 +47,4 @@ RenderModule::RenderModule(flecs::world& world)
     world.system<const TextRenderable>("TextRenderable").kind(flecs::OnStore).each(RenderText);
 }
 
-} // namespace RenderModule
+}

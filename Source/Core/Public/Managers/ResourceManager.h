@@ -6,11 +6,11 @@
 
 #include "Logger.h"
 
-#include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics/Text.hpp>
+
+#include <SFML/Audio/Music.hpp>
+#include <SFML/Audio/Sound.hpp>
 
 #include <string>
 #include <unordered_map>
@@ -56,13 +56,12 @@ public:
 
 private:
     using ResourceVariant = std::variant<
-        std::shared_ptr<sf::RenderTexture>,
         std::shared_ptr<sf::Font>,
-        std::shared_ptr<sf::Texture>,
+        std::shared_ptr<sf::Music>,
+        std::shared_ptr<sf::Sound>,
         std::shared_ptr<sf::Shader>,
         std::shared_ptr<sf::Sprite>,
-        std::shared_ptr<sf::Text>,
-        std::shared_ptr<sf::CircleShape>>;
+        std::shared_ptr<sf::Texture>>;
 
     std::unordered_map<std::string, ResourceVariant> _resources;
 };

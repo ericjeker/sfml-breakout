@@ -7,6 +7,7 @@
 #include "Configuration.h"
 #include "GameInstance.h"
 #include "Gameplay/GameController.h"
+#include "Managers/AudioManager.h"
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
@@ -49,11 +50,11 @@ int main()
     // We register the SFML window as a reference, so it's easy to access it
     GameService::Register<sf::RenderWindow>(renderWindow);
     GameService::Register<ResourceManager>(std::make_unique<ResourceManager>());
+    GameService::Register<AudioManager>(std::make_unique<AudioManager>(GameService::Get<ResourceManager>()));
     GameService::Register<SceneManager>(std::make_unique<SceneManager>());
     GameService::Register<GameController>(std::make_unique<GameController>());
     GameService::Register<EventManager>(std::make_unique<EventManager>());
     // TODO: NetworkManager
-    // TODO: AudioManager
 
     // Create the game instance
     LOG_DEBUG("(Main::main): Creating the GameInstance");
