@@ -4,13 +4,12 @@
 #ifndef PAUSESCENE_H
 #define PAUSESCENE_H
 
-#include "../Components/BackgroundRenderable.h"
+#include "../Modules/RenderModule/Components/BackgroundRenderable.h"
 #include "Components/TextRenderable.h"
 #include "Components/Transform.h"
 #include "Scenes/Scene.h"
 
 #include <SFML/Graphics/Text.hpp>
-
 
 
 class PauseScene final : public Scene
@@ -24,8 +23,6 @@ private:
     void CreateButtonEntity(std::unique_ptr<sf::Text> text, sf::Vector2f position, const std::function<void()>& callback);
     static void ProcessText(const Transform& t, const TextRenderable& textRenderable);
     static void ProcessBackground(const Transform& t, const BackgroundRenderable& bg);
-    static void RenderBackground(const BackgroundRenderable& bg);
-    static void RenderText(const TextRenderable& textRenderable);
 };
 
 

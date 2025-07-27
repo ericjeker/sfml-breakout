@@ -2,8 +2,9 @@
 
 #include "MainMenuScene.h"
 
-#include "../Events/RequestGameExit.h"
-#include "../Events/RequestStartGame.h"
+#include "../Events/ExitGame.h"
+#include "../Events/StartGame.h"
+#include "../Modules/RenderModule/RenderModule.h"
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
@@ -23,7 +24,15 @@ void MainMenuScene::Initialize()
     constexpr float centerX = Configuration::WINDOW_SIZE.x / 2;
     constexpr float centerY = Configuration::WINDOW_SIZE.y / 2;
 
-    const auto ecsWorld = GetWorld();
+    auto ecsWorld = GetWorld();
+    ecsWorld.import <RenderModule::RenderModule>();
+
+    // --- Create entities ---
+    auto backgroundDrawable = std::make_unique<sf::RectangleShape>();
+    backgroundDrawable->setSize(sf::Vector2f{Configuration::WINDOW_SIZE});
+    backgroundDrawable->setFillColor(NordTheme::Frost1);
+
+    ecsWorld.entity().set<BackgroundRenderable>({std::move(backgroundDrawable)}).set<Transform>({});
 
     // --- Add Title ---
     const auto fontRegular = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Regular");
@@ -41,7 +50,7 @@ void MainMenuScene::Initialize()
     CreateButtonEntity(
         std::move(playButton),
         {centerX, centerY},
-        [this]() { GameService::Get<EventManager>().EmitDeferred<RequestStartGame>({}, this); }
+        [this]() { GameService::Get<EventManager>().EmitDeferred<StartGame>({}, this); }
     );
 
     // --- Add Exit Button ---
@@ -51,11 +60,10 @@ void MainMenuScene::Initialize()
     CreateButtonEntity(
         std::move(exitButton),
         {centerX, centerY + 100},
-        [this]() { GameService::Get<EventManager>().EmitDeferred<RequestGameExit>({}, this); }
+        [this]() { GameService::Get<EventManager>().EmitDeferred<ExitGame>({}, this); }
     );
 
     GetWorld().system<Transform, TextRenderable>().each(ProcessText);
-    GetWorld().system<TextRenderable>().kind(flecs::OnStore).each(RenderText);
 }
 
 void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
@@ -116,8 +124,3 @@ void MainMenuScene::ProcessBackground(const Transform& t, const BackgroundRender
     bg.shape->setPosition(t.position);
 }
 
-void MainMenuScene::RenderText(const TextRenderable& textRenderable)
-{
-    auto& window = GameService::Get<sf::RenderWindow>();
-    window.draw(*textRenderable.text);
-}

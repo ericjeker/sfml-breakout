@@ -2,8 +2,8 @@
 
 #include "MyGame.h"
 
-#include "Events/RequestReturnToMainMenu.h"
-#include "Events/RequestStartGame.h"
+#include "Events/NavigateToMainMenu.h"
+#include "Events/StartGame.h"
 #include "Gameplay/GameController.h"
 #include "Gameplay/GameplayState.h"
 #include "Gameplay/MainMenuState.h"
@@ -18,9 +18,9 @@ void MyGame::Initialize()
     GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>());
 
     // --- Add event listeners ---
-    GameService::Get<EventManager>().Subscribe<RequestGameExit>(_exitGameListener);
-    GameService::Get<EventManager>().Subscribe<RequestStartGame>(_startGameListener);
-    GameService::Get<EventManager>().Subscribe<RequestReturnToMainMenu>(_returnToMainMenuListener);
+    GameService::Get<EventManager>().Subscribe<ExitGame>(_exitGameListener);
+    GameService::Get<EventManager>().Subscribe<StartGame>(_startGameListener);
+    GameService::Get<EventManager>().Subscribe<NavigateToMainMenu>(_returnToMainMenuListener);
 }
 
 void MyGame::Shutdown()

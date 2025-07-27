@@ -6,7 +6,9 @@
 #include <tracy/Tracy.hpp>
 #endif
 
-#include "../Components/BackgroundRenderable.h"
+#include "../Modules/RenderModule/RenderModule.h"
+#include "../Modules/RenderModule/Components/BackgroundRenderable.h"
+#include "../Modules/RenderModule/Components/BallRenderable.h"
 #include "Components/GravitySettings.h"
 #include "Configuration.h"
 #include "Managers/GameService.h"
@@ -24,17 +26,20 @@ void BouncingBallScene::Initialize()
 {
     Scene::Initialize();
 
-    auto backgroundDrawable = std::make_unique<sf::RectangleShape>();
-    backgroundDrawable->setSize(sf::Vector2f{Configuration::WINDOW_SIZE});
-    backgroundDrawable->setFillColor(NordTheme::Frost1);
-
-    const auto ecsWorld = GetWorld();
-
-    ecsWorld.entity().set<BackgroundRenderable>({std::move(backgroundDrawable)}).set<Transform>({});
+    // --- Get the world and import the modules ---
+    auto ecsWorld = GetWorld();
+    ecsWorld.import<RenderModule::RenderModule>();
 
     ecsWorld.set<GravitySettings>(
         {.gravity = PhysicsConstants::NO_GRAVITY, .pixelsPerCentimeter = PhysicsConstants::PIXELS_PER_CENTIMETER}
     );
+
+    // --- Create entities ---
+    auto backgroundDrawable = std::make_unique<sf::RectangleShape>();
+    backgroundDrawable->setSize(sf::Vector2f{Configuration::WINDOW_SIZE});
+    backgroundDrawable->setFillColor(NordTheme::Frost1);
+
+    ecsWorld.entity().set<BackgroundRenderable>({std::move(backgroundDrawable)}).set<Transform>({});
 
     // --- Create LOTTA balls ---
     CreateBalls(BALL_COUNT);
@@ -42,8 +47,6 @@ void BouncingBallScene::Initialize()
     // --- Add systems ---
     ecsWorld.system<Transform, Velocity, RigidBody, BallRenderable>().each(ProcessPhysics);
     ecsWorld.system<Transform, Velocity>().each(ProcessScreenBounce);
-    ecsWorld.system<BackgroundRenderable>().kind(flecs::OnStore).each(RenderBackground);
-    ecsWorld.system<BallRenderable>().kind(flecs::OnStore).each(RenderBalls);
 }
 
 void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
@@ -203,16 +206,4 @@ void BouncingBallScene::ProcessPhysics(const flecs::iter& it, size_t, Transform&
     t.position += v.velocity * it.delta_time();
 
     ball.shape->setPosition(t.position);
-}
-
-void BouncingBallScene::RenderBackground(const BackgroundRenderable& bg)
-{
-    auto& window = GameService::Get<sf::RenderWindow>();
-    window.draw(*bg.shape);
-}
-
-void BouncingBallScene::RenderBalls(const BallRenderable& ball)
-{
-    auto& window = GameService::Get<sf::RenderWindow>();
-    window.draw(*ball.shape);
 }

@@ -2,7 +2,7 @@
 
 #include "DebugScene.h"
 
-#include "GameInstance.h"
+#include "../Modules/RenderModule/RenderModule.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
 
@@ -12,7 +12,9 @@ void DebugScene::Initialize()
 {
     Scene::Initialize();
 
-    const auto ecsWorld = GetWorld();
+    auto ecsWorld = GetWorld();
+
+    ecsWorld.import<RenderModule::RenderModule>();
 
     // --- Resources ---
     const auto font = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Bold");
@@ -24,13 +26,6 @@ void DebugScene::Initialize()
 
     // --- Systems ---
     ecsWorld.system<Transform, TextRenderable>().each(ProcessText);
-    ecsWorld.system<TextRenderable>().kind(flecs::OnStore).each(RenderText);
-}
-
-void DebugScene::RenderText(const TextRenderable& textRenderable)
-{
-    auto& window = GameService::Get<sf::RenderWindow>();
-    window.draw(*textRenderable.text);
 }
 
 void DebugScene::ProcessText(const flecs::iter& it, size_t, const Transform& t, const TextRenderable& textRenderable)

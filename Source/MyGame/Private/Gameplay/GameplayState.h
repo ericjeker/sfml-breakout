@@ -4,7 +4,7 @@
 #ifndef GAMEPLAYSTATE_H
 #define GAMEPLAYSTATE_H
 
-#include "../Events/RequestGameResume.h"
+#include "../Events/ResumeGame.h"
 #include "../Scenes/BouncingBallScene.h"
 #include "../Scenes/PauseScene.h"
 #include "GameInstance.h"
@@ -25,7 +25,7 @@ public:
 private:
     bool _isPaused = false;
 
-    EventListener<RequestGameResume> _resumeGameListener = [this](const RequestGameResume& event, void* sender)
+    EventListener<ResumeGame> _resumeGameListener = [this](const ResumeGame& event, void* sender)
     {
         GameService::Get<SceneManager>().UnloadScene<PauseScene>();
         GameService::Get<SceneManager>().GetScene<BouncingBallScene>().Resume();

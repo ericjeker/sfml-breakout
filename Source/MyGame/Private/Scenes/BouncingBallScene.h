@@ -4,21 +4,14 @@
 #ifndef BOUNCINGBALLFLECSSCENE_H
 #define BOUNCINGBALLFLECSSCENE_H
 
-#include "../Components/BackgroundRenderable.h"
+#include "../Modules/RenderModule/Components/BallRenderable.h"
 #include "Components/RigidBody.h"
 #include "Components/Transform.h"
 #include "Components/Velocity.h"
 #include "Scenes/Scene.h"
 
-#include <SFML/Graphics/CircleShape.hpp>
-
 #include <flecs.h>
 
-
-struct BallRenderable
-{
-    std::unique_ptr<sf::CircleShape> shape;
-};
 
 class BouncingBallScene final : public Scene
 {
@@ -30,8 +23,6 @@ private:
     void CreateBalls(int count);
     static void ProcessScreenBounce(const flecs::iter& it, size_t, Transform& t, Velocity& v);
     static void ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p, const BallRenderable& ball);
-    static void RenderBackground(const BackgroundRenderable& bg);
-    static void RenderBalls(const BallRenderable& ball);
 };
 
 

@@ -1,9 +1,10 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "../Events/RequestGameResume.h"
+#include "GameplayState.h"
+
+#include "../Events/ResumeGame.h"
 #include "../Scenes/DebugScene.h"
 #include "../Scenes/PauseScene.h"
-#include "GameplayState.h"
 #include "Logger.h"
 #include "Managers/SceneManager.h"
 
@@ -21,7 +22,7 @@ void GameplayState::Enter()
     sceneManager.LoadScene<DebugScene>(SceneLoadMode::Additive);
 
     // --- Add the Listeners ---
-    GameService::Get<EventManager>().Subscribe<RequestGameResume>(_resumeGameListener);
+    GameService::Get<EventManager>().Subscribe<ResumeGame>(_resumeGameListener);
 }
 
 void GameplayState::Exit()
@@ -32,7 +33,7 @@ void GameplayState::Exit()
     sceneManager.RemoveScene<PauseScene>();
     sceneManager.RemoveScene<DebugScene>();
 
-    // GameService::Get<EventManager>().Unsubscribe<RequestGameResume>(_resumeGameListener);
+    // GameService::Get<EventManager>().Unsubscribe<ResumeGame>(_resumeGameListener);
 }
 
 void GameplayState::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
