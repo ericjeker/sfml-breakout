@@ -5,7 +5,6 @@
 #define SCENE_H
 
 #include <SFML/Graphics/RenderWindow.hpp>
-
 #include <SFML/Window/Event.hpp>
 
 #include <flecs.h>

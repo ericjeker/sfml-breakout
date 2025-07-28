@@ -20,24 +20,24 @@ public:
     explicit AudioManager(ResourceManager& resourceManager);
     ~AudioManager() = default;
 
-    void SetMasterVolume(const float volume);
-    float GetMasterVolume() const;
+    void SetMasterVolume(float volume);
+    [[nodiscard]] float GetMasterVolume() const;
 
     void PlaySound(const std::string& soundName);
-    void SetVolume(const float volume);
-    float GetVolume() const;
+    void SetVolume(float volume);
+    [[nodiscard]] float GetVolume() const;
 
     void PlayMusic(const std::string& musicName) const;
     void StopMusic() const;
     void PauseMusic() const;
     void ResumeMusic() const;
     bool IsMusicPlaying() const;
-    bool IsMusicPaused() const;
-    bool IsMusicStopped() const;
-    void SetMusicVolume(const float volume);
-    float GetMusicVolume() const;
-    void SetMusicLoop(const bool loop) const;
-    bool IsMusicLooping() const;
+    [[nodiscard]] bool IsMusicPaused() const;
+    [[nodiscard]] bool IsMusicStopped() const;
+    void SetMusicVolume(float volume);
+    [[nodiscard]] float GetMusicVolume() const;
+    void SetMusicLoop(bool loop) const;
+    [[nodiscard]] bool IsMusicLooping() const;
     void NextMusicTrack();
     void PreviousMusicTrack();
 

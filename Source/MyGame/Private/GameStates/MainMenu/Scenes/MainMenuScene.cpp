@@ -125,4 +125,3 @@ void MainMenuScene::ProcessBackground(const Transform& t, const RectangleShape& 
 {
     bg.shape->setPosition(t.position);
 }
-

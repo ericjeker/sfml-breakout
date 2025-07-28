@@ -16,7 +16,7 @@ namespace FileManager
 json LoadJSON(const std::string& filePath);
 yaml LoadYAML(const std::string& filePath);
 
-};
+}; // namespace FileManager
 
 
 #endif // FILEMANAGER_H

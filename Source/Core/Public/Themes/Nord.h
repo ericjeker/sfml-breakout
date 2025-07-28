@@ -1,18 +1,17 @@
 // Copyright (c) Eric Jeker. All Rights Reserved.
 
-/**
- * Nord is a beautiful theme from Arctic Ice Studio: https://www.nordtheme.com/
- *
- * Note that I didn't use the same naming convention and kept the color's name instead
- * of naming each color "nord0, nord1, ... nordx".
- */
-
 #pragma once
 #ifndef NORD_H
 #define NORD_H
 
 #include <SFML/Graphics/Color.hpp>
 
+/**
+ * Nord is a beautiful theme from Arctic Ice Studio: https://www.nordtheme.com/
+ *
+ * Note that I didn't use the same naming convention and kept the color's name instead
+ * of naming each color "nord0, nord1, ... nordx".
+ */
 struct NordTheme
 {
     // Polar Night

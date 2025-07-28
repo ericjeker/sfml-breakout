@@ -97,19 +97,7 @@ IncludeCategories:
   - Priority: 1
     Regex: '^\"(.+)\"$'
   - Priority: 2
-    Regex: '^<SFML\/Config.hpp>$'
-  - Priority: 3
-    Regex: '^<SFML\/(.+)\/Export.hpp>$'
-  - Priority: 4
-    Regex: '^<SFML\/Graphics'
-  - Priority: 5
-    Regex: '^<SFML\/Audio'
-  - Priority: 6
-    Regex: '^<SFML\/Network'
-  - Priority: 7
-    Regex: '^<SFML\/Window'
-  - Priority: 8
-    Regex: '^<SFML\/System'
+    Regex: '^<SFML\/(.+)'
   - Priority: 9
     Regex: '^<(glad|gl|X11|jni|android|stb_|GLES2|vorbis|miniaudio|catch2)'
   - Priority: 10

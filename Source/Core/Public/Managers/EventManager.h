@@ -99,7 +99,10 @@ public:
         // Process all deferred events
         for (auto& deferredEvent : _deferredEvents)
         {
-            LOG_DEBUG("(EventManager::ProcessDeferredEvents): Processing deferred event: " + std::string(deferredEvent.eventType.name()));
+            LOG_DEBUG(
+                "(EventManager::ProcessDeferredEvents): Processing deferred event: " +
+                std::string(deferredEvent.eventType.name())
+            );
             deferredEvent.eventExecutor();
         }
 

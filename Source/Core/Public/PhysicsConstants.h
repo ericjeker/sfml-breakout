@@ -25,7 +25,7 @@ constexpr float DEFAULT_BALL_RADIUS = 8.f;
 // Consider that the height of the screen is 2 meters (200 cm) high
 constexpr float PIXELS_PER_CENTIMETER = Configuration::WINDOW_SIZE.y / 200.f;
 
-}
+} // namespace PhysicsConstants
 
 
 #endif

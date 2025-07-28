@@ -105,7 +105,7 @@ public:
     T& GetScene()
     {
         static_assert(std::is_base_of_v<Scene, T>, "T must inherit from Scene");
-        auto it = _scenes.find(std::type_index(typeid(T)));
+        const auto it = _scenes.find(std::type_index(typeid(T)));
         if (it == _scenes.end())
         {
             throw std::runtime_error("Scene not found");

@@ -144,8 +144,8 @@ void BouncingBallScene::CreateBalls(const int count)
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> distX(0.f, Configuration::WINDOW_SIZE.x);
     std::uniform_real_distribution<float> distY(0.f, Configuration::WINDOW_SIZE.y);
-    std::uniform_real_distribution<float> velX(-50.f, 50.f);
-    std::uniform_real_distribution<float> velY(-50.f, 50.f);
+    std::uniform_real_distribution velX(-50.f, 50.f);
+    std::uniform_real_distribution velY(-50.f, 50.f);
 
     for (int i = 0; i < count; ++i)
     {

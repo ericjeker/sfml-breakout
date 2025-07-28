@@ -35,13 +35,7 @@ int main()
     sf::ContextSettings settings;
     settings.antiAliasingLevel = Configuration::ANTI_ALIASING_LEVEL;
 
-    auto renderWindow = sf::RenderWindow(
-        mode,
-        Configuration::WINDOW_TITLE,
-        Configuration::WINDOW_STYLE,
-        Configuration::WINDOW_STATE,
-        settings
-    );
+    auto renderWindow = sf::RenderWindow(mode, Configuration::WINDOW_TITLE, Configuration::WINDOW_STYLE, Configuration::WINDOW_STATE, settings);
 
     renderWindow.setFramerateLimit(Configuration::FRAMES_PER_SECOND);
     renderWindow.setVerticalSyncEnabled(Configuration::IS_VSYNC);

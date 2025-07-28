@@ -1,9 +1,8 @@
 // Copyright (c) Eric Jeker. All Rights Reserved.
 #pragma once
 
-#include <SFML/Window/Window.hpp>
-
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Window.hpp>
 
 namespace Configuration
 {
@@ -20,4 +19,4 @@ constexpr bool IS_VSYNC = true;
 constexpr unsigned int ANTI_ALIASING_LEVEL = 4;
 
 
-}
+} // namespace Configuration
