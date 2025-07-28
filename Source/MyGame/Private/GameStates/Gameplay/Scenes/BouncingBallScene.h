@@ -7,7 +7,7 @@
 #include "Components/Transform.h"
 #include "Modules/Physics/Components/RigidBody.h"
 #include "Modules/Physics/Components/Velocity.h"
-#include "Modules/Render/Components/CircleShape.h"
+#include "Modules/Render/Components/CircleRenderable.h"
 #include "Scenes/Scene.h"
 
 #include <flecs.h>
@@ -17,12 +17,12 @@ class BouncingBallScene final : public Scene
 {
 public:
     void Initialize() override;
-    void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
+    void HandleEvent(const std::optional<sf::Event>& event) override;
 
 private:
-    void CreateBalls(int count);
-    static void ProcessScreenBounce(const flecs::iter& it, size_t, Transform& t, Velocity& v);
-    static void ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p, const CircleShape& ball);
+    void CreateBalls();
+    static void ProcessScreenBounce(Transform& t, Velocity& v);
+    static void ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p, CircleRenderable& ball);
 };
 
 

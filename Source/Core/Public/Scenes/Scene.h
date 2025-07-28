@@ -30,7 +30,7 @@ public:
     virtual void Initialize();
     virtual void Shutdown();
     virtual void Update(float deltaTime);
-    virtual void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window);
+    virtual void HandleEvent(const std::optional<sf::Event>& event);
 
     // -- Scene States --
     [[nodiscard]] bool IsLoaded() const;

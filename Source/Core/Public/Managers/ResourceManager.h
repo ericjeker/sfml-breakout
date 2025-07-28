@@ -6,10 +6,8 @@
 
 #include "Logger.h"
 
-#include <SFML/Audio/Music.hpp>
-#include <SFML/Audio/Sound.hpp>
-#include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Graphics.hpp>
 
 #include <string>
 #include <unordered_map>
@@ -26,7 +24,7 @@ public:
     void CleanUp();
 
     template <typename T>
-    std::shared_ptr<T> GetResource(const std::string& name)
+    T* GetResource(const std::string& name)
     {
         const auto it = _resources.find(name);
         if (it == _resources.end())
@@ -36,7 +34,7 @@ public:
         }
 
         // Get the resource from _resources
-        std::shared_ptr<T>* value = std::get_if<std::shared_ptr<T>>(&it->second);
+        auto* value = std::get_if<std::unique_ptr<T>>(&it->second);
 
         if (value == nullptr)
         {
@@ -44,23 +42,30 @@ public:
             return nullptr;
         }
 
-        return *value;
+        return value->get();
     }
 
     template <typename T>
-    void SetResource(const std::string& name, std::shared_ptr<T> resource)
+    bool SetResource(const std::string& name, std::unique_ptr<T> resource)
     {
+        if (!resource)
+        {
+            LOG_ERROR("Attempted to set null resource: " + name);
+            return false;
+        }
+
         _resources[name] = std::move(resource);
+        return true;
     }
 
 private:
     using ResourceVariant = std::variant<
-        std::shared_ptr<sf::Font>,
-        std::shared_ptr<sf::Music>,
-        std::shared_ptr<sf::Sound>,
-        std::shared_ptr<sf::Shader>,
-        std::shared_ptr<sf::Sprite>,
-        std::shared_ptr<sf::Texture>>;
+        std::unique_ptr<sf::Font>,
+        std::unique_ptr<sf::Music>,
+        std::unique_ptr<sf::Sound>,
+        std::unique_ptr<sf::Shader>,
+        std::unique_ptr<sf::Sprite>,
+        std::unique_ptr<sf::Texture>>;
 
     std::unordered_map<std::string, ResourceVariant> _resources;
 };

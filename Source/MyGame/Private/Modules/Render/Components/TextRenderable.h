@@ -6,12 +6,10 @@
 
 #include <SFML/Graphics/Text.hpp>
 
-#include <memory>
-
 
 struct TextRenderable
 {
-    std::unique_ptr<sf::Text> text;
+    sf::Text text;
 };
 
 

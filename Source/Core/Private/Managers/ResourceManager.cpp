@@ -49,7 +49,8 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
 
                 LOG_INFO("(ResourceManager::LoadResourcesFromManifest): Loading asset: " + assetName);
 
-                if (assetType != "music" && assetType != "sound" && assetType != "texture" && assetType != "font")
+                if (assetType != "music" && assetType != "shader" && assetType != "sound" && assetType != "texture" &&
+                    assetType != "font")
                 {
                     LOG_ERROR("(ResourceManager::LoadResourcesFromManifest): Invalid asset type: " + assetType);
                     continue;
@@ -57,15 +58,15 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
 
                 if (assetType == "font")
                 {
-                    const auto font = std::make_shared<sf::Font>(assetPath);
-                    SetResource<sf::Font>(assetName, font);
+                    auto font = std::make_unique<sf::Font>(assetPath);
+                    SetResource<sf::Font>(assetName, std::move(font));
                 }
                 else if (assetType == "texture")
                 {
                 }
                 else if (assetType == "music")
                 {
-                    const auto music = std::make_shared<sf::Music>();
+                    auto music = std::make_unique<sf::Music>();
                     if (!music->openFromFile(assetPath))
                     {
                         LOG_ERROR(
@@ -73,9 +74,12 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
                             ") from : " + assetPath
                         );
                     }
-                    SetResource<sf::Music>(assetName, music);
+                    SetResource<sf::Music>(assetName, std::move(music));
                 }
                 else if (assetType == "sound")
+                {
+                }
+                else if (assetType == "shader")
                 {
                 }
             }

@@ -47,6 +47,6 @@ void SceneManager::HandleEvent(const std::optional<sf::Event>& event, sf::Render
             continue;
         }
 
-        scene->HandleEvent(event, renderWindow);
+        scene->HandleEvent(event);
     }
 }

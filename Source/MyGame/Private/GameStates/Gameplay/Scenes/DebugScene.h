@@ -13,7 +13,7 @@ class DebugScene final : public Scene
 {
 public:
     void Initialize() override;
-    static void ProcessText(const flecs::iter& it, size_t, const Transform& t, const TextRenderable& textRenderable);
+    static void ProcessText(const flecs::iter& it, size_t, const Transform& t, TextRenderable& textRenderable);
 };
 
 

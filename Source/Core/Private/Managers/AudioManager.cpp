@@ -27,9 +27,9 @@ float AudioManager::GetVolume() const
     return _soundVolume;
 }
 
-void AudioManager::PlayMusic(const std::string& musicName) const
+void AudioManager::PlayMusic(const std::string& musicName)
 {
-    const auto _currentlyPlaying = _resourceManager.GetResource<sf::Music>(musicName);
+    _currentlyPlaying = _resourceManager.GetResource<sf::Music>(musicName);
     if (!_currentlyPlaying)
     {
         LOG_ERROR("(AudioManager::PlayMusic): Could not find music: " + musicName);

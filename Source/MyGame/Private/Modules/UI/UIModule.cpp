@@ -6,8 +6,6 @@
 #include "Components/ButtonText.h"
 #include "Components/Clickable.h"
 #include "Components/Hoverable.h"
-#include "Components/Size.h"
-#include "Components/Transform.h"
 #include "Modules/Render/Components/TextRenderable.h"
 #include "Prefabs/Button.h"
 
@@ -31,17 +29,8 @@ UIModule::UIModule(flecs::world& world)
     world.component<Clickable>();
     world.component<Hoverable>();
 
-    // --- Declare Prefabs ---
-    world.prefab("ButtonPrefab")
-        .set<ButtonBackground>({})
-        .set<ButtonText>({.text = "Button Text"})
-        .set<Transform>({})
-        .set<Size>({})
-        .set<Clickable>({})
-        .set<Hoverable>({});
-
     // --- Declare Systems ---
-    world.system<ButtonBackground, TextRenderable>().kind(flecs::OnStore).each(RenderButton);
+    // world.system<ButtonBackground, TextRenderable>().kind(flecs::OnStore).each(RenderButton);
 }
 
 } // namespace Modules

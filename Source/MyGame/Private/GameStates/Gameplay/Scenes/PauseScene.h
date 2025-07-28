@@ -5,7 +5,7 @@
 #define PAUSESCENE_H
 
 #include "Components/Transform.h"
-#include "Modules/Render/Components/RectangleShape.h"
+#include "Modules/Render/Components/RectangleRenderable.h"
 #include "Modules/Render/Components/TextRenderable.h"
 #include "Scenes/Scene.h"
 
@@ -16,13 +16,13 @@ class PauseScene final : public Scene
 {
 public:
     void Initialize() override;
-    void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
+    void HandleEvent(const std::optional<sf::Event>& event) override;
 
 private:
-    void CreateTextEntity(std::unique_ptr<sf::Text> text, sf::Vector2f position);
-    void CreateButtonEntity(std::unique_ptr<sf::Text> text, sf::Vector2f position, const std::function<void()>& callback);
-    static void ProcessText(const Transform& t, const TextRenderable& textRenderable);
-    static void ProcessBackground(const Transform& t, const RectangleShape& bg);
+    void CreateTextEntity(sf::Text& text, sf::Vector2f position);
+    void CreateButtonEntity(sf::Text& text, sf::Vector2f position, const std::function<void()>& callback);
+    static void ProcessText(const Transform& t, TextRenderable& textRenderable);
+    static void ProcessBackground(const Transform& t, RectangleRenderable& bg);
 };
 
 
