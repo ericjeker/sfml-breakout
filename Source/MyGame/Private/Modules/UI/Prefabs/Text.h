@@ -15,10 +15,10 @@ namespace Prefabs
 
 struct TextParams
 {
-    std::string text;
-    const sf::Font* font;
-    float size = 10.f;
-    sf::Color color = sf::Color::Magenta;
+    std::string text = "Default Text";
+    std::string fontAsset = "Orbitron-Regular";
+    float fontSize = 12.f;
+    sf::Color textColor = sf::Color::Magenta;
     sf::Vector2f origin = {0.f, 0.f};
     sf::Vector2f position = {0.f, 0.f};
     sf::Vector2f scale = {1.f, 1.f};

@@ -7,6 +7,7 @@
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
+#include "Modules/Render/Components/TextRenderable.h"
 #include "Modules/Render/Prefabs/Rectangle.h"
 #include "Modules/Render/RenderModule.h"
 #include "Modules/UI/Prefabs/Button.h"
@@ -34,24 +35,21 @@ void MainMenuScene::Initialize()
     Prefabs::Rectangle::Create(
         world,
         {
-            .position = {0.f, 0.f},
             .size = sf::Vector2f{Configuration::WINDOW_SIZE},
-            .color = NordTheme::PolarNight1,
+            .position = {0.f, 0.f},
+            .color = NordTheme::PolarNight4,
         }
     );
 
     // --- Add Title ---
-    const auto* const fontRegular = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Regular");
-    const auto* const fontBold = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Bold");
-
     Prefabs::Text::Create(
         world,
         {
             .text = "Main Menu",
+            .fontAsset = "Orbitron-Bold",
+            .fontSize = 60.f,
             .position = {centerX, centerY - 200},
-            .font = fontBold,
-            .size = 60.f,
-            .color = NordTheme::SnowStorm3,
+            .textColor = NordTheme::SnowStorm3,
             .origin = sf::Vector2f{0.5f, 0.5f},
         }
     );
@@ -61,11 +59,12 @@ void MainMenuScene::Initialize()
         world,
         {
             .text = "Play",
-            .font = fontRegular,
+            .fontAsset = "Orbitron-Regular",
             .fontSize = 36.f,
             .position = {centerX, centerY},
-            .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<StartGame>({}, this); },
             .textColor = NordTheme::SnowStorm3,
+            .backgroundColor = sf::Color::Transparent,
+            .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<StartGame>({}, this); },
         }
     );
 
@@ -74,15 +73,14 @@ void MainMenuScene::Initialize()
         world,
         {
             .text = "Exit",
-            .font = fontRegular,
+            .fontAsset = "Orbitron-Regular",
             .fontSize = 36.f,
             .position = {centerX, centerY + 100},
-            .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<ExitGame>({}, this); },
             .textColor = NordTheme::SnowStorm3,
+            .backgroundColor = sf::Color::Transparent,
+            .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<ExitGame>({}, this); },
         }
     );
-
-    GetWorld().system<Transform, TextRenderable>().each(ApplyTransform);
 }
 
 void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
@@ -104,21 +102,11 @@ void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
         GetWorld().each(
             [&](const TextRenderable& textRenderable, const EventTrigger& eventTrigger)
             {
-                if (textRenderable.text.getGlobalBounds().contains(mousePosition))
+                if (textRenderable.text->getGlobalBounds().contains(mousePosition))
                 {
                     eventTrigger.callback();
                 }
             }
         );
     }
-}
-
-void MainMenuScene::ApplyTransform(const Transform& t, TextRenderable& textRenderable)
-{
-    textRenderable.text.setPosition(t.position);
-}
-
-void MainMenuScene::ProcessBackground(const Transform& t, RectangleRenderable& bg)
-{
-    bg.shape.setPosition(t.position);
 }

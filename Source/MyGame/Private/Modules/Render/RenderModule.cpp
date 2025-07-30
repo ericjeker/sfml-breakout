@@ -9,6 +9,7 @@
 #include "Components/ShaderUniforms.h"
 #include "Components/SpriteRenderable.h"
 #include "Components/TextRenderable.h"
+#include "Components/Transform.h"
 #include "Managers/GameService.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -17,10 +18,10 @@
 namespace
 {
 
-void RenderRectangleShape(const RectangleRenderable& bg)
+void RenderRectangleShape(const RectangleRenderable& rect)
 {
     auto& window = GameService::Get<sf::RenderWindow>();
-    window.draw(bg.shape);
+    window.draw(rect.shape);
 }
 
 void RenderCircleShape(const CircleRenderable& ball)
@@ -29,10 +30,11 @@ void RenderCircleShape(const CircleRenderable& ball)
     window.draw(ball.shape);
 }
 
-void RenderText(const TextRenderable& text)
+void RenderText(const Transform& t, TextRenderable& text)
 {
     auto& window = GameService::Get<sf::RenderWindow>();
-    window.draw(text.text);
+    text.text->setPosition(t.position);
+    window.draw(*text.text);
 }
 
 void RenderSprite(const SpriteRenderable& s)
@@ -41,32 +43,32 @@ void RenderSprite(const SpriteRenderable& s)
     window.draw(s.sprite);
 }
 
-void RenderShader(const ShaderRenderable& s, const ShaderUniforms& us)
-{
-    if (!sf::Shader::isAvailable())
-    {
-        LOG_ERROR("(RenderModule::RenderShader): Shaders are not available");
-        return;
-    }
-
-    for (const auto& [name, value] : us.uniforms)
-    {
-        if (std::empty(name))
-        {
-            LOG_ERROR("(RenderModule::RenderShader): Shader uniform name is empty");
-            continue;
-        }
-
-        // std::visit([&](const auto& v) { setter.setUniform(name, v); }, value);
-    }
-
-    // Create render states with our shader
-    sf::RenderStates states;
-    states.shader = &s.shader;
-
-    auto& window = GameService::Get<sf::RenderWindow>();
-    window.draw(*s.target, states);
-}
+// void RenderShader(const ShaderRenderable& s, const ShaderUniforms& us)
+// {
+//     if (!sf::Shader::isAvailable())
+//     {
+//         LOG_ERROR("(RenderModule::RenderShader): Shaders are not available");
+//         return;
+//     }
+//
+//     for (const auto& [name, value] : us.uniforms)
+//     {
+//         if (std::empty(name))
+//         {
+//             LOG_ERROR("(RenderModule::RenderShader): Shader uniform name is empty");
+//             continue;
+//         }
+//
+//         // std::visit([&](const auto& v) { setter.setUniform(name, v); }, value);
+//     }
+//
+//     // Create render states with our shader
+//     sf::RenderStates states;
+//     states.shader = &s.shader;
+//
+//     auto& window = GameService::Get<sf::RenderWindow>();
+//     window.draw(*s.target, states);
+// }
 
 } // namespace
 
@@ -79,13 +81,13 @@ RenderModule::RenderModule(const flecs::world& world)
     world.component<CircleRenderable>();
     world.component<TextRenderable>();
     world.component<SpriteRenderable>();
-    world.component<ShaderRenderable>();
+    // world.component<ShaderRenderable>();
     world.component<ShaderUniform>();
     world.component<ShaderUniforms>();
 
     world.system<const RectangleRenderable>("RectangleRenderable").kind(flecs::OnStore).each(RenderRectangleShape);
     world.system<const CircleRenderable>("CircleRenderable").kind(flecs::OnStore).each(RenderCircleShape);
-    world.system<const TextRenderable>("TextRenderable").kind(flecs::OnStore).each(RenderText);
+    world.system<const Transform, TextRenderable>("TextRenderable").kind(flecs::OnStore).each(RenderText);
     // world.system<const ShaderRenderable>("TextRenderable").kind(flecs::OnStore).each(RenderShader);
     world.system<const SpriteRenderable>("SpriteRenderable").kind(flecs::OnStore).each(RenderSprite);
 }

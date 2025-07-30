@@ -19,8 +19,8 @@ public:
     void HandleEvent(const std::optional<sf::Event>& event) override;
 
 private:
-    void CreateTextEntity(sf::Text& text, sf::Vector2f position);
-    void CreateButtonEntity(sf::Text& text, sf::Vector2f position, const std::function<void()>& callback);
+    void CreateTextEntity(std::unique_ptr<sf::Text> text, sf::Vector2f position);
+    void CreateButtonEntity(std::unique_ptr<sf::Text> text, sf::Vector2f position, const std::function<void()>& callback);
     static void ProcessText(const Transform& t, TextRenderable& textRenderable);
     static void ProcessBackground(const Transform& t, RectangleRenderable& bg);
 };

@@ -10,6 +10,10 @@ AudioManager::AudioManager(ResourceManager& resourceManager)
 void AudioManager::SetMasterVolume(const float volume)
 {
     _masterVolume = volume;
+    if (_currentlyPlaying)
+    {
+        SetMusicVolume(_musicVolume);
+    }
 }
 
 float AudioManager::GetMasterVolume() const
@@ -29,80 +33,74 @@ float AudioManager::GetVolume() const
 
 void AudioManager::PlayMusic(const std::string& musicName)
 {
-    _currentlyPlaying = _resourceManager.GetResource<sf::Music>(musicName);
-    if (!_currentlyPlaying)
-    {
-        LOG_ERROR("(AudioManager::PlayMusic): Could not find music: " + musicName);
-        return;
-    }
+    StopMusic();
 
-    _currentlyPlaying->setVolume(_musicVolume * _masterVolume);
-    _currentlyPlaying->play();
+    _currentlyPlaying = _resourceManager.GetResource<sf::Music>(musicName);
+    if (_currentlyPlaying)
+    {
+        _currentlyPlaying->setVolume(_musicVolume * _masterVolume);
+        _currentlyPlaying->play();
+    }
 }
 
 void AudioManager::StopMusic() const
 {
-    if (!_currentlyPlaying)
+    if (_currentlyPlaying)
     {
-        return;
+        _currentlyPlaying->stop();
     }
-
-    _currentlyPlaying->stop();
 }
 
 void AudioManager::PauseMusic() const
 {
-    if (!_currentlyPlaying)
+    if (_currentlyPlaying)
     {
-        return;
+        _currentlyPlaying->pause();
     }
-
-    _currentlyPlaying->pause();
 }
 
 void AudioManager::ResumeMusic() const
 {
-    if (!_currentlyPlaying)
+    if (_currentlyPlaying)
     {
-        return;
+        _currentlyPlaying->play();
     }
-
-    _currentlyPlaying->play();
 }
 
 bool AudioManager::IsMusicPlaying() const
 {
-    if (!_currentlyPlaying)
+    if (_currentlyPlaying)
     {
-        return false;
+        return _currentlyPlaying->getStatus() == sf::Music::Status::Playing;
     }
-
-    return _currentlyPlaying->getStatus() == sf::Music::Status::Playing;
+    return false;
 }
 
 bool AudioManager::IsMusicPaused() const
 {
-    if (!_currentlyPlaying)
+    if (_currentlyPlaying)
     {
-        return false;
+        return _currentlyPlaying->getStatus() == sf::Music::Status::Paused;
     }
-
-    return _currentlyPlaying->getStatus() == sf::Music::Status::Paused;
+    return false;
 }
 
 bool AudioManager::IsMusicStopped() const
 {
-    if (!_currentlyPlaying)
+    if (_currentlyPlaying)
     {
-        return false;
+        return _currentlyPlaying->getStatus() == sf::Music::Status::Stopped;
     }
-
-    return _currentlyPlaying->getStatus() == sf::Music::Status::Stopped;
+    return true;
 }
 
 void AudioManager::SetMusicVolume(const float volume)
 {
     _musicVolume = volume;
+    if (_currentlyPlaying)
+    {
+        _currentlyPlaying->setVolume(_musicVolume * _masterVolume);
+    }
 }
 
 float AudioManager::GetMusicVolume() const
@@ -112,20 +110,17 @@ float AudioManager::GetMusicVolume() const
 
 void AudioManager::SetMusicLoop(const bool loop) const
 {
-    if (!_currentlyPlaying)
+    if (_currentlyPlaying)
     {
-        return;
+        _currentlyPlaying->setLooping(loop);
     }
-
-    _currentlyPlaying->setLooping(loop);
 }
 
 bool AudioManager::IsMusicLooping() const
 {
-    if (!_currentlyPlaying)
+    if (_currentlyPlaying)
     {
-        return false;
+        return _currentlyPlaying->isLooping();
     }
-
-    return _currentlyPlaying->isLooping();
+    return false;
 }

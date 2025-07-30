@@ -18,7 +18,7 @@ void MyGame::Initialize()
     GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>());
 
     // --- Start the main theme ---
-    GameService::Get<AudioManager>().PlayMusic("8mm");
+    // GameService::Get<AudioManager>().PlayMusic("8mm");
 
     // --- Add event listeners ---
     GameService::Get<EventManager>().Subscribe<ExitGame>(_exitGameListener);

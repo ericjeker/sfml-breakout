@@ -9,7 +9,7 @@
 
 struct TextRenderable
 {
-    sf::Text text;
+    std::unique_ptr<sf::Text> text = nullptr;
 };
 
 
