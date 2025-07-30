@@ -15,7 +15,7 @@ namespace Prefabs
 struct ButtonParams
 {
     std::string text = "Button Text";
-    const sf::Font* font;
+    const sf::Font* font = nullptr;
     float fontSize = 28.0f;
     sf::Vector2f position = {0.0f, 0.0f};
     sf::Vector2f padding = {10.0f, 10.0f};

@@ -6,11 +6,11 @@
 
 #include <SFML/Graphics/Shader.hpp>
 
-
+template <typename T>
 struct ShaderRenderable
 {
     sf::Shader shader;
-    sf::Drawable* target;
+    T mesh;
     sf::Shader::Type type;
 };
 

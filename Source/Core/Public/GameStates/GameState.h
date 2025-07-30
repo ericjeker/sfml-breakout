@@ -24,7 +24,7 @@ public:
     [[nodiscard]] bool IsPaused() const;
 
     virtual void Update(float deltaTime);
-    virtual void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow) = 0;
+    virtual void HandleEvent(const std::optional<sf::Event>& event) = 0;
 
 private:
     bool _paused = false;

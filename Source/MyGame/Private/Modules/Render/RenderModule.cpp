@@ -87,7 +87,7 @@ RenderModule::RenderModule(const flecs::world& world)
     world.system<const CircleRenderable>("CircleRenderable").kind(flecs::OnStore).each(RenderCircleShape);
     world.system<const TextRenderable>("TextRenderable").kind(flecs::OnStore).each(RenderText);
     // world.system<const ShaderRenderable>("TextRenderable").kind(flecs::OnStore).each(RenderShader);
-    world.system<const SpriteRenderable>("TextRenderable").kind(flecs::OnStore).each(RenderSprite);
+    world.system<const SpriteRenderable>("SpriteRenderable").kind(flecs::OnStore).each(RenderSprite);
 }
 
 } // namespace Modules

@@ -25,7 +25,7 @@ void MainMenuState::Exit()
     sceneManager.RemoveScene<MainMenuScene>();
 }
 
-void MainMenuState::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
+void MainMenuState::HandleEvent(const std::optional<sf::Event>& event)
 {
     if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
     {

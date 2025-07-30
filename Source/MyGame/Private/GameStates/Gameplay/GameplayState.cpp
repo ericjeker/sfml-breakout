@@ -36,7 +36,7 @@ void GameplayState::Exit()
     // GameService::Get<EventManager>().Unsubscribe<ResumeGame>(_resumeGameListener);
 }
 
-void GameplayState::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
+void GameplayState::HandleEvent(const std::optional<sf::Event>& event)
 {
     auto& sceneManager = GameService::Get<SceneManager>();
 

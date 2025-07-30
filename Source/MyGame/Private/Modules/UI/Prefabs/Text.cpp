@@ -10,6 +10,8 @@ namespace Prefabs
 
 flecs::entity Text::Create(const flecs::world& world, const TextParams& params)
 {
+    assert(params.font && "Font must be provided");
+
     sf::Text text(*params.font, params.text, params.size);
     text.setFillColor(params.color);
     text.setOrigin(params.origin);

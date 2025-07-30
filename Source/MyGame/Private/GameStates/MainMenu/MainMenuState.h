@@ -13,7 +13,7 @@ public:
     void Enter() override;
     void Exit() override;
 
-    void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window) override;
+    void HandleEvent(const std::optional<sf::Event>& event) override;
 };
 
 

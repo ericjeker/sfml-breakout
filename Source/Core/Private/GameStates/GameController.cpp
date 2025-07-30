@@ -51,12 +51,12 @@ void GameController::Update(const float deltaTime)
     _stateStack.top()->Update(deltaTime);
 }
 
-void GameController::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow)
+void GameController::HandleEvent(const std::optional<sf::Event>& event)
 {
     if (_stateStack.empty())
     {
         return;
     }
 
-    _stateStack.top()->HandleEvent(event, renderWindow);
+    _stateStack.top()->HandleEvent(event);
 }
