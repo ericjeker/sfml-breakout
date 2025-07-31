@@ -10,7 +10,7 @@
 namespace Modules
 {
 
-class UIModule
+struct UIModule
 {
     explicit UIModule(flecs::world& world);
 };

@@ -59,8 +59,8 @@ void MainMenuScene::Initialize()
         world,
         {
             .text = "Play",
-            .fontAsset = "Orbitron-Regular",
-            .fontSize = 36.f,
+            .fontAsset = "Orbitron-Bold",
+            .fontSize = 48.f,
             .position = {centerX, centerY},
             .textColor = NordTheme::SnowStorm3,
             .backgroundColor = sf::Color::Transparent,

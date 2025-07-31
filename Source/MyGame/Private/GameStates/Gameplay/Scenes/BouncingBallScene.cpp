@@ -6,45 +6,45 @@
 #include <tracy/Tracy.hpp>
 #endif
 
+#include "Components/Transform.h"
 #include "Configuration.h"
 #include "Managers/GameService.h"
+#include "Modules/BouncingBalls/BouncingBallsModule.h"
+#include "Modules/BouncingBalls/Prefabs/Ball.h"
 #include "Modules/Physics/Components/GravitySettings.h"
-#include "Modules/Render/Components/CircleRenderable.h"
-#include "Modules/Render/Components/RectangleRenderable.h"
+#include "Modules/Physics/PhysicsModule.h"
+#include "Modules/Render/Prefabs/Rectangle.h"
 #include "Modules/Render/RenderModule.h"
 #include "PhysicsConstants.h"
 #include "Themes/Nord.h"
-
-#include <SFML/Graphics/RectangleShape.hpp>
 
 #include <random>
 
 
 void BouncingBallScene::Initialize()
 {
-    Scene::Initialize();
-
     // --- Get the world and import the modules ---
-    auto ecsWorld = GetWorld();
-    ecsWorld.import <Modules::RenderModule>();
+    auto world = GetWorld();
 
-    ecsWorld.set<GravitySettings>(
+    world.import <Modules::PhysicsModule>();
+    world.import <Modules::BouncingBallsModule>();
+    world.import <Modules::RenderModule>();
+
+    world.set<GravitySettings>(
         {.gravity = PhysicsConstants::NO_GRAVITY, .pixelsPerCentimeter = PhysicsConstants::PIXELS_PER_CENTIMETER}
     );
 
-    // --- Create entities ---
-    sf::RectangleShape backgroundDrawable;
-    backgroundDrawable.setSize(sf::Vector2f{Configuration::WINDOW_SIZE});
-    backgroundDrawable.setFillColor(NordTheme::Frost1);
-
-    ecsWorld.entity().set<RectangleRenderable>({std::move(backgroundDrawable)}).set<Transform>({});
+    Prefabs::Rectangle::Create(
+        world,
+        {
+            .size = sf::Vector2f{Configuration::WINDOW_SIZE},
+            .color = NordTheme::PolarNight4,
+            .position = {0.f, 0.f},
+        }
+    );
 
     // --- Create LOTTA balls ---
-    CreateBalls();
-
-    // --- Add systems ---
-    ecsWorld.system<Transform, Velocity, RigidBody, CircleRenderable>().each(ProcessPhysics);
-    ecsWorld.system<Transform, Velocity>().each(ProcessScreenBounce);
+    CreateBalls(world);
 }
 
 void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event)
@@ -133,11 +133,11 @@ void BouncingBallScene::HandleEvent(const std::optional<sf::Event>& event)
     // }
 }
 
-void BouncingBallScene::CreateBalls()
+void BouncingBallScene::CreateBalls(const flecs::world& world)
 {
     ZoneScopedN("BouncingBallScene::CreateBalls");
 
-    constexpr int BALL_COUNT = 2000;
+    constexpr int BALL_COUNT = 50;
 
     // Create balls
     std::random_device rd;
@@ -149,61 +149,18 @@ void BouncingBallScene::CreateBalls()
 
     for (int i = 0; i < BALL_COUNT; ++i)
     {
-        constexpr float RADIUS = 5.f;
-        const sf::Vector2f position = {distX(gen), distY(gen)};
-        const sf::Vector2f velocity =
-            {velX(gen) * PhysicsConstants::PIXELS_PER_CENTIMETER, velY(gen) * PhysicsConstants::PIXELS_PER_CENTIMETER};
+        constexpr float RADIUS = 15.f;
 
-        // Create a ball
-        sf::CircleShape ballShape;
-        ballShape.setFillColor(NordTheme::Aurora1);
-        ballShape.setOrigin({RADIUS, RADIUS});
-
-        GetWorld()
-            .entity()
-            .set<Transform>({.position = position})
-            .set<Velocity>({velocity})
-            .set<RigidBody>({.damping = PhysicsConstants::NO_DAMPING})
-            .set<CircleRenderable>({std::move(ballShape)});
+        Prefabs::Ball::Create(
+            world,
+            {
+                .radius = RADIUS,
+                .position = {distX(gen), distY(gen)},
+                .velocity = {velX(gen) * PhysicsConstants::PIXELS_PER_CENTIMETER, velY(gen) * PhysicsConstants::PIXELS_PER_CENTIMETER},
+                .color = NordTheme::Aurora1,
+                .friction = 0.9,
+                .gravity = PhysicsConstants::GRAVITY_DOWN,
+            }
+        );
     }
-}
-
-void BouncingBallScene::ProcessScreenBounce(Transform& t, Velocity& v)
-{
-    if (t.position.x < 0.f)
-    {
-        v.velocity.x *= -1.f;
-        t.position.x = 0.f;
-    }
-    else if (t.position.x > Configuration::WINDOW_SIZE.x)
-    {
-        v.velocity.x *= -1.f;
-        t.position.x = Configuration::WINDOW_SIZE.x;
-    }
-
-    if (t.position.y < 0.f)
-    {
-        v.velocity.y *= -1.f;
-        t.position.y = 0.f;
-    }
-    else if (t.position.y > Configuration::WINDOW_SIZE.y)
-    {
-        v.velocity.y *= -1.f;
-        t.position.y = Configuration::WINDOW_SIZE.y;
-    }
-}
-
-void BouncingBallScene::ProcessPhysics(const flecs::iter& it, size_t, Transform& t, Velocity& v, const RigidBody& p, CircleRenderable& ball)
-{
-    // Physics system
-    if (auto [gravity, pixelsPerCentimeter, enabled] = it.world().get<GravitySettings>(); enabled)
-    {
-        v.velocity.x += gravity.x * pixelsPerCentimeter * it.delta_time();
-        v.velocity.y += gravity.y * pixelsPerCentimeter * it.delta_time();
-    }
-
-    v.velocity *= p.damping;
-    t.position += v.velocity * it.delta_time();
-
-    ball.shape.setPosition(t.position);
 }

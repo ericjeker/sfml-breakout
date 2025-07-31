@@ -5,8 +5,10 @@
 #define BUTTON_H
 
 #include <SFML/Graphics.hpp>
+#include <SFML/System/Vector2.hpp>
 
 #include <flecs.h>
+#include <string>
 
 
 namespace Prefabs

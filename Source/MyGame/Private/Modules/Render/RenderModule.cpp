@@ -4,7 +4,6 @@
 
 #include "Components/CircleRenderable.h"
 #include "Components/RectangleRenderable.h"
-#include "Components/ShaderRenderable.h"
 #include "Components/ShaderUniform.h"
 #include "Components/ShaderUniforms.h"
 #include "Components/SpriteRenderable.h"
@@ -18,6 +17,13 @@
 namespace
 {
 
+void ApplyTransform(const Transform& t, CircleRenderable& c)
+{
+    c.shape.setPosition(t.position);
+    c.shape.setScale(t.scale);
+    c.shape.setRotation(sf::degrees(t.rotation));
+}
+
 void RenderRectangleShape(const RectangleRenderable& rect)
 {
     auto& window = GameService::Get<sf::RenderWindow>();
@@ -30,10 +36,9 @@ void RenderCircleShape(const CircleRenderable& ball)
     window.draw(ball.shape);
 }
 
-void RenderText(const Transform& t, TextRenderable& text)
+void RenderText(const TextRenderable& text)
 {
     auto& window = GameService::Get<sf::RenderWindow>();
-    text.text->setPosition(t.position);
     window.draw(*text.text);
 }
 
@@ -85,11 +90,12 @@ RenderModule::RenderModule(const flecs::world& world)
     world.component<ShaderUniform>();
     world.component<ShaderUniforms>();
 
+    world.system<const Transform, CircleRenderable>("ApplyTransform").kind(flecs::PreStore).each(ApplyTransform);
     world.system<const RectangleRenderable>("RectangleRenderable").kind(flecs::OnStore).each(RenderRectangleShape);
     world.system<const CircleRenderable>("CircleRenderable").kind(flecs::OnStore).each(RenderCircleShape);
-    world.system<const Transform, TextRenderable>("TextRenderable").kind(flecs::OnStore).each(RenderText);
-    // world.system<const ShaderRenderable>("TextRenderable").kind(flecs::OnStore).each(RenderShader);
+    world.system<const TextRenderable>("TextRenderable").kind(flecs::OnStore).each(RenderText);
     world.system<const SpriteRenderable>("SpriteRenderable").kind(flecs::OnStore).each(RenderSprite);
+    // world.system<const ShaderRenderable>("ShaderRenderable").kind(flecs::OnStore).each(RenderShader);
 }
 
 } // namespace Modules
