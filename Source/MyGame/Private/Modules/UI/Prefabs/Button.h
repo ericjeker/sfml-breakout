@@ -26,6 +26,7 @@ struct ButtonParams
     sf::Color textHoverColor = sf::Color::White;
     sf::Color backgroundColor = sf::Color::Transparent;
     sf::Color hoverColor = sf::Color::Transparent;
+    int zOrder = 0;
     // TODO: Add outline parameter
     std::function<void()> onClick = nullptr;
 };

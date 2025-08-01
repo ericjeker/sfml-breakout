@@ -63,6 +63,8 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
                 }
                 else if (assetType == "texture")
                 {
+                    auto texture = std::make_unique<sf::Texture>(assetPath);
+                    SetResource<sf::Texture>(assetName, std::move(texture));
                 }
                 else if (assetType == "music")
                 {

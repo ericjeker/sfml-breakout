@@ -4,16 +4,17 @@
 #ifndef DEBUGSCENE_H
 #define DEBUGSCENE_H
 
-#include "../../../Modules/Physics/Components/Transform.h"
-#include "Modules/Render/Components/TextRenderable.h"
 #include "Scenes/Scene.h"
 
+
+struct FPS
+{
+};
 
 class DebugScene final : public Scene
 {
 public:
     void Initialize() override;
-    static void ProcessText(const flecs::iter& it, size_t, const Transform& t, TextRenderable& textRenderable);
 };
 
 

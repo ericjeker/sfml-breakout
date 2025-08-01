@@ -35,6 +35,16 @@
           "path": "Assets/Shaders/glow.frag"
         }
       ]
+    },
+    {
+      "name": "Textures",
+      "assets": [
+        {
+          "name": "background",
+          "type": "texture",
+          "path": "Assets/Textures/background.png"
+        }
+      ]
     }
   ]
 }

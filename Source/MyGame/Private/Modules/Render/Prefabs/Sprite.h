@@ -1,22 +1,21 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef RECTANGLE_H
-#define RECTANGLE_H
+#ifndef SPRITE_H
+#define SPRITE_H
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
 
 #include <flecs.h>
-
+#include <string>
 
 namespace Prefabs
 {
 
-struct RectangleParams
+struct SpriteParams
 {
-    sf::Vector2f size;
-    sf::Color color = sf::Color::Magenta;
+    std::string textureAsset = nullptr;
     sf::Vector2f origin = {0.f, 0.f};
     sf::Vector2f position = {0.f, 0.f};
     sf::Vector2f scale = {1.f, 1.f};
@@ -24,9 +23,9 @@ struct RectangleParams
     int zOrder = 0;
 };
 
-struct Rectangle
+struct Sprite
 {
-    static flecs::entity Create(const flecs::world& world, const RectangleParams& params);
+    static flecs::entity Create(const flecs::world& world, const SpriteParams& params);
 };
 
 } // namespace Prefabs

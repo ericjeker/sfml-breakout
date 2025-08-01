@@ -9,7 +9,7 @@
 
 struct SpriteRenderable
 {
-    sf::Sprite sprite;
+    std::unique_ptr<sf::Sprite> sprite;
 };
 
 

@@ -10,6 +10,7 @@
 #include "Modules/Physics/Components/Transform.h"
 #include "Modules/Render/Components/RectangleRenderable.h"
 #include "Modules/Render/Components/TextRenderable.h"
+#include "Modules/Render/Prefabs/Rectangle.h"
 #include "Modules/Render/RenderModule.h"
 #include "Modules/UI/Prefabs/Button.h"
 #include "Modules/UI/Prefabs/Text.h"
@@ -34,15 +35,22 @@ void PauseScene::Initialize()
     auto world = GetWorld();
     world.import <Modules::RenderModule>();
 
+    int zOrder = 0;
+
     // --- Overlay ---
-    sf::RectangleShape background(sf::Vector2f{Configuration::WINDOW_SIZE});
     auto backgroundColor = NordTheme::PolarNight1;
     backgroundColor.a = 127;
-    background.setFillColor(backgroundColor);
 
-    world.entity()
-        .set<RectangleRenderable>({std::move(background)})
-        .set<Transform>({.position = {0.f, 0.f}, .scale = {1.f, 1.f}, .rotation = 0.f});
+    Prefabs::Rectangle::Create(
+        world,
+        {.size = sf::Vector2f{Configuration::WINDOW_SIZE},
+         .position = {0.f, 0.f},
+         .color = backgroundColor,
+         .position = {0.f, 0.f},
+         .scale = {1.f, 1.f},
+         .rotation = 0.f,
+         .zOrder = zOrder++}
+    );
 
     // --- Add Pause Text ---
     Prefabs::Text::Create(
@@ -54,6 +62,7 @@ void PauseScene::Initialize()
             .position = {CENTER_X, CENTER_Y - 200},
             .textColor = NordTheme::SnowStorm3,
             .origin = sf::Vector2f{0.5f, 0.5f},
+            .zOrder = zOrder++
         }
     );
 
@@ -67,6 +76,7 @@ void PauseScene::Initialize()
             .position = {CENTER_X, CENTER_Y},
             .textColor = NordTheme::SnowStorm3,
             .backgroundColor = sf::Color::Transparent,
+            .zOrder = zOrder++,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<ResumeGame>({}, this); },
         }
     );
@@ -81,6 +91,7 @@ void PauseScene::Initialize()
             .position = {CENTER_X, CENTER_Y + 100},
             .textColor = NordTheme::SnowStorm3,
             .backgroundColor = sf::Color::Transparent,
+            .zOrder = zOrder++,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<NavigateToMainMenu>({}, this); },
         }
     );

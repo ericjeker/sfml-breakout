@@ -9,6 +9,7 @@
 #include "Managers/ResourceManager.h"
 #include "Modules/Render/Components/RectangleRenderable.h"
 #include "Modules/Render/Components/TextRenderable.h"
+#include "Modules/Render/Components/ZOrder.h"
 #include "Modules/UI/Components/ButtonBackground.h"
 #include "Modules/UI/Components/ButtonText.h"
 #include "Modules/UI/Components/Clickable.h"
@@ -51,6 +52,7 @@ flecs::entity Button::Create(const flecs::world& world, const ButtonParams& para
                      .set<Size>({buttonBackground.getSize()})
                      .set<TextRenderable>({.text = std::move(buttonText)})
                      .set<RectangleRenderable>({.shape = std::move(buttonBackground)})
+                     .set<ZOrder>({params.zOrder})
                      .set<ButtonBackground>(
                          {.backgroundColor = params.backgroundColor, .hoverColor = params.hoverColor, .padding = params.padding}
                      )

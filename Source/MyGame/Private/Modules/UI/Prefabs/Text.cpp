@@ -2,10 +2,11 @@
 
 #include "Text.h"
 
-#include "../../Physics/Components/Transform.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
+#include "Modules/Physics/Components/Transform.h"
 #include "Modules/Render/Components/TextRenderable.h"
+#include "Modules/Render/Components/ZOrder.h"
 
 namespace Prefabs
 {
@@ -30,6 +31,7 @@ flecs::entity Text::Create(const flecs::world& world, const TextParams& params)
 
     const auto entity = world.entity()
                             .set<TextRenderable>({.text = std::move(text)})
+                            .set<ZOrder>({params.zOrder})
                             .set<Transform>({.position = params.position, .scale = params.scale, .rotation = params.rotation});
 
     return entity;

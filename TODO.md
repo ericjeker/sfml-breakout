@@ -16,7 +16,8 @@
 ## Features
 
 - [ ] Load scenes, entities, components, systems from serialized files
-- [ ] CollisionSystem with collision shape (circle, rectangle)
+- [x] CollisionSystem with collision shape (circle, rectangle)
+  - [ ] Add other types of Collider
 - [ ] SpatialPartitioning (grid)
 - [ ] SpriteRenderer
   - [ ] TileMap

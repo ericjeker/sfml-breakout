@@ -13,10 +13,9 @@ class BouncingBallScene final : public Scene
 {
 public:
     void Initialize() override;
-    void HandleEvent(const std::optional<sf::Event>& event) override;
 
 private:
-    static void CreateBalls(const flecs::world& world);
+    static void CreateBalls(const flecs::world& world, int zOrder);
 };
 
 

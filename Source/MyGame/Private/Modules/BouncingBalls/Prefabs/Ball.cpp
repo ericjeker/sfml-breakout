@@ -9,6 +9,7 @@
 #include "Modules/Physics/Components/Gravity.h"
 #include "Modules/Physics/Components/Velocity.h"
 #include "Modules/Render/Components/CircleRenderable.h"
+#include "Modules/Render/Components/ZOrder.h"
 
 
 namespace Prefabs
@@ -28,7 +29,8 @@ flecs::entity Ball::Create(const flecs::world& world, const BallParams& params)
         .set<Gravity>({params.gravity})
         .set<Transform>({.position = params.position})
         .set<Velocity>({params.velocity})
-        .set<Collider>({params.radius});
+        .set<Collider>({params.radius})
+        .set<ZOrder>({params.zOrder});
 }
 
 } // namespace Prefabs

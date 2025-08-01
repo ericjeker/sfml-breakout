@@ -9,6 +9,7 @@
 #include "Managers/ResourceManager.h"
 #include "Modules/Render/Components/TextRenderable.h"
 #include "Modules/Render/Prefabs/Rectangle.h"
+#include "Modules/Render/Prefabs/Sprite.h"
 #include "Modules/Render/RenderModule.h"
 #include "Modules/UI/Prefabs/Button.h"
 #include "Modules/UI/Prefabs/Text.h"
@@ -31,15 +32,21 @@ void MainMenuScene::Initialize()
     auto world = GetWorld();
     world.import <Modules::RenderModule>();
 
-    // --- Create entities ---
+    int zOrder = 0;
+
+    // --- Create Background ---
     Prefabs::Rectangle::Create(
         world,
         {
             .size = sf::Vector2f{Configuration::WINDOW_SIZE},
             .position = {0.f, 0.f},
             .color = NordTheme::PolarNight4,
+            .zOrder = zOrder++,
         }
     );
+
+    Prefabs::Sprite::
+        Create(world, {.textureAsset = "background", .origin = {0.5f, 0.5f}, .position = {centerX, centerY}, .scale = {2.f, 2.f}, .zOrder = zOrder++});
 
     // --- Add Title ---
     Prefabs::Text::Create(
@@ -51,6 +58,7 @@ void MainMenuScene::Initialize()
             .position = {centerX, centerY - 200},
             .textColor = NordTheme::SnowStorm3,
             .origin = sf::Vector2f{0.5f, 0.5f},
+            .zOrder = zOrder++
         }
     );
 
@@ -64,6 +72,7 @@ void MainMenuScene::Initialize()
             .position = {centerX, centerY},
             .textColor = NordTheme::SnowStorm3,
             .backgroundColor = sf::Color::Transparent,
+            .zOrder = zOrder++,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<StartGame>({}, this); },
         }
     );
@@ -78,6 +87,7 @@ void MainMenuScene::Initialize()
             .position = {centerX, centerY + 100},
             .textColor = NordTheme::SnowStorm3,
             .backgroundColor = sf::Color::Transparent,
+            .zOrder = zOrder++,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<ExitGame>({}, this); },
         }
     );
