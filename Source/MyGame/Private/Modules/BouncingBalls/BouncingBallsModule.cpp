@@ -4,6 +4,7 @@
 
 #include "Components/Transform.h"
 #include "Configuration.h"
+#include "Modules/Physics/Components/Collider.h"
 #include "Modules/Physics/Components/Velocity.h"
 
 
@@ -11,28 +12,30 @@ namespace
 {
 
 
-void ProcessScreenBounce(Transform& t, Velocity& v)
+void ProcessScreenBounce(Transform& t, Velocity& v, const Collider& c)
 {
-    if (t.position.x < 0.f)
+    const float radius = c.radius;
+
+    if (t.position.x - radius < 0.f)
     {
         v.velocity.x *= -1.f;
-        t.position.x = 0.f;
+        t.position.x =  radius;
     }
-    else if (t.position.x > Configuration::WINDOW_SIZE.x)
+    else if (t.position.x + radius > Configuration::WINDOW_SIZE.x)
     {
         v.velocity.x *= -1.f;
-        t.position.x = Configuration::WINDOW_SIZE.x;
+        t.position.x = Configuration::WINDOW_SIZE.x - radius;
     }
 
-    if (t.position.y < 0.f)
+    if (t.position.y - radius < 0.f)
     {
         v.velocity.y *= -1.f;
-        t.position.y = 0.f;
+        t.position.y = radius;
     }
-    else if (t.position.y > Configuration::WINDOW_SIZE.y)
+    else if (t.position.y + radius > Configuration::WINDOW_SIZE.y)
     {
         v.velocity.y *= -1.f;
-        t.position.y = Configuration::WINDOW_SIZE.y;
+        t.position.y = Configuration::WINDOW_SIZE.y - radius;
     }
 }
 
@@ -60,7 +63,7 @@ namespace Modules
 
 BouncingBallsModule::BouncingBallsModule(const flecs::world& world)
 {
-    world.system<Transform, Velocity>().kind(flecs::OnStore).each(ProcessScreenBounce);
+    world.system<Transform, Velocity, Collider>().kind(flecs::OnStore).each(ProcessScreenBounce);
 }
 
 } // namespace Modules

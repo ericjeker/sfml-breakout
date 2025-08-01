@@ -4,6 +4,7 @@
 
 #include "Components/Transform.h"
 #include "Modules/Physics/Components/Acceleration.h"
+#include "Modules/Physics/Components/Collider.h"
 #include "Modules/Physics/Components/Friction.h"
 #include "Modules/Physics/Components/Gravity.h"
 #include "Modules/Physics/Components/Velocity.h"
@@ -26,7 +27,8 @@ flecs::entity Ball::Create(const flecs::world& world, const BallParams& params)
         .set<Friction>({params.friction})
         .set<Gravity>({params.gravity})
         .set<Transform>({.position = params.position})
-        .set<Velocity>({params.velocity});
+        .set<Velocity>({params.velocity})
+        .set<Collider>({params.radius});
 }
 
 } // namespace Prefabs
