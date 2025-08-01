@@ -6,11 +6,9 @@
 
 #include <SFML/Graphics/CircleShape.hpp>
 
-#include <memory>
-
-struct CircleShape
+struct CircleRenderable
 {
-    std::unique_ptr<sf::CircleShape> shape;
+    sf::CircleShape shape;
 };
 
 

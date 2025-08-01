@@ -7,8 +7,11 @@
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
+#include "Modules/Render/Components/RectangleRenderable.h"
 #include "Modules/Render/Components/TextRenderable.h"
 #include "Modules/Render/RenderModule.h"
+#include "Modules/UI/Prefabs/Button.h"
+#include "Modules/UI/Prefabs/Text.h"
 
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -24,67 +27,73 @@
 
 void PauseScene::Initialize()
 {
-    Scene::Initialize();
-
     LOG_DEBUG("(PauseScene:Initialize)");
-    constexpr float centerX = Configuration::WINDOW_SIZE.x / 2;
-    constexpr float centerY = Configuration::WINDOW_SIZE.y / 2;
+    constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
+    constexpr float CENTER_Y = Configuration::WINDOW_SIZE.y / 2;
 
-    auto ecsWorld = GetWorld();
-    ecsWorld.import <Modules::RenderModule>();
+    auto world = GetWorld();
+    world.import <Modules::RenderModule>();
 
     // --- Overlay ---
-    auto background = std::make_unique<sf::RectangleShape>(sf::Vector2f{Configuration::WINDOW_SIZE});
+    sf::RectangleShape background(sf::Vector2f{Configuration::WINDOW_SIZE});
     auto backgroundColor = NordTheme::PolarNight1;
     backgroundColor.a = 127;
-    background->setFillColor(backgroundColor);
+    background.setFillColor(backgroundColor);
 
-    ecsWorld.entity()
-        .set<RectangleShape>({std::move(background)})
+    world.entity()
+        .set<RectangleRenderable>({std::move(background)})
         .set<Transform>({.position = {0.f, 0.f}, .scale = {1.f, 1.f}, .rotation = 0.f});
 
     // --- Add Pause Text ---
-    const auto fontRegular = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Regular");
-    const auto fontBold = GameService::Get<ResourceManager>().GetResource<sf::Font>("Orbitron-Bold");
-
-    auto pauseText = std::make_unique<sf::Text>(*fontBold, "Pause Scene", 60.f);
-    pauseText->setFillColor(NordTheme::SnowStorm3);
-    pauseText->setOrigin(pauseText->getLocalBounds().size / 2.f);
-    CreateTextEntity(std::move(pauseText), {centerX, centerY - 200});
+    Prefabs::Text::Create(
+        world,
+        {
+            .text = "Game Paused",
+            .fontAsset = "Orbitron-Bold",
+            .fontSize = 60.f,
+            .position = {CENTER_X, CENTER_Y - 200},
+            .textColor = NordTheme::SnowStorm3,
+            .origin = sf::Vector2f{0.5f, 0.5f},
+        }
+    );
 
     // --- Add Resume Button ---
-    auto resumeText = std::make_unique<sf::Text>(*fontRegular, "Resume", 36.f);
-    resumeText->setFillColor(NordTheme::SnowStorm3);
-    resumeText->setOrigin(resumeText->getLocalBounds().size / 2.f);
-    CreateButtonEntity(
-        std::move(resumeText),
-        {centerX, centerY},
-        [this]() { GameService::Get<EventManager>().EmitDeferred<ResumeGame>({}, this); }
+    Prefabs::Button::Create(
+        world,
+        {
+            .text = "Resume",
+            .fontAsset = "Orbitron-Bold",
+            .fontSize = 48.f,
+            .position = {CENTER_X, CENTER_Y},
+            .textColor = NordTheme::SnowStorm3,
+            .backgroundColor = sf::Color::Transparent,
+            .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<ResumeGame>({}, this); },
+        }
     );
 
     // --- Add Exit Button ---
-    auto exitText = std::make_unique<sf::Text>(*fontRegular, "Exit", 28.f);
-    exitText->setFillColor(NordTheme::SnowStorm3);
-    exitText->setOrigin(exitText->getLocalBounds().size / 2.f);
-    CreateButtonEntity(
-        std::move(exitText),
-        {centerX, centerY + 100},
-        [this]() { GameService::Get<EventManager>().EmitDeferred<NavigateToMainMenu>({}, this); }
+    Prefabs::Button::Create(
+        world,
+        {
+            .text = "Exit",
+            .fontAsset = "Orbitron-Regular",
+            .fontSize = 36.f,
+            .position = {CENTER_X, CENTER_Y + 100},
+            .textColor = NordTheme::SnowStorm3,
+            .backgroundColor = sf::Color::Transparent,
+            .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<NavigateToMainMenu>({}, this); },
+        }
     );
-
-    // --- Add the Systems ---
-    GetWorld().system<Transform, RectangleShape>().each(ProcessBackground);
-    GetWorld().system<Transform, TextRenderable>().each(ProcessText);
 }
 
-void PauseScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
+void PauseScene::HandleEvent(const std::optional<sf::Event>& event)
 {
     if (!IsLoaded() || IsPaused())
     {
         return;
     }
 
-    if (auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>())
+    if (const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>())
     {
         if (mousePressed->button != sf::Mouse::Button::Left)
         {
@@ -105,28 +114,4 @@ void PauseScene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWi
             }
         );
     }
-}
-
-void PauseScene::CreateTextEntity(std::unique_ptr<sf::Text> text, const sf::Vector2f position)
-{
-    GetWorld().entity().set<Transform>({.position = position}).set<TextRenderable>({.text = std::move(text)});
-}
-
-void PauseScene::CreateButtonEntity(std::unique_ptr<sf::Text> text, const sf::Vector2f position, const std::function<void()>& callback)
-{
-    GetWorld()
-        .entity()
-        .set<Transform>({.position = position})
-        .set<TextRenderable>({.text = std::move(text)})
-        .set<EventTrigger>({.callback = callback});
-}
-
-void PauseScene::ProcessText(const Transform& t, const TextRenderable& textRenderable)
-{
-    textRenderable.text->setPosition(t.position);
-}
-
-void PauseScene::ProcessBackground(const Transform& t, const RectangleShape& bg)
-{
-    bg.shape->setPosition(t.position);
 }

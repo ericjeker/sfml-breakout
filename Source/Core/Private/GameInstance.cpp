@@ -54,8 +54,8 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
         }
 
         // We delegate the event to the game controller
-        GameService::Get<GameController>().HandleEvent(event, renderWindow);
-        GameService::Get<SceneManager>().HandleEvent(event, renderWindow);
+        GameService::Get<GameController>().HandleEvent(event);
+        GameService::Get<SceneManager>().HandleEvent(event);
     }
 }
 

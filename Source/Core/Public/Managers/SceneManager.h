@@ -124,7 +124,7 @@ public:
     void UnloadAll();
 
     void Update(float deltaTime);
-    void HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& renderWindow);
+    void HandleEvent(const std::optional<sf::Event>& event);
 
 private:
     std::unordered_map<std::type_index, std::unique_ptr<Scene>> _scenes;

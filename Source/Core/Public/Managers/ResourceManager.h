@@ -6,14 +6,14 @@
 
 #include "Logger.h"
 
-#include <SFML/Audio/Music.hpp>
-#include <SFML/Audio/Sound.hpp>
-#include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Graphics.hpp>
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <variant>
+
 
 class ResourceManager
 {
@@ -36,8 +36,7 @@ public:
         }
 
         // Get the resource from _resources
-        std::shared_ptr<T>* value = std::get_if<std::shared_ptr<T>>(&it->second);
-
+        auto* value = std::get_if<std::shared_ptr<T>>(&it->second);
         if (value == nullptr)
         {
             LOG_ERROR("Resource " + name + " not found.");
@@ -48,9 +47,16 @@ public:
     }
 
     template <typename T>
-    void SetResource(const std::string& name, std::shared_ptr<T> resource)
+    bool SetResource(const std::string& name, std::shared_ptr<T> resource)
     {
+        if (!resource)
+        {
+            LOG_ERROR("Attempted to set null resource: " + name);
+            return false;
+        }
+
         _resources[name] = std::move(resource);
+        return true;
     }
 
 private:

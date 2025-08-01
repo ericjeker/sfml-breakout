@@ -4,13 +4,17 @@
 #ifndef PHYSICSMODULE_H
 #define PHYSICSMODULE_H
 
+#include <flecs.h>
 
-namespace Module {
 
-class PhysicsModule {
+namespace Modules
+{
 
+struct PhysicsModule
+{
+    explicit PhysicsModule(const flecs::world& world);
 };
 
-}
+} // namespace Modules
 
 #endif

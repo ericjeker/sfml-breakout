@@ -28,7 +28,7 @@ void DebugScene::Initialize()
     ecsWorld.system<Transform, TextRenderable>().each(ProcessText);
 }
 
-void DebugScene::ProcessText(const flecs::iter& it, size_t, const Transform& t, const TextRenderable& textRenderable)
+void DebugScene::ProcessText(const flecs::iter& it, size_t, const Transform& t, TextRenderable& textRenderable)
 {
     static float sinceLastUpdate = 0.f;
     static int frameCount = 0;

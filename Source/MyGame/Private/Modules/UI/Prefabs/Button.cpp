@@ -7,7 +7,7 @@
 #include "Components/Transform.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
-#include "Modules/Render/Components/RectangleShape.h"
+#include "Modules/Render/Components/RectangleRenderable.h"
 #include "Modules/Render/Components/TextRenderable.h"
 #include "Modules/UI/Components/ButtonBackground.h"
 #include "Modules/UI/Components/ButtonText.h"
@@ -20,28 +20,37 @@ namespace Prefabs
 
 flecs::entity Button::Create(const flecs::world& world, const ButtonParams& params)
 {
-    // --- Get font ---
-    const auto fontRegular = GameService::Get<ResourceManager>().GetResource<sf::Font>(params.fontAsset);
+    const auto font = GameService::Get<ResourceManager>().GetResource<sf::Font>(params.fontAsset);
+    if (!font)
+    {
+        return flecs::entity::null();
+    }
 
     // --- Create text ---
-    auto buttonText = std::make_unique<sf::Text>(*fontRegular, params.text, params.fontSize);
+    auto buttonText = std::make_unique<sf::Text>(*font, params.text, params.fontSize);
     const sf::FloatRect textBounds = buttonText->getLocalBounds();
+    const float originX = textBounds.size.x * params.origin.x + textBounds.position.x;
+    const float originY = textBounds.size.y * params.origin.y + textBounds.position.y;
+
     buttonText->setFillColor(params.textColor);
-    buttonText->setOrigin(textBounds.size / 2.f);
+    buttonText->setOrigin({originX, originY});
+    buttonText->setPosition(params.position);
 
     // --- Create background ---
-    auto buttonBackground = std::make_unique<sf::RectangleShape>();
-    buttonBackground->setSize({textBounds.size.y + params.padding.y * 2, textBounds.size.x + params.padding.x * 2});
-    buttonBackground->setOrigin(buttonBackground->getSize() / 2.f);
-    buttonBackground->setFillColor(params.backgroundColor);
+    sf::RectangleShape buttonBackground;
+    buttonBackground.setSize({textBounds.size.x + params.padding.x * 2, textBounds.size.y + params.padding.y * 2});
+    const sf::Vector2f size = buttonBackground.getSize();
+    buttonBackground.setOrigin({size.x * params.origin.x, size.y * params.origin.y});
+    buttonBackground.setFillColor(params.backgroundColor);
+    buttonBackground.setPosition(params.position);
 
     // --- Create the entity using the prefab ---
     const flecs::entity
         entity = world.entity()
-                     .set<Transform>({.position = {0.f, 0.f}})
-                     .set<Size>({buttonBackground->getSize()})
+                     .set<Transform>({.position = params.position})
+                     .set<Size>({buttonBackground.getSize()})
                      .set<TextRenderable>({.text = std::move(buttonText)})
-                     .set<RectangleShape>({.shape = std::move(buttonBackground)})
+                     .set<RectangleRenderable>({.shape = std::move(buttonBackground)})
                      .set<ButtonBackground>(
                          {.backgroundColor = params.backgroundColor, .hoverColor = params.hoverColor, .padding = params.padding}
                      )

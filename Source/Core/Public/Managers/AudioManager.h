@@ -27,7 +27,7 @@ public:
     void SetVolume(float volume);
     [[nodiscard]] float GetVolume() const;
 
-    void PlayMusic(const std::string& musicName) const;
+    void PlayMusic(const std::string& musicName);
     void StopMusic() const;
     void PauseMusic() const;
     void ResumeMusic() const;
@@ -47,7 +47,7 @@ private:
     float _musicVolume = DEFAULT_MUSIC_VOLUME;
 
     ResourceManager& _resourceManager;
-    std::shared_ptr<sf::Music> _currentlyPlaying;
+    std::shared_ptr<sf::Music> _currentlyPlaying = nullptr;
 
     // TODO: Not Implemented
     int _currentMusicTrack = 0;

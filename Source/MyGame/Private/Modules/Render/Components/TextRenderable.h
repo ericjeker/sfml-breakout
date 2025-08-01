@@ -11,7 +11,7 @@
 
 struct TextRenderable
 {
-    std::unique_ptr<sf::Text> text;
+    std::unique_ptr<sf::Text> text = nullptr;
 };
 
 

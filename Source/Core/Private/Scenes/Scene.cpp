@@ -25,7 +25,7 @@ void Scene::Update(const float deltaTime)
     GetWorld().progress(deltaTime);
 }
 
-void Scene::HandleEvent(const std::optional<sf::Event>& event, sf::RenderWindow& window)
+void Scene::HandleEvent(const std::optional<sf::Event>& event)
 {
 }
 

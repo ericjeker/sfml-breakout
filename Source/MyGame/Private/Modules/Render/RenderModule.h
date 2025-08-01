@@ -12,7 +12,7 @@ namespace Modules
 
 struct RenderModule
 {
-    explicit RenderModule(flecs::world& world);
+    explicit RenderModule(const flecs::world& world);
 };
 
 }

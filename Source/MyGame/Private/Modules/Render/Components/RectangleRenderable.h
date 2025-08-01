@@ -6,12 +6,10 @@
 
 #include <SFML/Graphics/RectangleShape.hpp>
 
-#include <memory>
 
-
-struct RectangleShape
+struct RectangleRenderable
 {
-    std::unique_ptr<sf::RectangleShape> shape;
+    sf::RectangleShape shape;
 };
 
 
