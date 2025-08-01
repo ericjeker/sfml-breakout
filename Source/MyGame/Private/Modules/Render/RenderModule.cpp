@@ -2,13 +2,13 @@
 
 #include "RenderModule.h"
 
+#include "../Physics/Components/Transform.h"
 #include "Components/CircleRenderable.h"
 #include "Components/RectangleRenderable.h"
 #include "Components/ShaderUniform.h"
 #include "Components/ShaderUniforms.h"
 #include "Components/SpriteRenderable.h"
 #include "Components/TextRenderable.h"
-#include "Components/Transform.h"
 #include "Managers/GameService.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>

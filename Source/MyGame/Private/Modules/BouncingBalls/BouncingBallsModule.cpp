@@ -2,7 +2,7 @@
 
 #include "BouncingBallsModule.h"
 
-#include "Components/Transform.h"
+#include "../Physics/Components/Transform.h"
 #include "Configuration.h"
 #include "Modules/Physics/Components/Collider.h"
 #include "Modules/Physics/Components/Velocity.h"

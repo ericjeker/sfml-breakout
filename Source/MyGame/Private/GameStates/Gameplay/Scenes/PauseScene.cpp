@@ -7,6 +7,7 @@
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
+#include "Modules/Physics/Components/Transform.h"
 #include "Modules/Render/Components/RectangleRenderable.h"
 #include "Modules/Render/Components/TextRenderable.h"
 #include "Modules/Render/RenderModule.h"
@@ -21,7 +22,6 @@
 #include <Themes/Nord.h>
 
 #include <Components/EventTrigger.h>
-#include <Components/Transform.h>
 #include <Configuration.h>
 
 

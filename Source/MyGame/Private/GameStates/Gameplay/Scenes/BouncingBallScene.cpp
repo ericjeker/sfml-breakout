@@ -6,9 +6,7 @@
 #include <tracy/Tracy.hpp>
 #endif
 
-#include "Components/Transform.h"
 #include "Configuration.h"
-#include "Managers/GameService.h"
 #include "Modules/BouncingBalls/BouncingBallsModule.h"
 #include "Modules/BouncingBalls/Prefabs/Ball.h"
 #include "Modules/Physics/Components/GravitySettings.h"
@@ -137,7 +135,7 @@ void BouncingBallScene::CreateBalls(const flecs::world& world)
 {
     ZoneScopedN("BouncingBallScene::CreateBalls");
 
-    constexpr int BALL_COUNT = 50;
+    constexpr int BALL_COUNT = 100;
 
     // Create balls
     std::random_device rd;
@@ -149,7 +147,7 @@ void BouncingBallScene::CreateBalls(const flecs::world& world)
 
     for (int i = 0; i < BALL_COUNT; ++i)
     {
-        constexpr float RADIUS = 15.f;
+        constexpr float RADIUS = 10.f;
 
         Prefabs::Ball::Create(
             world,
@@ -158,8 +156,8 @@ void BouncingBallScene::CreateBalls(const flecs::world& world)
                 .position = {distX(gen), distY(gen)},
                 .velocity = {velX(gen) * PhysicsConstants::PIXELS_PER_CENTIMETER, velY(gen) * PhysicsConstants::PIXELS_PER_CENTIMETER},
                 .color = NordTheme::Aurora1,
-                .friction = 0.9,
-                .gravity = PhysicsConstants::GRAVITY_DOWN,
+                .friction = 0.f,
+                .gravity = PhysicsConstants::NO_GRAVITY,
             }
         );
     }

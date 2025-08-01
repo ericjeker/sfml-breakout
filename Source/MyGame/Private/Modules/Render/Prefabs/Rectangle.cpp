@@ -2,7 +2,7 @@
 
 #include "Rectangle.h"
 
-#include "Components/Transform.h"
+#include "../../Physics/Components/Transform.h"
 #include "Modules/Render/Components/RectangleRenderable.h"
 
 namespace Prefabs

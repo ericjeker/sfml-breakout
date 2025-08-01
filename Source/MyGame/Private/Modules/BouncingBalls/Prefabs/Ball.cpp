@@ -2,7 +2,7 @@
 
 #include "Ball.h"
 
-#include "Components/Transform.h"
+#include "../../Physics/Components/Transform.h"
 #include "Modules/Physics/Components/Acceleration.h"
 #include "Modules/Physics/Components/Collider.h"
 #include "Modules/Physics/Components/Friction.h"
