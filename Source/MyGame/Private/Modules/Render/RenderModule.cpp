@@ -38,6 +38,11 @@ void RenderCircleShape(const CircleRenderable& ball)
 
 void RenderText(const TextRenderable& text)
 {
+    if (!text.text)
+    {
+        return;
+    }
+
     auto& window = GameService::Get<sf::RenderWindow>();
     window.draw(*text.text);
 }

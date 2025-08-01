@@ -21,7 +21,10 @@ flecs::entity Text::Create(const flecs::world& world, const TextParams& params)
     auto text = std::make_unique<sf::Text>(*font, params.text, params.fontSize);
     text->setFillColor(params.textColor);
     const sf::FloatRect textBounds = text->getLocalBounds();
-    text->setOrigin({textBounds.size.x * params.origin.x, textBounds.size.y * params.origin.y});
+    text->setOrigin(
+        {textBounds.size.x * params.origin.x + textBounds.position.x,
+         textBounds.size.y * params.origin.y + textBounds.position.y}
+    );
     text->setPosition(params.position);
     text->setScale(params.scale);
 

@@ -7,6 +7,7 @@
 #include "Components/Gravity.h"
 #include "Components/Transform.h"
 #include "Components/Velocity.h"
+#include "PhysicsConstants.h"
 
 namespace
 {

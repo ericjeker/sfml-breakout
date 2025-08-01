@@ -29,8 +29,8 @@ flecs::entity Button::Create(const flecs::world& world, const ButtonParams& para
     // --- Create text ---
     auto buttonText = std::make_unique<sf::Text>(*font, params.text, params.fontSize);
     const sf::FloatRect textBounds = buttonText->getLocalBounds();
-    float originX = (textBounds.size.x * params.origin.x) + textBounds.position.x;
-    float originY = (textBounds.size.y * params.origin.y) + textBounds.position.y;
+    const float originX = textBounds.size.x * params.origin.x + textBounds.position.x;
+    const float originY = textBounds.size.y * params.origin.y + textBounds.position.y;
 
     buttonText->setFillColor(params.textColor);
     buttonText->setOrigin({originX, originY});

@@ -6,6 +6,8 @@
 
 #include <SFML/Graphics/Text.hpp>
 
+#include <memory>
+
 
 struct TextRenderable
 {
