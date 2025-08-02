@@ -2,6 +2,7 @@
 
 #include "PauseScene.h"
 
+#include "Components/Size.h"
 #include "Events/NavigateToMainMenu.h"
 #include "Events/ResumeGame.h"
 #include "Managers/EventManager.h"
@@ -12,6 +13,8 @@
 #include "Modules/Render/Components/TextRenderable.h"
 #include "Modules/Render/Prefabs/Rectangle.h"
 #include "Modules/Render/RenderModule.h"
+#include "Modules/UI/Components/Clickable.h"
+#include "Modules/UI/Components/Interactable.h"
 #include "Modules/UI/Prefabs/Button.h"
 #include "Modules/UI/Prefabs/Text.h"
 
@@ -35,7 +38,7 @@ void PauseScene::Initialize()
     auto world = GetWorld();
     world.import <Modules::RenderModule>();
 
-    int zOrder = 0;
+    float zOrder = 0.f;
 
     // --- Overlay ---
     auto backgroundColor = NordTheme::PolarNight1;
@@ -113,12 +116,18 @@ void PauseScene::HandleEvent(const std::optional<sf::Event>& event)
 
         const sf::Vector2<float> mousePosition(mousePressed->position);
 
-        LOG_DEBUG("(PauseScene::HandleEvent): Handle click");
-
         GetWorld().each(
-            [&](const TextRenderable& textRenderable, const EventTrigger& eventTrigger)
+            [&](const Interactable& interactable,
+                const Clickable& clickable,
+                const Transform& t,
+                const Size& s,
+                const EventTrigger& eventTrigger)
             {
-                if (textRenderable.text->getGlobalBounds().contains(mousePosition))
+                sf::FloatRect bounds;
+                bounds.size = s.size;
+                bounds.position = t.position;
+
+                if (bounds.contains(mousePosition))
                 {
                     eventTrigger.callback();
                 }

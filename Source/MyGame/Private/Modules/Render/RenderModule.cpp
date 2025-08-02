@@ -92,7 +92,7 @@ void RenderSprite(const SpriteRenderable& s)
 
 struct RenderableEntry
 {
-    int zOrder;
+    float zOrder;
     flecs::entity entity;
 };
 
@@ -150,7 +150,7 @@ RenderModule::RenderModule(const flecs::world& world)
                 // Iterate through the sorted queue and draw each entity
                 for (const auto& [zOrder, entity] : renderables)
                 {
-                    if (flecs::entity currentEntity = entity; currentEntity.has<SpriteRenderable>())
+                    if (flecs::entity const currentEntity = entity; currentEntity.has<SpriteRenderable>())
                     {
                         RenderSprite(currentEntity.get<SpriteRenderable>());
                     }

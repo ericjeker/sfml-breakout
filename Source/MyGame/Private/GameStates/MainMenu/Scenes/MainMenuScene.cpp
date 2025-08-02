@@ -2,17 +2,22 @@
 
 #include "MainMenuScene.h"
 
+#include "Components/Size.h"
 #include "Events/ExitGame.h"
 #include "Events/StartGame.h"
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
+#include "Modules/Physics/Components/Transform.h"
 #include "Modules/Render/Components/TextRenderable.h"
 #include "Modules/Render/Prefabs/Rectangle.h"
 #include "Modules/Render/Prefabs/Sprite.h"
 #include "Modules/Render/RenderModule.h"
+#include "Modules/UI/Components/Clickable.h"
+#include "Modules/UI/Components/Interactable.h"
 #include "Modules/UI/Prefabs/Button.h"
 #include "Modules/UI/Prefabs/Text.h"
+#include "Modules/UI/UIModule.h"
 #include "Themes/Nord.h"
 
 #include <Logger.h>
@@ -23,16 +28,15 @@
 
 void MainMenuScene::Initialize()
 {
-    Scene::Initialize();
-
     LOG_DEBUG("(MainMenuScene:Initialize)");
     constexpr float centerX = Configuration::WINDOW_SIZE.x / 2;
     constexpr float centerY = Configuration::WINDOW_SIZE.y / 2;
 
     auto world = GetWorld();
+    world.import <Modules::UIModule>();
     world.import <Modules::RenderModule>();
 
-    int zOrder = 0;
+    float zOrder = 0;
 
     // --- Create Background ---
     Prefabs::Rectangle::Create(
@@ -45,21 +49,25 @@ void MainMenuScene::Initialize()
         }
     );
 
-    Prefabs::Sprite::
-        Create(world, {.textureAsset = "background", .origin = {0.5f, 0.5f}, .position = {centerX, centerY}, .scale = {2.f, 2.f}, .zOrder = zOrder++});
+    Prefabs::Sprite::Create(
+        world,
+        {.textureAsset = "background",
+         .origin = {0.5f, 0.5f},
+         .position = {centerX, centerY - 50},
+         .scale = {2.f, 2.f},
+         .zOrder = zOrder++}
+    );
 
     // --- Add Title ---
     Prefabs::Text::Create(
         world,
-        {
-            .text = "Main Menu",
-            .fontAsset = "Orbitron-Bold",
-            .fontSize = 60.f,
-            .position = {centerX, centerY - 200},
-            .textColor = NordTheme::SnowStorm3,
-            .origin = sf::Vector2f{0.5f, 0.5f},
-            .zOrder = zOrder++
-        }
+        {.text = "Main Menu",
+         .fontAsset = "Orbitron-Bold",
+         .fontSize = 60.f,
+         .position = {centerX, centerY - 200},
+         .textColor = NordTheme::SnowStorm3,
+         .origin = sf::Vector2f{0.5f, 0.5f},
+         .zOrder = zOrder++}
     );
 
     // --- Add Play Button ---
@@ -110,9 +118,17 @@ void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
         const sf::Vector2<float> mousePosition(mousePressed->position);
 
         GetWorld().each(
-            [&](const TextRenderable& textRenderable, const EventTrigger& eventTrigger)
+            [&](const Interactable& interactable,
+                const Clickable& clickable,
+                const Transform& t,
+                const Size& s,
+                const EventTrigger& eventTrigger)
             {
-                if (textRenderable.text->getGlobalBounds().contains(mousePosition))
+                sf::FloatRect bounds;
+                bounds.size = s.size;
+                bounds.position = t.position;
+
+                if (bounds.contains(mousePosition))
                 {
                     eventTrigger.callback();
                 }

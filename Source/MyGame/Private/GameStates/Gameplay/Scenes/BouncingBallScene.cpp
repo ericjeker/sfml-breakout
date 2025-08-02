@@ -33,7 +33,7 @@ void BouncingBallScene::Initialize()
         {.gravity = PhysicsConstants::NO_GRAVITY, .pixelsPerCentimeter = PhysicsConstants::PIXELS_PER_CENTIMETER}
     );
 
-    int zOrder = 0;
+    float zOrder = 0.f;
 
     Prefabs::Rectangle::Create(
         world,
@@ -49,7 +49,7 @@ void BouncingBallScene::Initialize()
     CreateBalls(world, zOrder);
 }
 
-void BouncingBallScene::CreateBalls(const flecs::world& world, int zOrder)
+void BouncingBallScene::CreateBalls(const flecs::world& world, float zOrder)
 {
     ZoneScopedN("BouncingBallScene::CreateBalls");
 

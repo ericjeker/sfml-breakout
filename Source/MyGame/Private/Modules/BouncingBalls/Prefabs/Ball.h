@@ -21,7 +21,7 @@ struct BallParams
     sf::Vector2f scale = {1.f, 1.f};
     sf::Vector2f origin = {0.5f, 0.5f};
     sf::Color color = sf::Color::Magenta;
-    int zOrder = 0;
+    float zOrder = 0.f;
 
     // TODO: should have an embedded struct for physics parameters
     sf::Vector2f acceleration = {0.f, 0.f};

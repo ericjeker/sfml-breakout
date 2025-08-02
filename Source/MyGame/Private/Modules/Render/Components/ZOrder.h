@@ -10,7 +10,7 @@
  */
 struct ZOrder
 {
-    int zOrder = 0;
+    float zOrder = 0.f;
 };
 
 

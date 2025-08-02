@@ -12,7 +12,7 @@ namespace Modules
 
 struct UIModule
 {
-    explicit UIModule(flecs::world& world);
+    explicit UIModule(const flecs::world& world);
 };
 
 }

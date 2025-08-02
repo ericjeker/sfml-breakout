@@ -15,7 +15,7 @@ public:
     void Initialize() override;
 
 private:
-    static void CreateBalls(const flecs::world& world, int zOrder);
+    static void CreateBalls(const flecs::world& world, float zOrder);
 };
 
 
