@@ -10,6 +10,7 @@
 #include "Managers/GameService.h"
 #include "Managers/SceneManager.h"
 #include "Scenes/BouncingBallScene.h"
+#include "Scenes/ControllerDemoScene.h"
 #include "Scenes/PauseScene.h"
 
 
@@ -27,7 +28,7 @@ private:
     EventListener<ResumeGame> _resumeGameListener = [this](const ResumeGame& event, void* sender)
     {
         GameService::Get<SceneManager>().UnloadScene<PauseScene>();
-        GameService::Get<SceneManager>().GetScene<BouncingBallScene>().Resume();
+        GameService::Get<SceneManager>().GetScene<ControllerDemoScene>().Resume();
         _isPaused = false;
     };
 };

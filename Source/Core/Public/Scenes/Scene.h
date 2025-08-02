@@ -55,6 +55,7 @@ private:
 
     // Flecs entities for singletons
     flecs::world _world{};
+    flecs::entity _rootEntity{};
 
     bool _isLoaded = false;
     bool _isPaused = false;

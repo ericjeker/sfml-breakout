@@ -1,11 +1,11 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Sprite.h"
+#include "Modules/Render/Prefabs/Sprite.h"
 
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
-#include "Modules/Physics/Components/Transform.h"
 #include "Modules/Render/Components/SpriteRenderable.h"
+#include "Modules/Render/Components/Transform.h"
 #include "Modules/Render/Components/ZOrder.h"
 
 

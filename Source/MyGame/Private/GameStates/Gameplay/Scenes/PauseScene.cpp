@@ -2,31 +2,26 @@
 
 #include "PauseScene.h"
 
-#include "Components/Size.h"
+#include "../../../../../Core/Public/Modules/UI/Components/EventTrigger.h"
+#include "Configuration.h"
 #include "Events/NavigateToMainMenu.h"
 #include "Events/ResumeGame.h"
+#include "Logger.h"
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
-#include "Modules/Physics/Components/Transform.h"
-#include "Modules/Render/Components/RectangleRenderable.h"
-#include "Modules/Render/Components/TextRenderable.h"
+#include "Modules/Render/Components/Size.h"
+#include "Modules/Render/Components/Transform.h"
 #include "Modules/Render/Prefabs/Rectangle.h"
 #include "Modules/Render/RenderModule.h"
 #include "Modules/UI/Components/Clickable.h"
 #include "Modules/UI/Components/Interactable.h"
 #include "Modules/UI/Prefabs/Button.h"
 #include "Modules/UI/Prefabs/Text.h"
+#include "Themes/Nord.h"
 
 #include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Text.hpp>
-
-#include <Logger.h>
-#include <Themes/Nord.h>
-
-#include <Components/EventTrigger.h>
-#include <Configuration.h>
 
 
 void PauseScene::Initialize()
@@ -47,26 +42,22 @@ void PauseScene::Initialize()
     Prefabs::Rectangle::Create(
         world,
         {.size = sf::Vector2f{Configuration::WINDOW_SIZE},
-         .position = {0.f, 0.f},
          .color = backgroundColor,
          .position = {0.f, 0.f},
          .scale = {1.f, 1.f},
-         .rotation = 0.f,
-         .zOrder = zOrder++}
+         .rotation = 0.f}
     );
 
     // --- Add Pause Text ---
     Prefabs::Text::Create(
         world,
-        {
-            .text = "Game Paused",
-            .fontAsset = "Orbitron-Bold",
-            .fontSize = 60.f,
-            .position = {CENTER_X, CENTER_Y - 200},
-            .textColor = NordTheme::SnowStorm3,
-            .origin = sf::Vector2f{0.5f, 0.5f},
-            .zOrder = zOrder++
-        }
+        {.text = "Game Paused",
+         .fontAsset = "Orbitron-Bold",
+         .fontSize = 60.f,
+         .textColor = NordTheme::SnowStorm3,
+         .origin = sf::Vector2f{0.5f, 0.5f},
+         .position = {CENTER_X, CENTER_Y - 200},
+         .zOrder = ++zOrder}
     );
 
     // --- Add Resume Button ---
@@ -76,10 +67,10 @@ void PauseScene::Initialize()
             .text = "Resume",
             .fontAsset = "Orbitron-Bold",
             .fontSize = 48.f,
-            .position = {CENTER_X, CENTER_Y},
             .textColor = NordTheme::SnowStorm3,
             .backgroundColor = sf::Color::Transparent,
-            .zOrder = zOrder++,
+            .position = {CENTER_X, CENTER_Y},
+            .zOrder = ++zOrder,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<ResumeGame>({}, this); },
         }
     );
@@ -91,10 +82,10 @@ void PauseScene::Initialize()
             .text = "Exit",
             .fontAsset = "Orbitron-Regular",
             .fontSize = 36.f,
-            .position = {CENTER_X, CENTER_Y + 100},
             .textColor = NordTheme::SnowStorm3,
             .backgroundColor = sf::Color::Transparent,
-            .zOrder = zOrder++,
+            .position = {CENTER_X, CENTER_Y + 100},
+            .zOrder = ++zOrder,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<NavigateToMainMenu>({}, this); },
         }
     );

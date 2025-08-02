@@ -1,16 +1,16 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "RenderModule.h"
+#include "Modules/Render/RenderModule.h"
 
-#include "Components/CircleRenderable.h"
-#include "Components/RectangleRenderable.h"
-#include "Components/ShaderUniform.h"
-#include "Components/ShaderUniforms.h"
-#include "Components/SpriteRenderable.h"
-#include "Components/TextRenderable.h"
-#include "Components/ZOrder.h"
+#include "Modules/Render/Components/CircleRenderable.h"
+#include "Modules/Render/Components/RectangleRenderable.h"
+#include "Modules/Render/Components/ShaderUniform.h"
+#include "Modules/Render/Components/ShaderUniforms.h"
+#include "Modules/Render/Components/SpriteRenderable.h"
+#include "Modules/Render/Components/TextRenderable.h"
+#include "Modules/Render/Components/Transform.h"
+#include "Modules/Render/Components/ZOrder.h"
 #include "Managers/GameService.h"
-#include "Modules/Physics/Components/Transform.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -25,6 +25,13 @@ void ApplyTransformToCircle(const Transform& t, CircleRenderable& c)
     c.shape.setPosition(t.position);
     c.shape.setScale(t.scale);
     c.shape.setRotation(sf::degrees(t.rotation));
+}
+
+void ApplyTransformToRectangle(const Transform& t, RectangleRenderable& r)
+{
+    r.shape.setPosition(t.position);
+    r.shape.setScale(t.scale);
+    r.shape.setRotation(sf::degrees(t.rotation));
 }
 
 void ApplyTransformToSprite(const Transform& t, SpriteRenderable& s)
@@ -114,6 +121,7 @@ RenderModule::RenderModule(const flecs::world& world)
     world.component<ShaderUniforms>();
 
     world.system<const Transform, CircleRenderable>("ApplyTransformToCircle").kind(flecs::PreStore).each(ApplyTransformToCircle);
+    world.system<const Transform, RectangleRenderable>("ApplyTransformToRectangle").kind(flecs::PreStore).each(ApplyTransformToRectangle);
     world.system<const Transform, SpriteRenderable>("ApplyTransformToSprite").kind(flecs::PreStore).each(ApplyTransformToSprite);
 
     // Renderers

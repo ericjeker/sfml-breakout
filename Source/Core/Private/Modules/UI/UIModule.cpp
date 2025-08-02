@@ -1,14 +1,14 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "UIModule.h"
+#include "Modules/UI/UIModule.h"
 
-#include "Components/ButtonBackground.h"
-#include "Components/ButtonText.h"
-#include "Components/Clickable.h"
-#include "Components/Hoverable.h"
-#include "Components/Interactable.h"
 #include "Modules/Render/Components/TextRenderable.h"
-#include "Prefabs/Button.h"
+#include "Modules/UI/Components/ButtonBackground.h"
+#include "Modules/UI/Components/ButtonText.h"
+#include "Modules/UI/Components/Clickable.h"
+#include "Modules/UI/Components/Hoverable.h"
+#include "Modules/UI/Components/Interactable.h"
+#include "Modules/UI/Prefabs/Button.h"
 
 namespace Modules
 {

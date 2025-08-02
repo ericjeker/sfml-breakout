@@ -11,12 +11,19 @@
 
 void Scene::Initialize()
 {
-    LOG_DEBUG("(Scene:Initialize)");
+    LOG_DEBUG("(Scene:Initialize): Create a the root entity");
+    _rootEntity = flecs::entity(_world);
 }
 
 void Scene::Shutdown()
 {
-    LOG_DEBUG("(Scene:Shutdown)");
+    LOG_DEBUG("(Scene:Shutdown): Delete children of root entity");
+    if (_rootEntity == flecs::entity::null())
+    {
+        return;
+    }
+
+    _world.delete_with(flecs::ChildOf, _rootEntity);
 }
 
 void Scene::Update(const float deltaTime)

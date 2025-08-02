@@ -35,14 +35,16 @@ int main()
     sf::ContextSettings settings;
     settings.antiAliasingLevel = Configuration::ANTI_ALIASING_LEVEL;
 
-    auto renderWindow = sf::RenderWindow(mode, Configuration::WINDOW_TITLE, Configuration::WINDOW_STYLE, Configuration::WINDOW_STATE, settings);
+    auto window = sf::RenderWindow(mode, Configuration::WINDOW_TITLE, Configuration::WINDOW_STYLE, Configuration::WINDOW_STATE, settings);
 
-    renderWindow.setFramerateLimit(Configuration::FRAMES_PER_SECOND);
-    renderWindow.setVerticalSyncEnabled(Configuration::IS_VSYNC);
+    window.setFramerateLimit(Configuration::FRAMES_PER_SECOND);
+    window.setVerticalSyncEnabled(Configuration::IS_VSYNC);
+
+    window.setKeyRepeatEnabled(Configuration::ENABLE_KEY_REPEAT);
 
     GameService::Initialize();
     // We register the SFML window as a reference, so it's easy to access it
-    GameService::Register<sf::RenderWindow>(renderWindow);
+    GameService::Register<sf::RenderWindow>(window);
     GameService::Register<ResourceManager>(std::make_unique<ResourceManager>());
     GameService::Register<AudioManager>(std::make_unique<AudioManager>(GameService::Get<ResourceManager>()));
     GameService::Register<SceneManager>(std::make_unique<SceneManager>());
@@ -58,7 +60,7 @@ int main()
     GameService::Register<GameInstance>(gameInstance);
 
     gameInstance.Initialize();
-    gameInstance.Run(renderWindow);
+    gameInstance.Run(window);
     gameInstance.Shutdown();
     LOG_DEBUG("(Main::main): Bye bye!");
 

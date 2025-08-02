@@ -2,13 +2,13 @@
 
 #include "Ball.h"
 
-#include "../../Physics/Components/Transform.h"
 #include "Modules/Physics/Components/Acceleration.h"
 #include "Modules/Physics/Components/Collider.h"
 #include "Modules/Physics/Components/Friction.h"
 #include "Modules/Physics/Components/Gravity.h"
 #include "Modules/Physics/Components/Velocity.h"
 #include "Modules/Render/Components/CircleRenderable.h"
+#include "Modules/Render/Components/Transform.h"
 #include "Modules/Render/Components/ZOrder.h"
 
 

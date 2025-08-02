@@ -2,16 +2,18 @@
 
 #include "MainMenuScene.h"
 
-#include "Components/Size.h"
+#include "../../../../../Core/Public/Modules/UI/Components/EventTrigger.h"
+#include "Configuration.h"
 #include "Events/ExitGame.h"
 #include "Events/StartGame.h"
+#include "Logger.h"
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
-#include "Modules/Physics/Components/Transform.h"
+#include "Modules/Render/Components/Size.h"
 #include "Modules/Render/Components/TextRenderable.h"
+#include "Modules/Render/Components/Transform.h"
 #include "Modules/Render/Prefabs/Rectangle.h"
-#include "Modules/Render/Prefabs/Sprite.h"
 #include "Modules/Render/RenderModule.h"
 #include "Modules/UI/Components/Clickable.h"
 #include "Modules/UI/Components/Interactable.h"
@@ -19,11 +21,6 @@
 #include "Modules/UI/Prefabs/Text.h"
 #include "Modules/UI/UIModule.h"
 #include "Themes/Nord.h"
-
-#include <Logger.h>
-
-#include <Components/EventTrigger.h>
-#include <Configuration.h>
 
 
 void MainMenuScene::Initialize()
@@ -43,19 +40,10 @@ void MainMenuScene::Initialize()
         world,
         {
             .size = sf::Vector2f{Configuration::WINDOW_SIZE},
-            .position = {0.f, 0.f},
             .color = NordTheme::PolarNight4,
+            .position = {0.f, 0.f},
             .zOrder = zOrder++,
         }
-    );
-
-    Prefabs::Sprite::Create(
-        world,
-        {.textureAsset = "background",
-         .origin = {0.5f, 0.5f},
-         .position = {centerX, centerY - 50},
-         .scale = {2.f, 2.f},
-         .zOrder = zOrder++}
     );
 
     // --- Add Title ---
@@ -64,9 +52,9 @@ void MainMenuScene::Initialize()
         {.text = "Main Menu",
          .fontAsset = "Orbitron-Bold",
          .fontSize = 60.f,
-         .position = {centerX, centerY - 200},
          .textColor = NordTheme::SnowStorm3,
          .origin = sf::Vector2f{0.5f, 0.5f},
+         .position = {centerX, centerY - 200},
          .zOrder = zOrder++}
     );
 
@@ -77,9 +65,9 @@ void MainMenuScene::Initialize()
             .text = "Play",
             .fontAsset = "Orbitron-Bold",
             .fontSize = 48.f,
-            .position = {centerX, centerY},
             .textColor = NordTheme::SnowStorm3,
             .backgroundColor = sf::Color::Transparent,
+            .position = {centerX, centerY},
             .zOrder = zOrder++,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<StartGame>({}, this); },
         }
@@ -92,9 +80,9 @@ void MainMenuScene::Initialize()
             .text = "Exit",
             .fontAsset = "Orbitron-Regular",
             .fontSize = 36.f,
-            .position = {centerX, centerY + 100},
             .textColor = NordTheme::SnowStorm3,
             .backgroundColor = sf::Color::Transparent,
+            .position = {centerX, centerY + 100},
             .zOrder = zOrder++,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<ExitGame>({}, this); },
         }

@@ -1,13 +1,13 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "PhysicsModule.h"
+#include "Modules/Physics/PhysicsModule.h"
 
-#include "Components/Acceleration.h"
-#include "Components/Collider.h"
-#include "Components/Friction.h"
-#include "Components/Gravity.h"
-#include "Components/Transform.h"
-#include "Components/Velocity.h"
+#include "Modules/Render/Components/Transform.h"
+#include "Modules/Physics/Components/Acceleration.h"
+#include "Modules/Physics/Components/Collider.h"
+#include "Modules/Physics/Components/Friction.h"
+#include "Modules/Physics/Components/Gravity.h"
+#include "Modules/Physics/Components/Velocity.h"
 #include "PhysicsConstants.h"
 
 #include <numbers>

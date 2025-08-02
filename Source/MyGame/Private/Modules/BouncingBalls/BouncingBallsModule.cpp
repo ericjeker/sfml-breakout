@@ -2,10 +2,10 @@
 
 #include "BouncingBallsModule.h"
 
-#include "../Physics/Components/Transform.h"
 #include "Configuration.h"
 #include "Modules/Physics/Components/Collider.h"
 #include "Modules/Physics/Components/Velocity.h"
+#include "Modules/Render/Components/Transform.h"
 
 
 namespace
@@ -19,7 +19,7 @@ void ProcessScreenBounce(Transform& t, Velocity& v, const Collider& c)
     if (t.position.x - radius < 0.f)
     {
         v.velocity.x *= -1.f;
-        t.position.x =  radius;
+        t.position.x = radius;
     }
     else if (t.position.x + radius > Configuration::WINDOW_SIZE.x)
     {
@@ -55,7 +55,7 @@ void ProcessScreenBounce(Transform& t, Velocity& v, const Collider& c)
 //     ball.shape.setPosition(t.position);
 // }
 
-}
+} // namespace
 
 
 namespace Modules

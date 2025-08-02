@@ -17,10 +17,10 @@ namespace Prefabs
 struct BallParams
 {
     float radius = 4.f;
+    sf::Color color = sf::Color::Magenta;
+    sf::Vector2f origin = {0.5f, 0.5f};
     sf::Vector2f position = {0.f, 0.f};
     sf::Vector2f scale = {1.f, 1.f};
-    sf::Vector2f origin = {0.5f, 0.5f};
-    sf::Color color = sf::Color::Magenta;
     float zOrder = 0.f;
 
     // TODO: should have an embedded struct for physics parameters

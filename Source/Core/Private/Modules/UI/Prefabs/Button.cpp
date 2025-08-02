@@ -1,19 +1,18 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Button.h"
+#include "Modules/UI/Prefabs/Button.h"
 
-#include "Components/EventTrigger.h"
-#include "Components/Size.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
-#include "Modules/Physics/Components/Transform.h"
 #include "Modules/Render/Components/RectangleRenderable.h"
+#include "Modules/Render/Components/Size.h"
 #include "Modules/Render/Components/TextRenderable.h"
+#include "Modules/Render/Components/Transform.h"
 #include "Modules/Render/Components/ZOrder.h"
 #include "Modules/UI/Components/ButtonBackground.h"
 #include "Modules/UI/Components/ButtonText.h"
 #include "Modules/UI/Components/Clickable.h"
-#include "Modules/UI/Components/Hoverable.h"
+#include "Modules/UI/Components/EventTrigger.h"
 #include "Modules/UI/Components/Interactable.h"
 
 
