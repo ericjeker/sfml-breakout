@@ -33,8 +33,6 @@ void GameplayState::Exit()
     sceneManager.RemoveScene<ControllerDemoScene>();
     sceneManager.RemoveScene<PauseScene>();
     sceneManager.RemoveScene<DebugScene>();
-
-    // GameService::Get<EventManager>().Unsubscribe<ResumeGame>(_resumeGameListener);
 }
 
 void GameplayState::HandleEvent(const std::optional<sf::Event>& event)
@@ -45,27 +43,8 @@ void GameplayState::HandleEvent(const std::optional<sf::Event>& event)
     {
         sceneManager.GetScene<ControllerDemoScene>().Pause();
         sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
-        _isPaused = true;
     }
     else if (event->is<sf::Event::FocusGained>())
     {
-    }
-    else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
-    {
-        if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
-        {
-            if (_isPaused)
-            {
-                sceneManager.UnloadScene<PauseScene>();
-                sceneManager.GetScene<ControllerDemoScene>().Resume();
-                _isPaused = false;
-            }
-            else
-            {
-                sceneManager.GetScene<ControllerDemoScene>().Pause();
-                sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
-                _isPaused = true;
-            }
-        }
     }
 }

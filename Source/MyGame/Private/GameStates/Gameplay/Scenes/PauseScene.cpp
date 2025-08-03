@@ -4,12 +4,14 @@
 
 #include "../../../../../Core/Public/Modules/UI/Components/EventTrigger.h"
 #include "Configuration.h"
+#include "ControllerDemoScene.h"
 #include "Events/NavigateToMainMenu.h"
 #include "Events/ResumeGame.h"
 #include "Logger.h"
 #include "Managers/EventManager.h"
 #include "Managers/GameService.h"
 #include "Managers/ResourceManager.h"
+#include "Managers/SceneManager.h"
 #include "Modules/Render/Components/Size.h"
 #include "Modules/Render/Components/Transform.h"
 #include "Modules/Render/Prefabs/Rectangle.h"
@@ -31,7 +33,10 @@ void PauseScene::Initialize()
     constexpr float CENTER_Y = Configuration::WINDOW_SIZE.y / 2;
 
     auto world = GetWorld();
-    world.import <Modules::RenderModule>();
+    // Clang Format is confused...
+    // clang-format off
+    world.import<Modules::RenderModule>();
+    // clang-format on
 
     float zOrder = 0.f;
 

@@ -23,13 +23,10 @@ public:
     void HandleEvent(const std::optional<sf::Event>& event) override;
 
 private:
-    bool _isPaused = false;
-
     EventListener<ResumeGame> _resumeGameListener = [this](const ResumeGame& event, void* sender)
     {
         GameService::Get<SceneManager>().UnloadScene<PauseScene>();
         GameService::Get<SceneManager>().GetScene<ControllerDemoScene>().Resume();
-        _isPaused = false;
     };
 };
 #endif

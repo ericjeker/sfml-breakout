@@ -25,7 +25,8 @@ void GravitySystem(const flecs::iter& it, size_t, const Gravity& g, Velocity& v)
 
 void FrictionSystem(const flecs::iter& it, size_t, const Friction& f, Velocity& v)
 {
-    v.velocity *= (1.f - f.friction * it.delta_time());
+    const float frictionFactory = std::max(0.f, 1.f - f.friction * it.delta_time());
+    v.velocity *= frictionFactory;
 }
 
 void AccelerationSystem(const flecs::iter& it, size_t, Acceleration& a, Velocity& v)

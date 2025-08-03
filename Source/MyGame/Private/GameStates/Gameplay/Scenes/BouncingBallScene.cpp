@@ -25,9 +25,12 @@ void BouncingBallScene::Initialize()
     // --- Get the world and import the modules ---
     auto world = GetWorld();
 
-    world.import <Modules::PhysicsModule>();
-    world.import <Modules::BouncingBallsModule>();
-    world.import <Modules::RenderModule>();
+    // Clang Format is confused...
+    // clang-format off
+    world.import<Modules::PhysicsModule>();
+    world.import<Modules::BouncingBallsModule>();
+    world.import<Modules::RenderModule>();
+    // clang-format on
 
     world.set<GravitySettings>(
         {.gravity = PhysicsConstants::NO_GRAVITY, .pixelsPerCentimeter = PhysicsConstants::PIXELS_PER_CENTIMETER}

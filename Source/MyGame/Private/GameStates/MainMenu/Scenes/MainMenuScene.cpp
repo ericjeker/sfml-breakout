@@ -30,8 +30,10 @@ void MainMenuScene::Initialize()
     constexpr float centerY = Configuration::WINDOW_SIZE.y / 2;
 
     auto world = GetWorld();
-    world.import <Modules::UIModule>();
-    world.import <Modules::RenderModule>();
+    // clang-format off
+    world.import<Modules::UIModule>();
+    world.import<Modules::RenderModule>();
+    // clang-format on
 
     float zOrder = 0;
 

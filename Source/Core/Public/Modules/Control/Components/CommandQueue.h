@@ -4,14 +4,14 @@
 #ifndef ACTIONREGISTRY_H
 #define ACTIONREGISTRY_H
 
-#include "Action.h"
+#include "Command.h"
 
 #include <vector>
 
 
-struct ActionRegistry
+struct CommandQueue
 {
-    std::vector<Action> intents{};
+    std::vector<Command> intents{};
 };
 
 

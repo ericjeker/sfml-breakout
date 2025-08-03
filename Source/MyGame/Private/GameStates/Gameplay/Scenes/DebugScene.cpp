@@ -23,7 +23,7 @@ void CalculateFPS(const flecs::iter& it, size_t, const TextRenderable& textRende
 
     if (sinceLastUpdate >= .3f)
     {
-        const float averageFps = frameCount / sinceLastUpdate;
+        const float averageFps = std::ceil(frameCount / sinceLastUpdate);
         textRenderable.text->setString("FPS: " + std::to_string(static_cast<int>(averageFps)));
         sinceLastUpdate = 0.f;
         frameCount = 0;
@@ -38,7 +38,9 @@ void DebugScene::Initialize()
 
     auto world = GetWorld();
 
-    world.import <Modules::RenderModule>();
+    // clang-format off
+    world.import<Modules::RenderModule>();
+    // clang-format on
 
     // --- Resources ---
     const flecs::entity& entity = Prefabs::Text::Create(

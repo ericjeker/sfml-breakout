@@ -2,8 +2,20 @@
 
 #include "Modules/Control/ControlModule.h"
 
-#include "Modules/Control/Components/ActionRegistry.h"
+#include "Modules/Control/Components/CommandQueue.h"
+#include "Modules/Control/Components/LifetimeOneFrame.h"
 #include "Modules/Control/Components/PossessedByPlayer.h"
+
+namespace
+{
+
+void DestroyEntity(const flecs::entity e, const LifetimeOneFrame& lifetime)
+{
+    e.destruct();
+}
+
+} // namespace
+
 
 namespace Modules
 {
@@ -11,7 +23,12 @@ namespace Modules
 ControlModule::ControlModule(const flecs::world& world)
 {
     world.component<PossessedByPlayer>();
-    world.component<ActionRegistry>();
+    world.component<CommandQueue>();
+    world.component<Command>();
+    world.component<LifetimeOneFrame>();
+
+
+    world.system<const LifetimeOneFrame>().each(DestroyEntity);
 }
 
 
