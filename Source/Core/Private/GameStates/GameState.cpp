@@ -4,6 +4,11 @@
 
 #include "Core/Logger.h"
 
+GameState::GameState(const flecs::world& world)
+    : _world(world)
+{
+}
+
 void GameState::Pause()
 {
     LOG_DEBUG("(GameState::Pause)");
@@ -23,4 +28,9 @@ bool GameState::IsPaused() const
 
 void GameState::Update(float deltaTime)
 {
+}
+
+const flecs::world& GameState::GetWorld() const
+{
+    return _world;
 }

@@ -25,12 +25,10 @@ public:
 
 private:
     EventListener<ExitGame> _exitGameListener = [this](const ExitGame& event, void* sender) { RequestExit(); };
-
-    EventListener<StartGame> _startGameListener = [](const StartGame& event, void* sender)
-    { GameService::Get<GameController>().ChangeState(std::make_unique<GameplayState>()); };
-
-    EventListener<NavigateToMainMenu> _returnToMainMenuListener = [](const NavigateToMainMenu& event, void* sender)
-    { GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>()); };
+    EventListener<StartGame> _startGameListener = [this](const StartGame& event, void* sender)
+    { GameService::Get<GameController>().ChangeState(std::make_unique<GameplayState>(GetWorld())); };
+    EventListener<NavigateToMainMenu> _returnToMainMenuListener = [this](const NavigateToMainMenu& event, void* sender)
+    { GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>(GetWorld())); };
 };
 
 

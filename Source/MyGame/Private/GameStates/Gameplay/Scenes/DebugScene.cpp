@@ -32,11 +32,17 @@ void CalculateFPS(const flecs::iter& it, size_t, const TextRenderable& textRende
 
 } // namespace
 
+DebugScene::DebugScene(const flecs::world& world)
+    : Scene(world)
+{
+}
+
+
 void DebugScene::Initialize()
 {
     Scene::Initialize();
 
-    auto world = GetWorld();
+    auto& world = GetLocalWorld();
 
     // clang-format off
     world.import<Modules::RenderModule>();

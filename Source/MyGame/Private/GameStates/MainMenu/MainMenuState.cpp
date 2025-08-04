@@ -8,11 +8,18 @@
 #include "Core/Managers/SceneManager.h"
 #include "Scenes/MainMenuScene.h"
 
+MainMenuState::MainMenuState(const flecs::world& world)
+    : GameState(world)
+{
+}
+
 void MainMenuState::Enter()
 {
+    // TODO: Initialize State Global Systems
+
     LOG_DEBUG("(MainMenuState::MainMenuState): Adding scenes to the SceneManager");
     auto& sceneManager = GameService::Get<SceneManager>();
-    sceneManager.AddScene<MainMenuScene>(std::make_unique<MainMenuScene>());
+    sceneManager.AddScene<MainMenuScene>(std::make_unique<MainMenuScene>(GetWorld()));
 
     LOG_DEBUG("(MainMenuState::Enter): Loading MainMenuScene");
     sceneManager.LoadScene<MainMenuScene>(SceneLoadMode::Single);

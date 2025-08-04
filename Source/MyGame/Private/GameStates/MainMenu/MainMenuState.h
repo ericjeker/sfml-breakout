@@ -10,6 +10,7 @@
 class MainMenuState final : public GameState
 {
 public:
+    explicit MainMenuState(const flecs::world& world);
     void Enter() override;
     void Exit() override;
 

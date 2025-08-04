@@ -24,13 +24,19 @@
 #include <SFML/Graphics/Text.hpp>
 
 
+PauseScene::PauseScene(const flecs::world& world)
+    : Scene(world)
+{
+}
+
+
 void PauseScene::Initialize()
 {
     LOG_DEBUG("(PauseScene:Initialize)");
     constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
     constexpr float CENTER_Y = Configuration::WINDOW_SIZE.y / 2;
 
-    auto world = GetWorld();
+    auto& world = GetLocalWorld();
     // Clang Format is confused...
     // clang-format off
     world.import<Modules::RenderModule>();
@@ -110,7 +116,7 @@ void PauseScene::HandleEvent(const std::optional<sf::Event>& event)
 
         const sf::Vector2<float> mousePosition(mousePressed->position);
 
-        GetWorld().each(
+        GetLocalWorld().each(
             [&](const Interactable& interactable,
                 const Clickable& clickable,
                 const Transform& t,

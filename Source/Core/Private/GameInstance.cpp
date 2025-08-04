@@ -10,6 +10,7 @@
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
 
+
 void GameInstance::Run(sf::RenderWindow& renderWindow) const
 {
     LOG_DEBUG("(GameInstance::Run): Starting game loop");
@@ -28,6 +29,8 @@ void GameInstance::Run(sf::RenderWindow& renderWindow) const
 
         renderWindow.clear();
         Update(deltaTime);
+        // Progress of the world by one tick.
+        GetWorld().progress(deltaTime);
         renderWindow.display();
 
         // Process deferred events at the end of the frame
@@ -46,6 +49,7 @@ void GameInstance::Run(sf::RenderWindow& renderWindow) const
 void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
 {
     ZoneScoped;
+
     while (const auto event = renderWindow.pollEvent())
     {
         if (event->is<sf::Event::Closed>())
@@ -74,4 +78,9 @@ void GameInstance::RequestExit()
 bool GameInstance::ShouldExit() const
 {
     return _shouldExit;
+}
+
+const flecs::world& GameInstance::GetWorld() const
+{
+    return _world;
 }

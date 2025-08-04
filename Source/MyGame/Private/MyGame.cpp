@@ -15,7 +15,7 @@ void MyGame::Initialize()
     LOG_DEBUG("(MyGame::Initialization): Load Resources");
     GameService::Get<ResourceManager>().LoadResourcesFromManifest("Assets/Manifest.json");
     LOG_DEBUG("(MyGame::Initialization): Load the Main Menu State");
-    GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>());
+    GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>(GetWorld()));
 
     // --- Start the main theme ---
     // GameService::Get<AudioManager>().PlayMusic("8mm");

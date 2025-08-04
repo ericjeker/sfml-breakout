@@ -9,27 +9,34 @@
 #include "Core/Scenes/Scene.h"
 
 
+Scene::Scene(const flecs::world& world)
+    : _world(world)
+{
+}
+
 void Scene::Initialize()
 {
     LOG_DEBUG("(Scene:Initialize): Create a the root entity");
-    _rootEntity = flecs::entity(_world);
+    _rootEntity = GetWorld().entity();
 }
 
 void Scene::Shutdown()
 {
-    LOG_DEBUG("(Scene:Shutdown): Delete children of root entity");
-    if (_rootEntity == flecs::entity::null())
+    LOG_DEBUG("(Scene:Shutdown): Delete root entity");
+    if (GetRootEntity() == flecs::entity::null() || !GetWorld().exists(GetRootEntity()))
     {
         return;
     }
 
-    _world.delete_with(flecs::ChildOf, _rootEntity);
+    GetWorld().defer([&] {
+        GetWorld().delete_with(flecs::ChildOf, GetRootEntity());
+    });
 }
 
 void Scene::Update(const float deltaTime)
 {
     // Progress of the world by one tick.
-    GetWorld().progress(deltaTime);
+    GetLocalWorld().progress(deltaTime);
 }
 
 void Scene::HandleEvent(const std::optional<sf::Event>& event)
@@ -54,13 +61,15 @@ bool Scene::IsPaused() const
 void Scene::Pause()
 {
     _isPaused = true;
-    _world.entity(flecs::OnUpdate).disable();
+    // GetRootEntity().disable();
+    // GetLocalWorld().entity(flecs::OnUpdate).disable();
 }
 
 void Scene::Resume()
 {
     _isPaused = false;
-    _world.entity(flecs::OnUpdate).enable();
+    // GetRootEntity().enable();
+    // GetLocalWorld().entity(flecs::OnUpdate).enable();
 }
 
 const std::string& Scene::GetName() const
@@ -91,4 +100,24 @@ flecs::world& Scene::GetWorld()
 const flecs::world& Scene::GetWorld() const
 {
     return _world;
+}
+
+flecs::world& Scene::GetLocalWorld()
+{
+    return _localWorld;
+}
+
+const flecs::world& Scene::GetLocalWorld() const
+{
+    return _localWorld;
+}
+
+flecs::entity& Scene::GetRootEntity()
+{
+    return _rootEntity;
+}
+
+const flecs::entity& Scene::GetRootEntity() const
+{
+    return _rootEntity;
 }

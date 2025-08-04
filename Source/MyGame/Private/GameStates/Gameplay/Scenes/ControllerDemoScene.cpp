@@ -26,9 +26,15 @@
 #include "PauseScene.h"
 
 
+ControllerDemoScene::ControllerDemoScene(const flecs::world& world)
+    : Scene(world)
+{
+}
+
+
 void ControllerDemoScene::Initialize()
 {
-    auto world = GetWorld();
+    auto& world = GetLocalWorld();
 
     // Clang Format is confused...
     // clang-format off

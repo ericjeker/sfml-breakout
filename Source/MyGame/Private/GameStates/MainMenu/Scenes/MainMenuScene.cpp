@@ -23,13 +23,18 @@
 #include "Events/StartGame.h"
 
 
+MainMenuScene::MainMenuScene(const flecs::world& world)
+    : Scene(world)
+{
+}
+
 void MainMenuScene::Initialize()
 {
     LOG_DEBUG("(MainMenuScene:Initialize)");
     constexpr float centerX = Configuration::WINDOW_SIZE.x / 2;
     constexpr float centerY = Configuration::WINDOW_SIZE.y / 2;
 
-    auto world = GetWorld();
+    auto& world = GetLocalWorld();
     // clang-format off
     world.import<Modules::UIModule>();
     world.import<Modules::RenderModule>();
@@ -107,7 +112,7 @@ void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
 
         const sf::Vector2<float> mousePosition(mousePressed->position);
 
-        GetWorld().each(
+        GetLocalWorld().each(
             [&](const Interactable& interactable,
                 const Clickable& clickable,
                 const Transform& t,

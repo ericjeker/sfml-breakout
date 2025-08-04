@@ -24,7 +24,7 @@
 class Scene
 {
 public:
-    Scene() = default;
+    explicit Scene(const flecs::world& world);
     virtual ~Scene() = default;
 
     virtual void Initialize();
@@ -46,8 +46,17 @@ public:
     void SetName(const std::string& name);
     void SetPath(const std::string& path);
 
+    /**
+     * Temporarily we are going to have two worlds here until the refactoring is finished.
+     */
     flecs::world& GetWorld();
     const flecs::world& GetWorld() const;
+
+    flecs::world& GetLocalWorld();
+    const flecs::world& GetLocalWorld() const;
+
+    flecs::entity& GetRootEntity();
+    const flecs::entity& GetRootEntity() const;
 
 private:
     std::string _name;
@@ -55,6 +64,7 @@ private:
 
     // Flecs entities for singletons
     flecs::world _world{};
+    flecs::world _localWorld{};
     flecs::entity _rootEntity{};
 
     bool _isLoaded = false;

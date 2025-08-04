@@ -20,10 +20,15 @@
 #include <random>
 
 
+BouncingBallScene::BouncingBallScene(const flecs::world& world)
+    : Scene(world)
+{
+}
+
 void BouncingBallScene::Initialize()
 {
     // --- Get the world and import the modules ---
-    auto world = GetWorld();
+    auto& world = GetLocalWorld();
 
     // Clang Format is confused...
     // clang-format off

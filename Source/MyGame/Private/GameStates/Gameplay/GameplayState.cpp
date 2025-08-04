@@ -9,14 +9,19 @@
 #include "Scenes/DebugScene.h"
 #include "Scenes/PauseScene.h"
 
+GameplayState::GameplayState(const flecs::world& world)
+    : GameState(world)
+{
+}
+
 void GameplayState::Enter()
 {
     auto& sceneManager = GameService::Get<SceneManager>();
 
     LOG_DEBUG("(GameplayState::GameplayState): Adding scenes to the SceneManager");
-    sceneManager.AddScene<ControllerDemoScene>(std::make_unique<ControllerDemoScene>());
-    sceneManager.AddScene<PauseScene>(std::make_unique<PauseScene>());
-    sceneManager.AddScene<DebugScene>(std::make_unique<DebugScene>());
+    sceneManager.AddScene<ControllerDemoScene>(std::make_unique<ControllerDemoScene>(GetWorld()));
+    sceneManager.AddScene<PauseScene>(std::make_unique<PauseScene>(GetWorld()));
+    sceneManager.AddScene<DebugScene>(std::make_unique<DebugScene>(GetWorld()));
 
     LOG_DEBUG("(GameplayState::Enter): Loading Controller");
     sceneManager.LoadScene<ControllerDemoScene>(SceneLoadMode::Single);

@@ -7,13 +7,14 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 
+#include <flecs.h>
 #include <optional>
 
 
 class GameState
 {
 public:
-    GameState() = default;
+    explicit GameState(const flecs::world& world);
     virtual ~GameState() = default;
 
     virtual void Enter() = 0;
@@ -26,8 +27,11 @@ public:
     virtual void Update(float deltaTime);
     virtual void HandleEvent(const std::optional<sf::Event>& event) = 0;
 
+    const flecs::world& GetWorld() const;
+
 private:
     bool _paused = false;
+    const flecs::world& _world;
 };
 
 
