@@ -4,9 +4,9 @@
 #include <tracy/Tracy.hpp>
 #endif
 
-#include "Logger.h"
-#include "Managers/GameService.h"
-#include "Scenes/Scene.h"
+#include "Core/Logger.h"
+#include "Core/Managers/GameService.h"
+#include "Core/Scenes/Scene.h"
 
 
 void Scene::Initialize()

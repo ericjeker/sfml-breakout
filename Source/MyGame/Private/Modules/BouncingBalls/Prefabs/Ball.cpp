@@ -2,14 +2,14 @@
 
 #include "Ball.h"
 
-#include "Modules/Physics/Components/Acceleration.h"
-#include "Modules/Physics/Components/Collider.h"
-#include "Modules/Physics/Components/Friction.h"
-#include "Modules/Physics/Components/Gravity.h"
-#include "Modules/Physics/Components/Velocity.h"
-#include "Modules/Render/Components/CircleRenderable.h"
-#include "Modules/Render/Components/Transform.h"
-#include "Modules/Render/Components/ZOrder.h"
+#include "Core/Modules/Physics/Components/Acceleration.h"
+#include "Core/Modules/Physics/Components/Collider.h"
+#include "Core/Modules/Physics/Components/Friction.h"
+#include "Core/Modules/Physics/Components/Gravity.h"
+#include "Core/Modules/Physics/Components/Velocity.h"
+#include "Core/Modules/Render/Components/CircleRenderable.h"
+#include "Core/Modules/Render/Components/Transform.h"
+#include "Core/Modules/Render/Components/ZOrder.h"
 
 
 namespace Prefabs

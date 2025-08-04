@@ -3,12 +3,12 @@
 #include <tracy/Tracy.hpp>
 #endif
 
-#include "GameInstance.h"
-#include "GameStates/GameController.h"
-#include "Logger.h"
-#include "Managers/EventManager.h"
-#include "Managers/GameService.h"
-#include "Managers/SceneManager.h"
+#include "Core/GameInstance.h"
+#include "Core/GameStates/GameController.h"
+#include "Core/Logger.h"
+#include "Core/Managers/EventManager.h"
+#include "Core/Managers/GameService.h"
+#include "Core/Managers/SceneManager.h"
 
 void GameInstance::Run(sf::RenderWindow& renderWindow) const
 {

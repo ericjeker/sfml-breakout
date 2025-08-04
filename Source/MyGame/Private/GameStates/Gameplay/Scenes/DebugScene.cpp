@@ -2,12 +2,12 @@
 
 #include "DebugScene.h"
 
-#include "Managers/GameService.h"
-#include "Modules/Render/Components/TextRenderable.h"
-#include "Modules/Render/RenderModule.h"
-#include "Modules/UI/Prefabs/Text.h"
+#include "Core/Managers/GameService.h"
+#include "Core/Modules/Render/Components/TextRenderable.h"
+#include "Core/Modules/Render/RenderModule.h"
+#include "Core/Modules/UI/Prefabs/Text.h"
 
-#include <Themes/Nord.h>
+#include <Core/Themes/Nord.h>
 
 // Local systems, or I could create a DebugSceneModule
 namespace

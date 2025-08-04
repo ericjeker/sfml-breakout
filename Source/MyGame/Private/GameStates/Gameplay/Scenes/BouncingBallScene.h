@@ -4,7 +4,7 @@
 #ifndef BOUNCINGBALLFLECSSCENE_H
 #define BOUNCINGBALLFLECSSCENE_H
 
-#include "Scenes/Scene.h"
+#include "Core/Scenes/Scene.h"
 
 #include <flecs.h>
 

@@ -3,10 +3,9 @@
 #include <tracy/Tracy.hpp>
 #endif
 
-#include "Managers/SceneManager.h"
+#include "Core/Managers/SceneManager.h"
 
 #include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
 
 #include <ranges>
 

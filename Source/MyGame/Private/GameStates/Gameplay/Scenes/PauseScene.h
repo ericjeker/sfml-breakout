@@ -4,7 +4,7 @@
 #ifndef PAUSESCENE_H
 #define PAUSESCENE_H
 
-#include "Scenes/Scene.h"
+#include "Core/Scenes/Scene.h"
 
 #include <SFML/Graphics/Text.hpp>
 

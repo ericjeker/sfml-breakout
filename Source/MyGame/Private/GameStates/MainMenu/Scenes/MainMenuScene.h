@@ -4,7 +4,7 @@
 #ifndef MAINMENUSCENE_H
 #define MAINMENUSCENE_H
 
-#include "Scenes/Scene.h"
+#include "Core/Scenes/Scene.h"
 
 #include <SFML/Graphics/Text.hpp>
 

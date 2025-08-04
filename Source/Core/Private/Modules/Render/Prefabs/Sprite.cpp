@@ -1,12 +1,12 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Modules/Render/Prefabs/Sprite.h"
+#include "Core/Modules/Render/Prefabs/Sprite.h"
 
-#include "Managers/GameService.h"
-#include "Managers/ResourceManager.h"
-#include "Modules/Render/Components/SpriteRenderable.h"
-#include "Modules/Render/Components/Transform.h"
-#include "Modules/Render/Components/ZOrder.h"
+#include "Core/Managers/GameService.h"
+#include "Core/Managers/ResourceManager.h"
+#include "Core/Modules/Render/Components/SpriteRenderable.h"
+#include "Core/Modules/Render/Components/Transform.h"
+#include "Core/Modules/Render/Components/ZOrder.h"
 
 
 namespace Prefabs

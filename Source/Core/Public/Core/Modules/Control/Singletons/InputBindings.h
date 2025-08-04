@@ -4,7 +4,7 @@
 #ifndef INPUTBINDINGS_H
 #define INPUTBINDINGS_H
 
-#include "Modules/Control/InputKey.h"
+#include "Core/Modules/Control/InputKey.h"
 
 #include <unordered_map>
 

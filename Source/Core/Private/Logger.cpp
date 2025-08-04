@@ -1,6 +1,6 @@
 // Copyright (c) Eric Jeker. All Rights Reserved.
 
-#include "Logger.h"
+#include "Core/Logger.h"
 
 #include <iostream>
 #include <ostream>
@@ -8,61 +8,62 @@
 namespace
 {
 
-void Log(const Logger::LogLevel level, const std::string& message)
+std::string SeverityToText(const Logger::LogLevel level)
 {
-	// Use std::cerr when the log level is below or equal Error
-	auto& oStream = (level <= Logger::LogLevel::Error) ? std::cerr : std::cout;
-	switch (level)
-	{
-		case Logger::LogLevel::Fatal:
-			oStream << "[FATAL] " << message << std::endl;
-			break;
-		case Logger::LogLevel::Error:
-			oStream << "[ERROR] " << message << std::endl;
-			break;
-		case Logger::LogLevel::Warning:
-			oStream << "[WARN]  " << message << std::endl;
-			break;
-		case Logger::LogLevel::Info:
-			oStream << "[INFO]  " << message << std::endl;
-			break;
-		case Logger::LogLevel::Debug:
-			oStream << "[DEBUG] " << message << std::endl;
-			break;
-		case Logger::LogLevel::Trace:
-			oStream << "[TRACE] " << message << std::endl;
-			break;
-	}
+    switch (level)
+    {
+        case Logger::LogLevel::Trace:
+            return "TRACE";
+        case Logger::LogLevel::Debug:
+            return "DEBUG";
+        case Logger::LogLevel::Info:
+            return "INFO";
+        case Logger::LogLevel::Warning:
+            return "WARN";
+        case Logger::LogLevel::Error:
+            return "ERROR";
+        case Logger::LogLevel::Fatal:
+            return "FATAL";
+    }
+
+    return "UNKNOWN";
 }
 
+void Log(const Logger::LogLevel level, const std::string& message)
+{
+    // Use std::cerr when the log level is below or equal Error
+    auto& oStream = (level <= Logger::LogLevel::Error) ? std::cerr : std::cout;
+    oStream << " [" << SeverityToText(level) << "] " << message << std::endl;
 }
+
+} // namespace
 
 void Logger::Fatal(const std::string& message)
 {
-	Log(LogLevel::Fatal, message);
+    Log(LogLevel::Fatal, message);
 }
 
 void Logger::Error(const std::string& message)
 {
-	Log(LogLevel::Error, message);
+    Log(LogLevel::Error, message);
 }
 
 void Logger::Warn(const std::string& message)
 {
-	Log(LogLevel::Warning, message);
+    Log(LogLevel::Warning, message);
 }
 
 void Logger::Info(const std::string& message)
 {
-	Log(LogLevel::Info, message);
+    Log(LogLevel::Info, message);
 }
 
 void Logger::Debug(const std::string& message)
 {
-	Log(LogLevel::Debug, message);
+    Log(LogLevel::Debug, message);
 }
 
 void Logger::Trace(const std::string& message)
 {
-	Log(LogLevel::Trace, message);
+    Log(LogLevel::Trace, message);
 }

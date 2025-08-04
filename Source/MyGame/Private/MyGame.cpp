@@ -2,13 +2,13 @@
 
 #include "MyGame.h"
 
+#include "Core/GameStates/GameController.h"
+#include "Core/Logger.h"
+#include "Core/Managers/AudioManager.h"
+#include "Core/Managers/ResourceManager.h"
 #include "Events/NavigateToMainMenu.h"
 #include "Events/StartGame.h"
-#include "GameStates/GameController.h"
 #include "GameStates/MainMenu/MainMenuState.h"
-#include "Logger.h"
-#include "Managers/AudioManager.h"
-#include "Managers/ResourceManager.h"
 
 void MyGame::Initialize()
 {

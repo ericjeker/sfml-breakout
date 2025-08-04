@@ -1,6 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Managers/AudioManager.h"
+#include "Core/Managers/AudioManager.h"
 
 AudioManager::AudioManager(ResourceManager& resourceManager)
     : _resourceManager(resourceManager)

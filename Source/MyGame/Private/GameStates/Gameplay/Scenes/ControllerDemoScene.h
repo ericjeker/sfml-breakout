@@ -4,8 +4,7 @@
 #ifndef CONTROLLERDEMOSCENE_H
 #define CONTROLLERDEMOSCENE_H
 
-#include "Scenes/Scene.h"
-
+#include "Core/Scenes/Scene.h"
 
 
 class ControllerDemoScene final : public Scene

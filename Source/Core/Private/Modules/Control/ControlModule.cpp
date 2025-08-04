@@ -1,10 +1,10 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Modules/Control/ControlModule.h"
+#include "Core/Modules/Control/ControlModule.h"
 
-#include "Modules/Control/Components/CommandQueue.h"
-#include "Modules/Control/Components/LifetimeOneFrame.h"
-#include "Modules/Control/Components/PossessedByPlayer.h"
+#include "Core/Modules/Control/Components/CommandQueue.h"
+#include "Core/Modules/Control/Components/LifetimeOneFrame.h"
+#include "Core/Modules/Control/Components/PossessedByPlayer.h"
 
 namespace
 {

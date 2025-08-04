@@ -5,9 +5,7 @@
 #define SCENEMANAGER_H
 
 #include "ResourceManager.h"
-#include "Scenes/Scene.h"
-
-#include <SFML/Graphics/RenderWindow.hpp>
+#include "Core/Scenes/Scene.h"
 
 #include <memory>
 #include <typeindex>
@@ -123,10 +121,13 @@ public:
      */
     void UnloadAll();
 
+    // TODO: This should probably be removed as we can progress the flecs::world from GameInstance.
     void Update(float deltaTime);
+    // TODO: This should probably be removed as we process sf::Events from Systems.
     void HandleEvent(const std::optional<sf::Event>& event);
 
 private:
+    // TODO: The Scene stack should hold the flecs::entity root so it can easily be deleted or disabled.
     std::unordered_map<std::type_index, std::unique_ptr<Scene>> _scenes;
     std::vector<std::type_index> _sceneOrder;
 };

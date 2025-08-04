@@ -4,7 +4,7 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 
-#include "Logger.h"
+#include "Core/Logger.h"
 
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>

@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Managers/FileManager.h"
+#include "Core/Managers/FileManager.h"
 
-#include "Logger.h"
+#include "Core/Logger.h"
 #include "nlohmann/json.hpp"
 #include "yaml-cpp/yaml.h"
 

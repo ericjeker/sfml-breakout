@@ -4,7 +4,7 @@
 #ifndef DEBUGSCENE_H
 #define DEBUGSCENE_H
 
-#include "Scenes/Scene.h"
+#include "Core/Scenes/Scene.h"
 
 
 struct FPS

@@ -1,19 +1,19 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Modules/UI/Prefabs/Button.h"
+#include "Core/Modules/UI/Prefabs/Button.h"
 
-#include "Managers/GameService.h"
-#include "Managers/ResourceManager.h"
-#include "Modules/Render/Components/RectangleRenderable.h"
-#include "Modules/Render/Components/Size.h"
-#include "Modules/Render/Components/TextRenderable.h"
-#include "Modules/Render/Components/Transform.h"
-#include "Modules/Render/Components/ZOrder.h"
-#include "Modules/UI/Components/ButtonBackground.h"
-#include "Modules/UI/Components/ButtonText.h"
-#include "Modules/UI/Components/Clickable.h"
-#include "Modules/UI/Components/EventTrigger.h"
-#include "Modules/UI/Components/Interactable.h"
+#include "Core/Managers/GameService.h"
+#include "Core/Managers/ResourceManager.h"
+#include "Core/Modules/Render/Components/RectangleRenderable.h"
+#include "Core/Modules/Render/Components/Size.h"
+#include "Core/Modules/Render/Components/TextRenderable.h"
+#include "Core/Modules/Render/Components/Transform.h"
+#include "Core/Modules/Render/Components/ZOrder.h"
+#include "Core/Modules/UI/Components/ButtonBackground.h"
+#include "Core/Modules/UI/Components/ButtonText.h"
+#include "Core/Modules/UI/Components/Clickable.h"
+#include "Core/Modules/UI/Components/EventTrigger.h"
+#include "Core/Modules/UI/Components/Interactable.h"
 
 
 namespace Prefabs

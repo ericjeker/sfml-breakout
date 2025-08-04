@@ -1,9 +1,9 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Managers/ResourceManager.h"
+#include "Core/Managers/ResourceManager.h"
 
-#include "Logger.h"
-#include "Managers/FileManager.h"
+#include "Core/Logger.h"
+#include "Core/Managers/FileManager.h"
 
 #include <nlohmann/json.hpp>
 

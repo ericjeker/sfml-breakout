@@ -1,10 +1,10 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Modules/Render/Prefabs/Rectangle.h"
+#include "Core/Modules/Render/Prefabs/Rectangle.h"
 
-#include "Modules/Render/Components/RectangleRenderable.h"
-#include "Modules/Render/Components/Transform.h"
-#include "Modules/Render/Components/ZOrder.h"
+#include "Core/Modules/Render/Components/RectangleRenderable.h"
+#include "Core/Modules/Render/Components/Transform.h"
+#include "Core/Modules/Render/Components/ZOrder.h"
 
 namespace Prefabs
 {

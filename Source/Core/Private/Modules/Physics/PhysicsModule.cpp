@@ -1,14 +1,14 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Modules/Physics/PhysicsModule.h"
+#include "Core/Modules/Physics/PhysicsModule.h"
 
-#include "Modules/Render/Components/Transform.h"
-#include "Modules/Physics/Components/Acceleration.h"
-#include "Modules/Physics/Components/Collider.h"
-#include "Modules/Physics/Components/Friction.h"
-#include "Modules/Physics/Components/Gravity.h"
-#include "Modules/Physics/Components/Velocity.h"
-#include "PhysicsConstants.h"
+#include "Core/PhysicsConstants.h"
+#include "Core/Modules/Physics/Components/Acceleration.h"
+#include "Core/Modules/Physics/Components/Collider.h"
+#include "Core/Modules/Physics/Components/Friction.h"
+#include "Core/Modules/Physics/Components/Gravity.h"
+#include "Core/Modules/Physics/Components/Velocity.h"
+#include "Core/Modules/Render/Components/Transform.h"
 
 #include <numbers>
 #include <tracy/Tracy.hpp>

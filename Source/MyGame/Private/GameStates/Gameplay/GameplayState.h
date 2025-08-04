@@ -4,12 +4,11 @@
 #ifndef GAMEPLAYSTATE_H
 #define GAMEPLAYSTATE_H
 
+#include "Core/GameStates/GameState.h"
+#include "Core/Managers/EventManager.h"
+#include "Core/Managers/GameService.h"
+#include "Core/Managers/SceneManager.h"
 #include "Events/ResumeGame.h"
-#include "GameStates/GameState.h"
-#include "Managers/EventManager.h"
-#include "Managers/GameService.h"
-#include "Managers/SceneManager.h"
-#include "Scenes/BouncingBallScene.h"
 #include "Scenes/ControllerDemoScene.h"
 #include "Scenes/PauseScene.h"
 

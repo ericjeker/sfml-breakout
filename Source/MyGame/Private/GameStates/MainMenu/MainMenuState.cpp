@@ -2,10 +2,10 @@
 
 #include "MainMenuState.h"
 
-#include "GameInstance.h"
-#include "Logger.h"
-#include "Managers/GameService.h"
-#include "Managers/SceneManager.h"
+#include "Core/GameInstance.h"
+#include "Core/Logger.h"
+#include "Core/Managers/GameService.h"
+#include "Core/Managers/SceneManager.h"
 #include "Scenes/MainMenuScene.h"
 
 void MainMenuState::Enter()

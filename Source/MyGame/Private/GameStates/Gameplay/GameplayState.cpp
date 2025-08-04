@@ -2,9 +2,9 @@
 
 #include "GameplayState.h"
 
+#include "Core/Logger.h"
+#include "Core/Managers/SceneManager.h"
 #include "Events/ResumeGame.h"
-#include "Logger.h"
-#include "Managers/SceneManager.h"
 #include "Scenes/ControllerDemoScene.h"
 #include "Scenes/DebugScene.h"
 #include "Scenes/PauseScene.h"

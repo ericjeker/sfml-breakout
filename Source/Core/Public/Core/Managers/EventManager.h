@@ -4,7 +4,8 @@
 #ifndef EVENTMANAGER_H
 #define EVENTMANAGER_H
 
-#include <Logger.h>
+#include "Core/Logger.h"
+
 #include <functional>
 #include <map>
 #include <string>

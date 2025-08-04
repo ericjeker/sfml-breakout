@@ -2,25 +2,27 @@
 
 #include "ControllerDemoScene.h"
 
-#include "Configuration.h"
-#include "Logger.h"
-#include "Managers/GameService.h"
-#include "Managers/SceneManager.h"
-#include "Modules/Control/Components/Command.h"
-#include "Modules/Control/Components/CommandQueue.h"
-#include "Modules/Control/Components/PossessedByPlayer.h"
-#include "Modules/Control/ControlModule.h"
-#include "Modules/Control/Singletons/InputBindings.h"
+#include "Core/Configuration.h"
+#include "Core/Logger.h"
+#include "Core/Managers/GameService.h"
+#include "Core/Managers/SceneManager.h"
+#include "Core/Modules/Control/Components/Command.h"
+#include "Core/Modules/Control/Components/CommandQueue.h"
+#include "Core/Modules/Control/Components/LifetimeOneFrame.h"
+#include "Core/Modules/Control/Components/PossessedByPlayer.h"
+#include "Core/Modules/Control/ControlModule.h"
+#include "Core/Modules/Control/Singletons/InputBindings.h"
+#include "Core/Modules/Physics/Components/Acceleration.h"
+#include "Core/Modules/Physics/Components/Friction.h"
+#include "Core/Modules/Physics/Components/Gravity.h"
+#include "Core/Modules/Physics/Components/Velocity.h"
+#include "Core/Modules/Physics/PhysicsModule.h"
+#include "Core/Modules/Render/Prefabs/Rectangle.h"
+#include "Core/Modules/Render/RenderModule.h"
 #include "Modules/ControlDemo/Components/MoveIntent.h"
 #include "Modules/ControlDemo/Components/PauseIntent.h"
+#include "Modules/ControlDemo/Components/ResumeIntent.h"
 #include "Modules/ControlDemo/Components/Target.h"
-#include "Modules/Physics/Components/Acceleration.h"
-#include "Modules/Physics/Components/Friction.h"
-#include "Modules/Physics/Components/Gravity.h"
-#include "Modules/Physics/Components/Velocity.h"
-#include "Modules/Physics/PhysicsModule.h"
-#include "Modules/Render/Prefabs/Rectangle.h"
-#include "Modules/Render/RenderModule.h"
 #include "PauseScene.h"
 
 
@@ -40,14 +42,17 @@ void ControllerDemoScene::Initialize()
     CreateUISystem(world);
     CreatePlayerEntity(world);
 
-    // Input System, translate Input -> Command Entities
-    world.system<const InputBindings>()
+    /**
+     * Input System, translate Input and spawn Command Entities in the game world.
+     */
+    world.system<const InputBindings>("InputSystem")
         .term_at(0)
         .singleton()
         .kind(flecs::PostLoad)
         .each(
-            [&](flecs::iter& it, size_t, const InputBindings& b)
+            [&](const flecs::iter& it, size_t, const InputBindings& b)
             {
+                // TODO: To remove this, I'll have to manage the ActiveScene, somehow.
                 if (!IsLoaded() || IsPaused())
                 {
                     return;
@@ -65,9 +70,11 @@ void ControllerDemoScene::Initialize()
 
                     LOG_DEBUG("(ControlModule::InputSystem): InputKey is activated, adding prefab.");
 
-                    // TODO: tell this entity to last only for 1 frame
+                    // TODO:
+                    //   - Add the Command as child_of the entity
+                    //   - Add a Seq number to guarantee the sequence of commands
                     q.each([&](flecs::entity e, const PossessedByPlayer& p)
-                           { it.world().entity().is_a(prefab).add<Target>().set<Target>({e}); });
+                           { it.world().entity().is_a(prefab).add<LifetimeOneFrame>().add<Target>().set<Target>({e}); });
                 }
             }
         );
@@ -109,6 +116,7 @@ void ControllerDemoScene::CreateMovementSystem(const flecs::world& world)
 
 void ControllerDemoScene::CreateUISystem(const flecs::world& world)
 {
+    // Query for PauseIntent and pause the Scene
     world.system<const PauseIntent>("PauseSystem")
         .each(
             [](const flecs::entity& cmd, const PauseIntent& p)
@@ -117,6 +125,20 @@ void ControllerDemoScene::CreateUISystem(const flecs::world& world)
                 auto& sceneManager = GameService::Get<SceneManager>();
                 sceneManager.GetScene<ControllerDemoScene>().Pause();
                 sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
+
+                // Destroy the command entity
+                cmd.destruct();
+            }
+        );
+
+    world.system<const ResumeIntent>("ResumeSystem")
+        .each(
+            [](const flecs::entity& cmd, const ResumeIntent& p)
+            {
+                LOG_DEBUG("(ControlModule::ResumeSystem): ResumeIntent");
+                auto& sceneManager = GameService::Get<SceneManager>();
+                sceneManager.UnloadScene<PauseScene>();
+                sceneManager.GetScene<ControllerDemoScene>().Resume();
 
                 // Destroy the command entity
                 cmd.destruct();

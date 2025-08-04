@@ -1,16 +1,16 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Modules/Render/RenderModule.h"
+#include "Core/Modules/Render/RenderModule.h"
 
-#include "Modules/Render/Components/CircleRenderable.h"
-#include "Modules/Render/Components/RectangleRenderable.h"
-#include "Modules/Render/Components/ShaderUniform.h"
-#include "Modules/Render/Components/ShaderUniforms.h"
-#include "Modules/Render/Components/SpriteRenderable.h"
-#include "Modules/Render/Components/TextRenderable.h"
-#include "Modules/Render/Components/Transform.h"
-#include "Modules/Render/Components/ZOrder.h"
-#include "Managers/GameService.h"
+#include "Core/Modules/Render/Components/CircleRenderable.h"
+#include "Core/Modules/Render/Components/RectangleRenderable.h"
+#include "Core/Modules/Render/Components/ShaderUniform.h"
+#include "Core/Modules/Render/Components/ShaderUniforms.h"
+#include "Core/Modules/Render/Components/SpriteRenderable.h"
+#include "Core/Modules/Render/Components/TextRenderable.h"
+#include "Core/Modules/Render/Components/Transform.h"
+#include "Core/Modules/Render/Components/ZOrder.h"
+#include "Core/Managers/GameService.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 

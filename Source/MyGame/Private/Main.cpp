@@ -4,18 +4,20 @@
 #include <tracy/Tracy.hpp>
 #endif
 
-#include "Configuration.h"
-#include "GameInstance.h"
-#include "GameStates/GameController.h"
-#include "Managers/AudioManager.h"
-#include "Managers/EventManager.h"
-#include "Managers/GameService.h"
-#include "Managers/ResourceManager.h"
-#include "Managers/SceneManager.h"
+#include "Core/Configuration.h"
+#include "Core/GameInstance.h"
+#include "Core/GameStates/GameController.h"
+#include "Core/Managers/AudioManager.h"
+#include "Core/Managers/EventManager.h"
+#include "Core/Managers/FileManager.h"
+#include "Core/Managers/GameService.h"
+#include "Core/Managers/ResourceManager.h"
+#include "Core/Managers/SceneManager.h"
 #include "MyGame.h"
 
 #include <SFML/Graphics.hpp>
 
+#include <nlohmann/json.hpp>
 
 /**
  * Entry point of the application. Initializes the necessary components, configures
@@ -28,18 +30,18 @@ int main()
 {
     ZoneScoped;
 
-    // Create the window mode
+    // --- Create the window mode ---
     const sf::VideoMode mode(Configuration::WINDOW_SIZE);
 
-    // Enable anti-aliasing
+    // --- Enable anti-aliasing ---
     sf::ContextSettings settings;
     settings.antiAliasingLevel = Configuration::ANTI_ALIASING_LEVEL;
 
     auto window = sf::RenderWindow(mode, Configuration::WINDOW_TITLE, Configuration::WINDOW_STYLE, Configuration::WINDOW_STATE, settings);
 
+    // --- Configure the window ---
     window.setFramerateLimit(Configuration::FRAMES_PER_SECOND);
     window.setVerticalSyncEnabled(Configuration::IS_VSYNC);
-
     window.setKeyRepeatEnabled(Configuration::ENABLE_KEY_REPEAT);
 
     GameService::Initialize();

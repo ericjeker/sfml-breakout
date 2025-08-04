@@ -1,0 +1,20 @@
+{
+  "Window": {
+    "Title": "Game Engine Using Flecs ECS",
+    "Size": [
+      1920,
+      1080
+    ],
+    "Style": "Close",
+    "State": "Windowed",
+    "FullScreen": false
+  },
+  "Render": {
+    "FPS": 60,
+    "VSync": true,
+    "AntiAliasingLevel": 8
+  },
+  "Input": {
+    "EnableKeyRepeat": false
+  }
+}

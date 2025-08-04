@@ -1,12 +1,12 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Modules/UI/Prefabs/Text.h"
+#include "Core/Modules/UI/Prefabs/Text.h"
 
-#include "Managers/GameService.h"
-#include "Managers/ResourceManager.h"
-#include "Modules/Render/Components/TextRenderable.h"
-#include "Modules/Render/Components/Transform.h"
-#include "Modules/Render/Components/ZOrder.h"
+#include "Core/Managers/GameService.h"
+#include "Core/Managers/ResourceManager.h"
+#include "Core/Modules/Render/Components/TextRenderable.h"
+#include "Core/Modules/Render/Components/Transform.h"
+#include "Core/Modules/Render/Components/ZOrder.h"
 
 namespace Prefabs
 {

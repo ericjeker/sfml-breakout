@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "GameStates/GameState.h"
+#include "Core/GameStates/GameState.h"
 
-#include "Logger.h"
+#include "Core/Logger.h"
 
 void GameState::Pause()
 {

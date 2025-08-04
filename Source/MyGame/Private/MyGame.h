@@ -4,15 +4,15 @@
 #ifndef MYGAME_H
 #define MYGAME_H
 
+#include "Core/GameInstance.h"
+#include "Core/GameStates/GameController.h"
+#include "Core/Managers/EventManager.h"
+#include "Core/Managers/GameService.h"
 #include "Events/ExitGame.h"
 #include "Events/NavigateToMainMenu.h"
 #include "Events/StartGame.h"
-#include "GameInstance.h"
-#include "GameStates/GameController.h"
 #include "GameStates/Gameplay/GameplayState.h"
 #include "GameStates/MainMenu/MainMenuState.h"
-#include "Managers/EventManager.h"
-#include "Managers/GameService.h"
 
 #include <functional>
 
@@ -24,16 +24,13 @@ public:
     void Shutdown() override;
 
 private:
-    EventListener<ExitGame> _exitGameListener = [this](const ExitGame& event, void* sender)
-    { RequestExit(); };
+    EventListener<ExitGame> _exitGameListener = [this](const ExitGame& event, void* sender) { RequestExit(); };
 
     EventListener<StartGame> _startGameListener = [](const StartGame& event, void* sender)
     { GameService::Get<GameController>().ChangeState(std::make_unique<GameplayState>()); };
 
     EventListener<NavigateToMainMenu> _returnToMainMenuListener = [](const NavigateToMainMenu& event, void* sender)
-    {
-        GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>());
-    };
+    { GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>()); };
 };
 
 

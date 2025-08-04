@@ -4,7 +4,7 @@
 #ifndef GRAVITY_H
 #define GRAVITY_H
 
-#include "PhysicsConstants.h"
+#include "Core/PhysicsConstants.h"
 
 
 struct Gravity

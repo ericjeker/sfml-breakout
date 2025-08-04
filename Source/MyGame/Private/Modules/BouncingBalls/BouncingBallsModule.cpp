@@ -2,10 +2,10 @@
 
 #include "BouncingBallsModule.h"
 
-#include "Configuration.h"
-#include "Modules/Physics/Components/Collider.h"
-#include "Modules/Physics/Components/Velocity.h"
-#include "Modules/Render/Components/Transform.h"
+#include "Core/Configuration.h"
+#include "Core/Modules/Physics/Components/Collider.h"
+#include "Core/Modules/Physics/Components/Velocity.h"
+#include "Core/Modules/Render/Components/Transform.h"
 
 
 namespace

@@ -6,16 +6,16 @@
 #include <tracy/Tracy.hpp>
 #endif
 
-#include "Configuration.h"
+#include "Core/Configuration.h"
+#include "Core/Modules/Physics/Components/GravitySettings.h"
+#include "Core/Modules/Physics/PhysicsModule.h"
+#include "Core/Modules/Render/Prefabs/Rectangle.h"
+#include "Core/Modules/Render/Prefabs/Sprite.h"
+#include "Core/Modules/Render/RenderModule.h"
+#include "Core/PhysicsConstants.h"
+#include "Core/Themes/Nord.h"
 #include "Modules/BouncingBalls/BouncingBallsModule.h"
 #include "Modules/BouncingBalls/Prefabs/Ball.h"
-#include "Modules/Physics/Components/GravitySettings.h"
-#include "Modules/Physics/PhysicsModule.h"
-#include "Modules/Render/Prefabs/Rectangle.h"
-#include "Modules/Render/Prefabs/Sprite.h"
-#include "Modules/Render/RenderModule.h"
-#include "PhysicsConstants.h"
-#include "Themes/Nord.h"
 
 #include <random>
 
