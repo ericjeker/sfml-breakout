@@ -15,9 +15,9 @@ public:
 
 private:
     static void CreateInputBindings(const flecs::world& world);
-    static void CreateMovementSystem(const flecs::world& world);
-    static void CreateUISystem(const flecs::world& world);
-    static void CreatePlayerEntity(const flecs::world& world);
+    void CreateMovementSystem(const flecs::world& world);
+    void CreateUISystem(const flecs::world& world);
+    void CreatePlayerEntity(const flecs::world& world);
 
 };
 

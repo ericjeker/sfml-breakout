@@ -67,7 +67,6 @@ void GameInstance::Update(const float deltaTime)
 {
     ZoneScoped;
     GameService::Get<GameController>().Update(deltaTime);
-    GameService::Get<SceneManager>().Update(deltaTime);
 }
 
 void GameInstance::RequestExit()

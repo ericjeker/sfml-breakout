@@ -6,6 +6,8 @@
 #include "Core/Logger.h"
 #include "Core/Managers/AudioManager.h"
 #include "Core/Managers/ResourceManager.h"
+#include "Core/Modules/Control/ControlModule.h"
+#include "Core/Modules/Physics/PhysicsModule.h"
 #include "Core/Modules/Render/RenderModule.h"
 #include "Core/Modules/UI/UIModule.h"
 #include "Events/NavigateToMainMenu.h"
@@ -20,13 +22,16 @@ void MyGame::Initialize()
 
     // --- Initialize the World with global systems and components ---
     // clang-format off
-    GetWorld().import<Modules::UIModule>();
-    GetWorld().import<Modules::RenderModule>();
+    auto& world = GetWorld();
+    world.import<Modules::UIModule>();
+    world.import<Modules::ControlModule>();
+    world.import<Modules::PhysicsModule>();
+    world.import<Modules::RenderModule>();
     // clang-format on
 
     // --- Load the Main Menu State ---
     LOG_DEBUG("(MyGame::Initialization): Load the Main Menu State");
-    GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>(GetWorld()));
+    GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>(world));
 
     // --- Start the main theme ---
     // GameService::Get<AudioManager>().PlayMusic("8mm");

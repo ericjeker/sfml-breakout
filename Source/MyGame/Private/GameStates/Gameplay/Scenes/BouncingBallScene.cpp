@@ -7,11 +7,10 @@
 #endif
 
 #include "Core/Configuration.h"
+#include "Core/Logger.h"
 #include "Core/Modules/Physics/Components/GravitySettings.h"
-#include "Core/Modules/Physics/PhysicsModule.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
 #include "Core/Modules/Render/Prefabs/Sprite.h"
-#include "Core/Modules/Render/RenderModule.h"
 #include "Core/PhysicsConstants.h"
 #include "Core/Themes/Nord.h"
 #include "Modules/BouncingBalls/BouncingBallsModule.h"
@@ -27,14 +26,14 @@ BouncingBallScene::BouncingBallScene(flecs::world& world)
 
 void BouncingBallScene::Initialize()
 {
+    Scene::Initialize();
+
     // --- Get the world and import the modules ---
-    auto& world = GetLocalWorld();
+    auto& world = GetWorld();
 
     // Clang Format is confused...
     // clang-format off
-    world.import<Modules::PhysicsModule>();
-    world.import<Modules::BouncingBallsModule>();
-    world.import<Modules::RenderModule>();
+    world.import<Modules::BouncingBallsModule>().child_of(GetRootEntity());
     // clang-format on
 
     world.set<GravitySettings>(
@@ -51,7 +50,8 @@ void BouncingBallScene::Initialize()
             .position = {0.f, 0.f},
             .zOrder = zOrder++,
         }
-    );
+    )
+        .child_of(GetRootEntity());
 
     // --- Create LOTTA balls ---
     CreateBalls(world, zOrder);
@@ -86,6 +86,7 @@ void BouncingBallScene::CreateBalls(const flecs::world& world, float zOrder)
                 .gravity = PhysicsConstants::NO_GRAVITY,
                 .friction = 0.f,
             }
-        );
+        )
+            .child_of(GetRootEntity());
     }
 }

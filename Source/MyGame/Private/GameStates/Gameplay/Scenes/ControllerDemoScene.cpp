@@ -16,9 +16,7 @@
 #include "Core/Modules/Physics/Components/Friction.h"
 #include "Core/Modules/Physics/Components/Gravity.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
-#include "Core/Modules/Physics/PhysicsModule.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
-#include "Core/Modules/Render/RenderModule.h"
 #include "Modules/ControlDemo/Components/MoveIntent.h"
 #include "Modules/ControlDemo/Components/PauseIntent.h"
 #include "Modules/ControlDemo/Components/ResumeIntent.h"
@@ -34,14 +32,10 @@ ControllerDemoScene::ControllerDemoScene(flecs::world& world)
 
 void ControllerDemoScene::Initialize()
 {
-    auto& world = GetLocalWorld();
+    Scene::Initialize();
+    LOG_DEBUG("(ControllerDemoScene:Initialize)");
 
-    // Clang Format is confused...
-    // clang-format off
-    world.import<Modules::ControlModule>();
-    world.import<Modules::PhysicsModule>();
-    world.import<Modules::RenderModule>();
-    // clang-format on
+    const auto& world = GetWorld();
 
     CreateInputBindings(world);
     CreateMovementSystem(world);
@@ -83,7 +77,7 @@ void ControllerDemoScene::Initialize()
                            { it.world().entity().is_a(prefab).add<LifetimeOneFrame>().add<Target>().set<Target>({e}); });
                 }
             }
-        );
+        ).child_of(GetRootEntity());
 }
 
 void ControllerDemoScene::CreateInputBindings(const flecs::world& world)
@@ -117,7 +111,7 @@ void ControllerDemoScene::CreateMovementSystem(const flecs::world& world)
                 // Destroy the command entity
                 cmd.destruct();
             }
-        );
+        ).child_of(GetRootEntity());
 }
 
 void ControllerDemoScene::CreateUISystem(const flecs::world& world)
@@ -135,7 +129,7 @@ void ControllerDemoScene::CreateUISystem(const flecs::world& world)
                 // Destroy the command entity
                 cmd.destruct();
             }
-        );
+        ).child_of(GetRootEntity());
 
     world.system<const ResumeIntent>("ResumeSystem")
         .each(
@@ -149,7 +143,7 @@ void ControllerDemoScene::CreateUISystem(const flecs::world& world)
                 // Destroy the command entity
                 cmd.destruct();
             }
-        );
+        ).child_of(GetRootEntity());
 }
 
 void ControllerDemoScene::CreatePlayerEntity(const flecs::world& world)
@@ -166,7 +160,7 @@ void ControllerDemoScene::CreatePlayerEntity(const flecs::world& world)
             .position = {CENTER_X, CENTER_Y},
             .zOrder = 0.f,
         }
-    );
+    ).child_of(GetRootEntity());
 
     entity.add<PossessedByPlayer>().set<CommandQueue>({});
     entity.set<Acceleration>({});

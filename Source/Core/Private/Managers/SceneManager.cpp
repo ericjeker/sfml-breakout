@@ -17,21 +17,6 @@ void SceneManager::UnloadAll()
     }
 }
 
-void SceneManager::Update(const float deltaTime)
-{
-    ZoneScopedN("SceneManager::Update");
-    for (const auto& typeIdx : _sceneOrder)
-    {
-        const auto& scene = _scenes.at(typeIdx);
-        if (!scene->IsLoaded())
-        {
-            continue;
-        }
-
-        scene->Update(deltaTime);
-    }
-}
-
 void SceneManager::HandleEvent(const std::optional<sf::Event>& event)
 {
     ZoneScopedN("SceneManager::HandleEvent");

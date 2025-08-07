@@ -21,7 +21,7 @@ void MainMenuState::Enter()
     auto& sceneManager = GameService::Get<SceneManager>();
     sceneManager.AddScene<MainMenuScene>(std::make_unique<MainMenuScene>(GetWorld()));
 
-    LOG_DEBUG("(MainMenuState::Enter): Loading MainMenuScene");
+    LOG_DEBUG("(MainMenuState::Enter): LoingBallSceneading MainMenuScene");
     sceneManager.LoadScene<MainMenuScene>(SceneLoadMode::Single);
 }
 

@@ -32,15 +32,13 @@ PauseScene::PauseScene(flecs::world& world)
 
 void PauseScene::Initialize()
 {
+    Scene::Initialize();
     LOG_DEBUG("(PauseScene:Initialize)");
+
     constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
     constexpr float CENTER_Y = Configuration::WINDOW_SIZE.y / 2;
 
-    auto& world = GetLocalWorld();
-    // Clang Format is confused...
-    // clang-format off
-    world.import<Modules::RenderModule>();
-    // clang-format on
+    const auto& world = GetWorld();
 
     float zOrder = 0.f;
 
@@ -55,7 +53,7 @@ void PauseScene::Initialize()
          .position = {0.f, 0.f},
          .scale = {1.f, 1.f},
          .rotation = 0.f}
-    );
+    ).child_of(GetRootEntity());
 
     // --- Add Pause Text ---
     Prefabs::Text::Create(
@@ -67,7 +65,7 @@ void PauseScene::Initialize()
          .origin = sf::Vector2f{0.5f, 0.5f},
          .position = {CENTER_X, CENTER_Y - 200},
          .zOrder = ++zOrder}
-    );
+    ).child_of(GetRootEntity());
 
     // --- Add Resume Button ---
     Prefabs::Button::Create(
@@ -82,7 +80,7 @@ void PauseScene::Initialize()
             .zOrder = ++zOrder,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<ResumeGame>({}, this); },
         }
-    );
+    ).child_of(GetRootEntity());
 
     // --- Add Exit Button ---
     Prefabs::Button::Create(
@@ -97,7 +95,7 @@ void PauseScene::Initialize()
             .zOrder = ++zOrder,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<NavigateToMainMenu>({}, this); },
         }
-    );
+    ).child_of(GetRootEntity());
 }
 
 void PauseScene::HandleEvent(const std::optional<sf::Event>& event)
@@ -116,7 +114,7 @@ void PauseScene::HandleEvent(const std::optional<sf::Event>& event)
 
         const sf::Vector2<float> mousePosition(mousePressed->position);
 
-        GetLocalWorld().each(
+        GetWorld().each(
             [&](const Interactable& interactable,
                 const Clickable& clickable,
                 const Transform& t,

@@ -32,12 +32,6 @@ void Scene::Shutdown()
     GetWorld().defer([&] { GetWorld().delete_with(flecs::ChildOf, GetRootEntity()); });
 }
 
-void Scene::Update(const float deltaTime)
-{
-    // Progress of the world by one tick.
-    GetLocalWorld().progress(deltaTime);
-}
-
 void Scene::HandleEvent(const std::optional<sf::Event>& event)
 {
 }
@@ -99,16 +93,6 @@ flecs::world& Scene::GetWorld()
 const flecs::world& Scene::GetWorld() const
 {
     return _world;
-}
-
-flecs::world& Scene::GetLocalWorld()
-{
-    return _localWorld;
-}
-
-const flecs::world& Scene::GetLocalWorld() const
-{
-    return _localWorld;
 }
 
 flecs::entity& Scene::GetRootEntity()

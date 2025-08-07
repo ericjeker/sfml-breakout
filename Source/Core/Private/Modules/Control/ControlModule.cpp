@@ -5,6 +5,7 @@
 #include "Core/Modules/Control/Components/CommandQueue.h"
 #include "Core/Modules/Control/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Control/Components/PossessedByPlayer.h"
+#include "Core/Modules/Control/Singletons/InputBindings.h"
 
 namespace
 {
@@ -27,6 +28,7 @@ ControlModule::ControlModule(const flecs::world& world)
     world.component<Command>();
     world.component<LifetimeOneFrame>();
 
+    world.singleton<InputBindings>();
 
     world.system<const LifetimeOneFrame>().each(DestroyEntity);
 }

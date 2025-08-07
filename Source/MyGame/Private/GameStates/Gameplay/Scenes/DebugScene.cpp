@@ -42,11 +42,7 @@ void DebugScene::Initialize()
 {
     Scene::Initialize();
 
-    auto& world = GetLocalWorld();
-
-    // clang-format off
-    world.import<Modules::RenderModule>();
-    // clang-format on
+    const auto& world = GetWorld();
 
     // --- Resources ---
     const flecs::entity& entity = Prefabs::Text::Create(
@@ -59,10 +55,10 @@ void DebugScene::Initialize()
             .origin = {0.f, 0.f},
             .position = {5.f, 5.f},
         }
-    );
+    ).child_of(GetRootEntity());
 
     // Tag the text so we can easily edit it
-    entity.add<FPS>();
+    entity.add<FPS>().child_of(GetRootEntity());
 
-    world.system<const TextRenderable, const FPS>().each(CalculateFPS);
+    world.system<const TextRenderable, const FPS>().each(CalculateFPS).child_of(GetRootEntity());
 }
