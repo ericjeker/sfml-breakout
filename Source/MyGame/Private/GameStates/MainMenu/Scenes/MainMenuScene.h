@@ -11,7 +11,7 @@
 class MainMenuScene final : public Scene
 {
 public:
-    explicit MainMenuScene(const flecs::world& world);
+    explicit MainMenuScene(flecs::world& world);
 
     void Initialize() override;
     void HandleEvent(const std::optional<sf::Event>& event) override;

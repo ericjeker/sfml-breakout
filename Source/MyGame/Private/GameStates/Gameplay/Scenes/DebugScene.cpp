@@ -32,7 +32,7 @@ void CalculateFPS(const flecs::iter& it, size_t, const TextRenderable& textRende
 
 } // namespace
 
-DebugScene::DebugScene(const flecs::world& world)
+DebugScene::DebugScene(flecs::world& world)
     : Scene(world)
 {
 }

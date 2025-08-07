@@ -4,7 +4,7 @@
 
 #include "Core/Logger.h"
 
-GameState::GameState(const flecs::world& world)
+GameState::GameState(flecs::world& world)
     : _world(world)
 {
 }
@@ -28,6 +28,11 @@ bool GameState::IsPaused() const
 
 void GameState::Update(float deltaTime)
 {
+}
+
+flecs::world& GameState::GetWorld()
+{
+    return _world;
 }
 
 const flecs::world& GameState::GetWorld() const

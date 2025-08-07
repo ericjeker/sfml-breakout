@@ -10,7 +10,7 @@
 class ControllerDemoScene final : public Scene
 {
 public:
-    explicit ControllerDemoScene(const flecs::world& world);
+    explicit ControllerDemoScene(flecs::world& world);
     void Initialize() override;
 
 private:

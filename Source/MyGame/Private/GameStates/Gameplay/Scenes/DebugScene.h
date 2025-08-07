@@ -14,7 +14,7 @@ struct FPS
 class DebugScene final : public Scene
 {
 public:
-    explicit DebugScene(const flecs::world& world);
+    explicit DebugScene(flecs::world& world);
     void Initialize() override;
 };
 

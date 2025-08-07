@@ -20,7 +20,7 @@
 #include <random>
 
 
-BouncingBallScene::BouncingBallScene(const flecs::world& world)
+BouncingBallScene::BouncingBallScene(flecs::world& world)
     : Scene(world)
 {
 }

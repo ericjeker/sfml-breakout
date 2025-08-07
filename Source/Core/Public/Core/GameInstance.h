@@ -30,10 +30,13 @@ public:
     void RequestExit();
     [[nodiscard]] bool ShouldExit() const;
 
-    virtual const flecs::world& GetWorld() const;
+    flecs::world& GetWorld();
+    [[nodiscard]] const flecs::world& GetWorld() const;
 
 private:
     bool _shouldExit = false;
+
+    // The Only World
     flecs::world _world;
 };
 

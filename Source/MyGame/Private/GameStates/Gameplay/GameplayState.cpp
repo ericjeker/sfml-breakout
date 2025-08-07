@@ -9,7 +9,7 @@
 #include "Scenes/DebugScene.h"
 #include "Scenes/PauseScene.h"
 
-GameplayState::GameplayState(const flecs::world& world)
+GameplayState::GameplayState(flecs::world& world)
     : GameState(world)
 {
 }

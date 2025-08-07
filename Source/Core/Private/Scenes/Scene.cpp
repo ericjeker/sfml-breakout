@@ -9,7 +9,7 @@
 #include "Core/Scenes/Scene.h"
 
 
-Scene::Scene(const flecs::world& world)
+Scene::Scene(flecs::world& world)
     : _world(world)
 {
 }
@@ -22,15 +22,14 @@ void Scene::Initialize()
 
 void Scene::Shutdown()
 {
-    LOG_DEBUG("(Scene:Shutdown): Delete root entity");
     if (GetRootEntity() == flecs::entity::null() || !GetWorld().exists(GetRootEntity()))
     {
+        LOG_DEBUG("(Scene:Shutdown): No root entity");
         return;
     }
 
-    GetWorld().defer([&] {
-        GetWorld().delete_with(flecs::ChildOf, GetRootEntity());
-    });
+    LOG_DEBUG("(Scene:Shutdown): Deferring root entity destruction");
+    GetWorld().defer([&] { GetWorld().delete_with(flecs::ChildOf, GetRootEntity()); });
 }
 
 void Scene::Update(const float deltaTime)

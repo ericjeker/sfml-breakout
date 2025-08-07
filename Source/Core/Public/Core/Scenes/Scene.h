@@ -24,11 +24,17 @@
 class Scene
 {
 public:
-    explicit Scene(const flecs::world& world);
+    explicit Scene(flecs::world& world);
     virtual ~Scene() = default;
 
     virtual void Initialize();
+
+    /**
+     * When the Scene is shutdown, the root entity is deleted, which deletes
+     * all the child entities from the world.
+     */
     virtual void Shutdown();
+
     virtual void Update(float deltaTime);
     virtual void HandleEvent(const std::optional<sf::Event>& event);
 
@@ -50,22 +56,23 @@ public:
      * Temporarily we are going to have two worlds here until the refactoring is finished.
      */
     flecs::world& GetWorld();
-    const flecs::world& GetWorld() const;
+    [[nodiscard]] const flecs::world& GetWorld() const;
 
     flecs::world& GetLocalWorld();
-    const flecs::world& GetLocalWorld() const;
+    [[nodiscard]] const flecs::world& GetLocalWorld() const;
 
     flecs::entity& GetRootEntity();
-    const flecs::entity& GetRootEntity() const;
+    [[nodiscard]] const flecs::entity& GetRootEntity() const;
 
 private:
     std::string _name;
     std::string _path;
 
     // Flecs entities for singletons
-    flecs::world _world{};
-    flecs::world _localWorld{};
-    flecs::entity _rootEntity{};
+    flecs::world& _world;
+    flecs::entity _rootEntity;
+    // TODO: ultimately remove the local world
+    flecs::world _localWorld;
 
     bool _isLoaded = false;
     bool _isPaused = false;

@@ -11,35 +11,29 @@
 #include "Core/Modules/Render/Components/TextRenderable.h"
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
-#include "Core/Modules/Render/RenderModule.h"
 #include "Core/Modules/UI/Components/Clickable.h"
 #include "Core/Modules/UI/Components/EventTrigger.h"
 #include "Core/Modules/UI/Components/Interactable.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
-#include "Core/Modules/UI/UIModule.h"
 #include "Core/Themes/Nord.h"
 #include "Events/ExitGame.h"
 #include "Events/StartGame.h"
 
 
-MainMenuScene::MainMenuScene(const flecs::world& world)
+MainMenuScene::MainMenuScene(flecs::world& world)
     : Scene(world)
 {
 }
 
 void MainMenuScene::Initialize()
 {
-    LOG_DEBUG("(MainMenuScene:Initialize)");
+    Scene::Initialize();
+
     constexpr float centerX = Configuration::WINDOW_SIZE.x / 2;
     constexpr float centerY = Configuration::WINDOW_SIZE.y / 2;
 
-    auto& world = GetLocalWorld();
-    // clang-format off
-    world.import<Modules::UIModule>();
-    world.import<Modules::RenderModule>();
-    // clang-format on
-
+    const auto& world = GetWorld();
     float zOrder = 0;
 
     // --- Create Background ---
@@ -51,7 +45,8 @@ void MainMenuScene::Initialize()
             .position = {0.f, 0.f},
             .zOrder = zOrder++,
         }
-    );
+    )
+        .child_of(GetRootEntity());
 
     // --- Add Title ---
     Prefabs::Text::Create(
@@ -63,7 +58,8 @@ void MainMenuScene::Initialize()
          .origin = sf::Vector2f{0.5f, 0.5f},
          .position = {centerX, centerY - 200},
          .zOrder = zOrder++}
-    );
+    )
+        .child_of(GetRootEntity());
 
     // --- Add Play Button ---
     Prefabs::Button::Create(
@@ -78,7 +74,8 @@ void MainMenuScene::Initialize()
             .zOrder = zOrder++,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<StartGame>({}, this); },
         }
-    );
+    )
+        .child_of(GetRootEntity());
 
     // --- Add Exit Button ---
     Prefabs::Button::Create(
@@ -93,7 +90,8 @@ void MainMenuScene::Initialize()
             .zOrder = zOrder++,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<ExitGame>({}, this); },
         }
-    );
+    )
+        .child_of(GetRootEntity());
 }
 
 void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
@@ -112,7 +110,7 @@ void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
 
         const sf::Vector2<float> mousePosition(mousePressed->position);
 
-        GetLocalWorld().each(
+        GetWorld().each(
             [&](const Interactable& interactable,
                 const Clickable& clickable,
                 const Transform& t,

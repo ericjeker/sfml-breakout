@@ -1,13 +1,10 @@
 // Copyright (c) Eric Jeker 2025.
-#ifdef TRACY_ENABLE
-#include <tracy/Tracy.hpp>
-#endif
-
 #include "Core/Managers/SceneManager.h"
 
 #include <SFML/Graphics/Font.hpp>
 
 #include <ranges>
+#include <tracy/Tracy.hpp>
 
 void SceneManager::UnloadAll()
 {

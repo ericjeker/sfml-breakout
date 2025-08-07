@@ -14,7 +14,7 @@
 class GameState
 {
 public:
-    explicit GameState(const flecs::world& world);
+    explicit GameState(flecs::world& world);
     virtual ~GameState() = default;
 
     virtual void Enter() = 0;
@@ -27,11 +27,12 @@ public:
     virtual void Update(float deltaTime);
     virtual void HandleEvent(const std::optional<sf::Event>& event) = 0;
 
+    flecs::world& GetWorld();
     const flecs::world& GetWorld() const;
 
 private:
     bool _paused = false;
-    const flecs::world& _world;
+    flecs::world& _world;
 };
 
 

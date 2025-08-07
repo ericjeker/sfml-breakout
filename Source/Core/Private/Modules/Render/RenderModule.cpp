@@ -2,6 +2,7 @@
 
 #include "Core/Modules/Render/RenderModule.h"
 
+#include "Core/Managers/GameService.h"
 #include "Core/Modules/Render/Components/CircleRenderable.h"
 #include "Core/Modules/Render/Components/RectangleRenderable.h"
 #include "Core/Modules/Render/Components/ShaderUniform.h"
@@ -10,7 +11,6 @@
 #include "Core/Modules/Render/Components/TextRenderable.h"
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Modules/Render/Components/ZOrder.h"
-#include "Core/Managers/GameService.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -103,6 +103,47 @@ struct RenderableEntry
     flecs::entity entity;
 };
 
+void Render(const flecs::iter& it)
+{
+    ZoneScopedN("RenderModule::Render");
+
+    std::vector<RenderableEntry> renderables;
+
+    // Collect all the renderable entities
+    it.world().each([&](const flecs::entity e, const Transform& t, const SpriteRenderable& s, const ZOrder& zOrder)
+                    { renderables.push_back({zOrder.zOrder, e}); });
+    it.world().each([&](const flecs::entity e, const Transform& t, const CircleRenderable& c, const ZOrder& zOrder)
+                    { renderables.push_back({zOrder.zOrder, e}); });
+    it.world().each([&](const flecs::entity e, const Transform& t, const RectangleRenderable& r, const ZOrder& zOrder)
+                    { renderables.push_back({zOrder.zOrder, e}); });
+    it.world().each([&](const flecs::entity e, const Transform& t, const TextRenderable& text, const ZOrder& zOrder)
+                    { renderables.push_back({zOrder.zOrder, e}); });
+
+    // Sort the collected renderable entities by their ZOrder value
+    std::ranges::sort(renderables, [](const RenderableEntry& a, const RenderableEntry& b) { return a.zOrder < b.zOrder; });
+
+    // Iterate through the sorted queue and draw each entity
+    for (const auto& [zOrder, entity] : renderables)
+    {
+        if (const flecs::entity currentEntity = entity; currentEntity.has<SpriteRenderable>())
+        {
+            RenderSprite(currentEntity.get<SpriteRenderable>());
+        }
+        else if (currentEntity.has<CircleRenderable>())
+        {
+            RenderCircleShape(currentEntity.get<CircleRenderable>());
+        }
+        else if (currentEntity.has<RectangleRenderable>())
+        {
+            RenderRectangleShape(currentEntity.get<RectangleRenderable>());
+        }
+        else if (currentEntity.has<TextRenderable>())
+        {
+            RenderText(currentEntity.get<TextRenderable>());
+        }
+    }
+}
+
 } // namespace
 
 namespace Modules
@@ -121,62 +162,13 @@ RenderModule::RenderModule(const flecs::world& world)
     world.component<ShaderUniforms>();
 
     world.system<const Transform, CircleRenderable>("ApplyTransformToCircle").kind(flecs::PreStore).each(ApplyTransformToCircle);
-    world.system<const Transform, RectangleRenderable>("ApplyTransformToRectangle").kind(flecs::PreStore).each(ApplyTransformToRectangle);
+    world.system<const Transform, RectangleRenderable>("ApplyTransformToRectangle")
+        .kind(flecs::PreStore)
+        .each(ApplyTransformToRectangle);
     world.system<const Transform, SpriteRenderable>("ApplyTransformToSprite").kind(flecs::PreStore).each(ApplyTransformToSprite);
 
-    // Renderers
-    // world.system<const RectangleRenderable>("RectangleRenderable").kind(flecs::OnStore).each(RenderRectangleShape);
-    // world.system<const CircleRenderable>("CircleRenderable").kind(flecs::OnStore).each(RenderCircleShape);
-    // world.system<const TextRenderable>("TextRenderable").kind(flecs::OnStore).each(RenderText);
-    // world.system<const SpriteRenderable>("SpriteRenderable").kind(flecs::OnStore).each(RenderSprite);
-    // world.system<const ShaderRenderable>("ShaderRenderable").kind(flecs::OnStore).each(RenderShader);
-
-    world.system()
-        .kind(flecs::OnStore)
-        .run(
-            [](const flecs::iter& it)
-            {
-                ZoneScopedN("RenderModule::Render");
-
-                std::vector<RenderableEntry> renderables;
-
-                it.world().each([&](const flecs::entity e, const Transform& t, const SpriteRenderable& s, const ZOrder& zOrder
-                                ) { renderables.push_back({zOrder.zOrder, e}); });
-                it.world().each([&](const flecs::entity e, const Transform& t, const CircleRenderable& c, const ZOrder& zOrder
-                                ) { renderables.push_back({zOrder.zOrder, e}); });
-                it.world().each([&](const flecs::entity e, const Transform& t, const RectangleRenderable& r, const ZOrder& zOrder
-                                ) { renderables.push_back({zOrder.zOrder, e}); });
-                it.world().each([&](const flecs::entity e, const Transform& t, const TextRenderable& text, const ZOrder& zOrder
-                                ) { renderables.push_back({zOrder.zOrder, e}); });
-
-                // Sort the collected renderable entities by their ZOrder value
-                std::ranges::sort(
-                    renderables,
-                    [](const RenderableEntry& a, const RenderableEntry& b) { return a.zOrder < b.zOrder; }
-                );
-
-                // Iterate through the sorted queue and draw each entity
-                for (const auto& [zOrder, entity] : renderables)
-                {
-                    if (flecs::entity const currentEntity = entity; currentEntity.has<SpriteRenderable>())
-                    {
-                        RenderSprite(currentEntity.get<SpriteRenderable>());
-                    }
-                    else if (currentEntity.has<CircleRenderable>())
-                    {
-                        RenderCircleShape(currentEntity.get<CircleRenderable>());
-                    }
-                    else if (currentEntity.has<RectangleRenderable>())
-                    {
-                        RenderRectangleShape(currentEntity.get<RectangleRenderable>());
-                    }
-                    else if (currentEntity.has<TextRenderable>())
-                    {
-                        RenderText(currentEntity.get<TextRenderable>());
-                    }
-                }
-            }
-        );
+    // Render all the Renderable Components
+    world.system().kind(flecs::OnStore).run(Render);
 }
 
 } // namespace Modules

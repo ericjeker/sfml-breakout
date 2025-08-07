@@ -16,7 +16,7 @@
 class GameplayState final : public GameState
 {
 public:
-    explicit GameplayState(const flecs::world& world);
+    explicit GameplayState(flecs::world& world);
     void Enter() override;
     void Exit() override;
 

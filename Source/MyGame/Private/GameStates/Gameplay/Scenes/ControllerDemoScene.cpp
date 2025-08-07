@@ -26,7 +26,7 @@
 #include "PauseScene.h"
 
 
-ControllerDemoScene::ControllerDemoScene(const flecs::world& world)
+ControllerDemoScene::ControllerDemoScene(flecs::world& world)
     : Scene(world)
 {
 }

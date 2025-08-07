@@ -8,7 +8,7 @@
 #include "Core/Managers/SceneManager.h"
 #include "Scenes/MainMenuScene.h"
 
-MainMenuState::MainMenuState(const flecs::world& world)
+MainMenuState::MainMenuState(flecs::world& world)
     : GameState(world)
 {
 }

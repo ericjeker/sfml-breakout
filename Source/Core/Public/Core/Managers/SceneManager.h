@@ -4,8 +4,8 @@
 #ifndef SCENEMANAGER_H
 #define SCENEMANAGER_H
 
-#include "ResourceManager.h"
 #include "Core/Scenes/Scene.h"
+#include "ResourceManager.h"
 
 #include <memory>
 #include <typeindex>
@@ -45,7 +45,6 @@ public:
 
         _sceneOrder.push_back(typeIndex);
         _scenes[typeIndex] = std::move(scene);
-        _scenes[typeIndex]->Initialize();
     }
 
     template <typename T>
@@ -84,6 +83,7 @@ public:
         {
             LOG_DEBUG("(SceneManager::LoadScene): Loading scene " + std::string(typeid(T).name()) + ".");
             it->second->SetLoaded(true);
+            it->second->Initialize();
         }
     }
 

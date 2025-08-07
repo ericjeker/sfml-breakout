@@ -19,16 +19,6 @@ FetchContent_Declare(SFML
         SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-# --- YAML ---
-FetchContent_Declare(yaml-cpp
-        GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-        GIT_TAG 0.8.0
-        GIT_SHALLOW ON
-        EXCLUDE_FROM_ALL
-        SYSTEM
-)
-FetchContent_MakeAvailable(yaml-cpp)
-
 # --- JSON Processing ---
 FetchContent_Declare(
         json
@@ -55,7 +45,6 @@ target_link_libraries(Vendor INTERFACE
         SFML::System
         SFML::Audio
         nlohmann_json::nlohmann_json
-        yaml-cpp
         Tracy::TracyClient
         flecs::flecs_static
 )

@@ -12,7 +12,7 @@
 class BouncingBallScene final : public Scene
 {
 public:
-    explicit BouncingBallScene(const flecs::world& world);
+    explicit BouncingBallScene(flecs::world& world);
     void Initialize() override;
 
 private:

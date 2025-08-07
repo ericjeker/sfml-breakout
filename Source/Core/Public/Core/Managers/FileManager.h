@@ -5,17 +5,15 @@
 
 #include <nlohmann/json_fwd.hpp>
 #include <string>
-#include <yaml-cpp/node/node.h>
 
 using json = nlohmann::json;
-using yaml = YAML::Node;
 
 namespace FileManager
 {
 
 json LoadJSON(const std::string& filePath);
-yaml LoadYAML(const std::string& filePath);
-}; // namespace FileManager
+
+}
 
 
 #endif // FILEMANAGER_H

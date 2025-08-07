@@ -24,7 +24,7 @@
 #include <SFML/Graphics/Text.hpp>
 
 
-PauseScene::PauseScene(const flecs::world& world)
+PauseScene::PauseScene(flecs::world& world)
     : Scene(world)
 {
 }

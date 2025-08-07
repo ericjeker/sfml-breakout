@@ -44,6 +44,7 @@ int main()
     window.setVerticalSyncEnabled(Configuration::IS_VSYNC);
     window.setKeyRepeatEnabled(Configuration::ENABLE_KEY_REPEAT);
 
+    // --- Initialize the Game Service Locator ---
     GameService::Initialize();
     // We register the SFML window as a reference, so it's easy to access it
     GameService::Register<sf::RenderWindow>(window);
@@ -54,16 +55,17 @@ int main()
     GameService::Register<EventManager>(std::make_unique<EventManager>());
     // TODO: NetworkManager
 
-    // Create the game instance
+    // --- Create the game instance ---
     LOG_DEBUG("(Main::main): Creating the GameInstance");
     MyGame gameInstance{};
 
-    // Register the game instance as a service
+    // --- Register the game instance as a service ---
     GameService::Register<GameInstance>(gameInstance);
 
     gameInstance.Initialize();
     gameInstance.Run(window);
     gameInstance.Shutdown();
+
     LOG_DEBUG("(Main::main): Bye bye!");
 
     return 0;

@@ -80,6 +80,11 @@ bool GameInstance::ShouldExit() const
     return _shouldExit;
 }
 
+flecs::world& GameInstance::GetWorld()
+{
+    return _world;
+}
+
 const flecs::world& GameInstance::GetWorld() const
 {
     return _world;
