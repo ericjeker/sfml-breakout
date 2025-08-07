@@ -6,6 +6,8 @@
 #include "Core/Logger.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
+#include "Core/Modules/UI/Components/MouseReleased.h"
+#include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 #include "Scenes/MainMenuScene.h"
 
 MainMenuState::MainMenuState(flecs::world& world)
@@ -39,6 +41,15 @@ void MainMenuState::HandleEvent(const std::optional<sf::Event>& event)
         if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
         {
             GameService::Get<GameInstance>().RequestExit();
+        }
+    }
+    else if (auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>())
+    {
+        if (mouseReleased->button == sf::Mouse::Button::Left)
+        {
+            GetWorld().entity().is_a<MouseReleasedEvent>().set<MouseReleased>(
+                {.position = mouseReleased->position, .button = mouseReleased->button}
+            );
         }
     }
 }

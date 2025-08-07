@@ -2,19 +2,33 @@
 
 #include "Core/Modules/UI/UIModule.h"
 
+#include "Core/Managers/GameService.h"
+#include "Core/Modules/Control/Components/LifetimeOneFrame.h"
+#include "Core/Modules/Render/Components/Size.h"
 #include "Core/Modules/Render/Components/TextRenderable.h"
+#include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Modules/UI/Components/ButtonBackground.h"
 #include "Core/Modules/UI/Components/ButtonText.h"
 #include "Core/Modules/UI/Components/Clickable.h"
+#include "Core/Modules/UI/Components/EventTrigger.h"
 #include "Core/Modules/UI/Components/Hoverable.h"
 #include "Core/Modules/UI/Components/Interactable.h"
+#include "Core/Modules/UI/Components/MousePosition.h"
+#include "Core/Modules/UI/Components/MousePressed.h"
+#include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
+#include "Core/Modules/UI/Prefabs/MousePressedEvent.h"
+#include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 
 namespace Modules
 {
 
 UIModule::UIModule(const flecs::world& world)
 {
+    // --- Declare Prefabs ---
+    world.prefab<MousePressedEvent>().add<LifetimeOneFrame>().add<MousePressed>();
+    world.prefab<MouseReleasedEvent>().add<LifetimeOneFrame>().add<MouseReleased>();
+
     // --- Declare Components ---
     world.component<ButtonBackground>();
     world.component<ButtonText>();
@@ -22,6 +36,62 @@ UIModule::UIModule(const flecs::world& world)
     world.component<Hoverable>();
     world.component<Interactable>();
     world.component<TextRenderable>();
+
+    // --- Declare Singletons ---
+    world.singleton<MousePosition>();
+
+    world.system("UIInputSystem")
+        .kind(flecs::PostLoad)
+        .run(
+            [](const flecs::iter& it)
+            {
+                const auto& renderWindow = GameService::Get<sf::RenderWindow>();
+                const auto pos = sf::Mouse::getPosition(renderWindow);
+                it.world().set<MousePosition>({.position = pos});
+            }
+        );
+
+
+    world.system<const MouseReleased>("UIHitTest")
+        .kind(flecs::PreUpdate)
+        .each(
+            [&](const flecs::iter& it, size_t index, const MouseReleased& mouseReleased)
+            {
+                // We have a mouseReleased event. Now, find any clickable entities that were hit.
+                if (mouseReleased.button != sf::Mouse::Button::Left)
+                {
+                    return;
+                }
+
+                // Query the world for all entities that are Clickable and have the necessary components
+                it.world().query<const Clickable, const EventTrigger, const Transform, const Size>().each(
+                    [&](const Clickable& clickable, const EventTrigger& eventTrigger, const Transform& t, const Size& s)
+                    {
+                        sf::FloatRect bounds;
+                        bounds.size = s.size;
+                        bounds.position = t.position;
+
+                        LOG_DEBUG(
+                            std::format(
+                                "(MainMenuScene) Mouse pos: ({}, {}), Bounds: pos({}, {}), size({}, {})",
+                                mouseReleased.position.x,
+                                mouseReleased.position.y,
+                                bounds.position.x,
+                                bounds.position.y,
+                                bounds.size.x,
+                                bounds.size.y
+                            )
+                        );
+
+                        if (bounds.contains(sf::Vector2f(mouseReleased.position)))
+                        {
+                            // The mouse press hit this clickable entity
+                            eventTrigger.callback();
+                        }
+                    }
+                );
+            }
+        );
 }
 
 } // namespace Modules

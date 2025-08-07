@@ -6,15 +6,12 @@
 
 #include "Core/Scenes/Scene.h"
 
-#include <SFML/Graphics/Text.hpp>
-
 class MainMenuScene final : public Scene
 {
 public:
     explicit MainMenuScene(flecs::world& world);
 
     void Initialize() override;
-    void HandleEvent(const std::optional<sf::Event>& event) override;
 };
 
 

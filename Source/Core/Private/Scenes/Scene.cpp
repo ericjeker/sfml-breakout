@@ -6,6 +6,7 @@
 
 #include "Core/Logger.h"
 #include "Core/Managers/GameService.h"
+#include "Core/Modules/Scene/Components/ScenePaused.h"
 #include "Core/Scenes/Scene.h"
 
 
@@ -18,6 +19,7 @@ void Scene::Initialize()
 {
     LOG_DEBUG("(Scene:Initialize): Create a the root entity");
     _rootEntity = GetWorld().entity();
+    _rootEntity.add<ScenePaused>().disable<ScenePaused>();
 }
 
 void Scene::Shutdown()
@@ -54,15 +56,13 @@ bool Scene::IsPaused() const
 void Scene::Pause()
 {
     _isPaused = true;
-    // GetRootEntity().disable();
-    // GetLocalWorld().entity(flecs::OnUpdate).disable();
+    GetRootEntity().enable<ScenePaused>();
 }
 
 void Scene::Resume()
 {
     _isPaused = false;
-    // GetRootEntity().enable();
-    // GetLocalWorld().entity(flecs::OnUpdate).enable();
+    GetRootEntity().disable<ScenePaused>();
 }
 
 const std::string& Scene::GetName() const

@@ -14,6 +14,8 @@
 #include "Core/Modules/UI/Components/Clickable.h"
 #include "Core/Modules/UI/Components/EventTrigger.h"
 #include "Core/Modules/UI/Components/Interactable.h"
+#include "Core/Modules/UI/Components/MousePosition.h"
+#include "Core/Modules/UI/Components/MousePressed.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
@@ -29,11 +31,13 @@ MainMenuScene::MainMenuScene(flecs::world& world)
 void MainMenuScene::Initialize()
 {
     Scene::Initialize();
+    LOG_DEBUG("(MainMenuScene:Initialize)");
 
     constexpr float centerX = Configuration::WINDOW_SIZE.x / 2;
     constexpr float centerY = Configuration::WINDOW_SIZE.y / 2;
 
     const auto& world = GetWorld();
+
     float zOrder = 0;
 
     // --- Create Background ---
@@ -92,40 +96,5 @@ void MainMenuScene::Initialize()
         }
     )
         .child_of(GetRootEntity());
-}
 
-void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
-{
-    if (!IsLoaded() || IsPaused())
-    {
-        return;
-    }
-
-    if (const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>())
-    {
-        if (mousePressed->button != sf::Mouse::Button::Left)
-        {
-            return;
-        }
-
-        const sf::Vector2<float> mousePosition(mousePressed->position);
-
-        GetWorld().each(
-            [&](const Interactable& interactable,
-                const Clickable& clickable,
-                const Transform& t,
-                const Size& s,
-                const EventTrigger& eventTrigger)
-            {
-                sf::FloatRect bounds;
-                bounds.size = s.size;
-                bounds.position = t.position;
-
-                if (bounds.contains(mousePosition))
-                {
-                    eventTrigger.callback();
-                }
-            }
-        );
-    }
 }

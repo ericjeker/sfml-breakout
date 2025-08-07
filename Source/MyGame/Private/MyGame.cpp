@@ -9,6 +9,7 @@
 #include "Core/Modules/Control/ControlModule.h"
 #include "Core/Modules/Physics/PhysicsModule.h"
 #include "Core/Modules/Render/RenderModule.h"
+#include "Core/Modules/Scene/SceneModule.h"
 #include "Core/Modules/UI/UIModule.h"
 #include "Events/NavigateToMainMenu.h"
 #include "Events/StartGame.h"
@@ -23,6 +24,7 @@ void MyGame::Initialize()
     // --- Initialize the World with global systems and components ---
     // clang-format off
     auto& world = GetWorld();
+    world.import<Modules::SceneModule>();
     world.import<Modules::UIModule>();
     world.import<Modules::ControlModule>();
     world.import<Modules::PhysicsModule>();

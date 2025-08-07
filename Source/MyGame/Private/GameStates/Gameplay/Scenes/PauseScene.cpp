@@ -14,7 +14,9 @@
 #include "Core/Modules/UI/Components/Clickable.h"
 #include "Core/Modules/UI/Components/EventTrigger.h"
 #include "Core/Modules/UI/Components/Interactable.h"
+#include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
+#include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
 #include "Events/NavigateToMainMenu.h"
@@ -53,7 +55,8 @@ void PauseScene::Initialize()
          .position = {0.f, 0.f},
          .scale = {1.f, 1.f},
          .rotation = 0.f}
-    ).child_of(GetRootEntity());
+    )
+        .child_of(GetRootEntity());
 
     // --- Add Pause Text ---
     Prefabs::Text::Create(
@@ -65,7 +68,8 @@ void PauseScene::Initialize()
          .origin = sf::Vector2f{0.5f, 0.5f},
          .position = {CENTER_X, CENTER_Y - 200},
          .zOrder = ++zOrder}
-    ).child_of(GetRootEntity());
+    )
+        .child_of(GetRootEntity());
 
     // --- Add Resume Button ---
     Prefabs::Button::Create(
@@ -80,7 +84,8 @@ void PauseScene::Initialize()
             .zOrder = ++zOrder,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<ResumeGame>({}, this); },
         }
-    ).child_of(GetRootEntity());
+    )
+        .child_of(GetRootEntity());
 
     // --- Add Exit Button ---
     Prefabs::Button::Create(
@@ -95,7 +100,8 @@ void PauseScene::Initialize()
             .zOrder = ++zOrder,
             .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<NavigateToMainMenu>({}, this); },
         }
-    ).child_of(GetRootEntity());
+    )
+        .child_of(GetRootEntity());
 }
 
 void PauseScene::HandleEvent(const std::optional<sf::Event>& event)
@@ -105,31 +111,15 @@ void PauseScene::HandleEvent(const std::optional<sf::Event>& event)
         return;
     }
 
-    if (const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>())
+    if (const auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>())
     {
-        if (mousePressed->button != sf::Mouse::Button::Left)
+        if (mouseReleased->button != sf::Mouse::Button::Left)
         {
             return;
         }
 
-        const sf::Vector2<float> mousePosition(mousePressed->position);
-
-        GetWorld().each(
-            [&](const Interactable& interactable,
-                const Clickable& clickable,
-                const Transform& t,
-                const Size& s,
-                const EventTrigger& eventTrigger)
-            {
-                sf::FloatRect bounds;
-                bounds.size = s.size;
-                bounds.position = t.position;
-
-                if (bounds.contains(mousePosition))
-                {
-                    eventTrigger.callback();
-                }
-            }
+        GetWorld().entity().is_a<MouseReleasedEvent>().set<MouseReleased>(
+            {.position = mouseReleased->position, .button = mouseReleased->button}
         );
     }
 }
