@@ -23,9 +23,7 @@ public:
      * @param renderWindow
      */
     void Run(sf::RenderWindow& renderWindow) const;
-
     static void HandleEvents(sf::RenderWindow& renderWindow);
-    static void Update(float deltaTime);
 
     void RequestExit();
     [[nodiscard]] bool ShouldExit() const;

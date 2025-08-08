@@ -41,16 +41,6 @@ void GameController::ChangeState(std::unique_ptr<GameState> state)
     _stateStack.top()->Enter();
 }
 
-void GameController::Update(const float deltaTime)
-{
-    if (_stateStack.empty())
-    {
-        return;
-    }
-
-    _stateStack.top()->Update(deltaTime);
-}
-
 void GameController::HandleEvent(const std::optional<sf::Event>& event)
 {
     if (_stateStack.empty())

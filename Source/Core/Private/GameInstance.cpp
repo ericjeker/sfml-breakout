@@ -23,13 +23,11 @@ void GameInstance::Run(sf::RenderWindow& renderWindow) const
 
         const float deltaTime = clock.restart().asSeconds();
 
-        // Call Hierarchy: GameInstance -> GameController -> GameState
-        //                              -> SceneManager -> Scene -> Systems -> Components
+        // Event-Based Input System
         HandleEvents(renderWindow);
 
+        // Progresses the world
         renderWindow.clear();
-        Update(deltaTime);
-        // Progress of the world by one tick.
         GetWorld().progress(deltaTime);
         renderWindow.display();
 
@@ -61,12 +59,6 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
         GameService::Get<GameController>().HandleEvent(event);
         GameService::Get<SceneManager>().HandleEvent(event);
     }
-}
-
-void GameInstance::Update(const float deltaTime)
-{
-    ZoneScoped;
-    GameService::Get<GameController>().Update(deltaTime);
 }
 
 void GameInstance::RequestExit()

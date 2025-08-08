@@ -24,11 +24,10 @@ public:
     virtual void Resume();
     [[nodiscard]] bool IsPaused() const;
 
-    virtual void Update(float deltaTime);
-    virtual void HandleEvent(const std::optional<sf::Event>& event) = 0;
+    virtual void HandleEvent(const std::optional<sf::Event>& event);
 
     flecs::world& GetWorld();
-    const flecs::world& GetWorld() const;
+    [[nodiscard]] const flecs::world& GetWorld() const;
 
 private:
     bool _paused = false;

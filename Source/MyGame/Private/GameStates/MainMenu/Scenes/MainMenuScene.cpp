@@ -3,6 +3,7 @@
 #include "MainMenuScene.h"
 
 #include "Core/Configuration.h"
+#include "Core/GameInstance.h"
 #include "Core/Logger.h"
 #include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
@@ -16,7 +17,9 @@
 #include "Core/Modules/UI/Components/Interactable.h"
 #include "Core/Modules/UI/Components/MousePosition.h"
 #include "Core/Modules/UI/Components/MousePressed.h"
+#include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
+#include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
 #include "Events/ExitGame.h"
@@ -97,4 +100,24 @@ void MainMenuScene::Initialize()
     )
         .child_of(GetRootEntity());
 
+}
+
+void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
+{
+    if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+    {
+        if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
+        {
+            GameService::Get<GameInstance>().RequestExit();
+        }
+    }
+    else if (const auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>())
+    {
+        if (mouseReleased->button == sf::Mouse::Button::Left)
+        {
+            GetWorld().entity().is_a<MouseReleasedEvent>().set<MouseReleased>(
+                {.position = mouseReleased->position, .button = mouseReleased->button}
+            );
+        }
+    }
 }

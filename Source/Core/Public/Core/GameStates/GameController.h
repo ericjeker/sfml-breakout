@@ -28,11 +28,12 @@
 class GameController
 {
 public:
+    // State stack management
     void PushState(std::unique_ptr<GameState> state);
     void PopState();
     void ChangeState(std::unique_ptr<GameState> state);
 
-    void Update(float deltaTime);
+    // Delegate event handling to the current top state
     void HandleEvent(const std::optional<sf::Event>& event);
 
 private:

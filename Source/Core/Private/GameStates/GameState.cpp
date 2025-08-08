@@ -26,7 +26,7 @@ bool GameState::IsPaused() const
     return _paused;
 }
 
-void GameState::Update(float deltaTime)
+void GameState::HandleEvent(const std::optional<sf::Event>& event)
 {
 }
 
