@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef ANIMATIONSTATECOMPONENT_H
-#define ANIMATIONSTATECOMPONENT_H
+
+
 #include "Scenes/Component.h"
 
 
@@ -19,4 +19,4 @@ struct AnimationStateComponent : Component
 };
 
 
-#endif
+

@@ -1,8 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef SCENEMANAGER_H
-#define SCENEMANAGER_H
 
 #include "Core/Scenes/Scene.h"
 #include "ResourceManager.h"
@@ -131,6 +129,3 @@ private:
     std::unordered_map<std::type_index, std::unique_ptr<Scene>> _scenes;
     std::vector<std::type_index> _sceneOrder;
 };
-
-
-#endif

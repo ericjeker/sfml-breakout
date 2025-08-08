@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef MAINMENUSTATE_H
-#define MAINMENUSTATE_H
+
+
 
 #include "Core/GameStates/GameState.h"
 
@@ -17,4 +17,4 @@ public:
 };
 
 
-#endif
+

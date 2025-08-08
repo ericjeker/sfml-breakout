@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef INPUTBINDINGS_H
-#define INPUTBINDINGS_H
+
+
 
 #include "Core/Modules/Control/InputKey.h"
 
@@ -14,4 +14,4 @@ struct InputBindings
 };
 
 
-#endif
+

@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef MYGAME_H
-#define MYGAME_H
+
+
 
 #include "Core/GameInstance.h"
 #include "Core/GameStates/GameController.h"
@@ -32,4 +32,4 @@ private:
 };
 
 
-#endif
+

@@ -1,14 +1,14 @@
 // Copyright (c) Eric Jeker 2025.
-#ifdef TRACY_ENABLE
-#include <tracy/Tracy.hpp>
-#endif
 
 #include "Core/GameInstance.h"
+
 #include "Core/GameStates/GameController.h"
 #include "Core/Logger.h"
 #include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
+
+#include <tracy/Tracy.hpp>
 
 
 void GameInstance::Run(sf::RenderWindow& renderWindow) const

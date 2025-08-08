@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef BOUNCINGBALLSMODULE_H
-#define BOUNCINGBALLSMODULE_H
+
+
 
 #include <flecs.h>
 
@@ -17,4 +17,4 @@ struct BouncingBallsModule
 }; // namespace Modules
 
 
-#endif
+

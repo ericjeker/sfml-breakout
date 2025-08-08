@@ -149,7 +149,6 @@ void Render(const flecs::iter& it)
 namespace Modules
 {
 
-
 RenderModule::RenderModule(const flecs::world& world)
 {
     world.component<ZOrder>();

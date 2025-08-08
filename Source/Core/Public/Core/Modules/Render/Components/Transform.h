@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef TRANSFORM_H
-#define TRANSFORM_H
+
+
 
 #include <SFML/System/Vector2.hpp>
 
@@ -15,4 +15,4 @@ struct Transform
 };
 
 
-#endif
+

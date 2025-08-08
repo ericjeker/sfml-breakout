@@ -48,6 +48,50 @@ Scenes are initialized in the `SceneManager::LoadScene()` function.
 A scene is a cohesive set of game objects (entities) add to the Flecs world. Each scene has its own root entity to which
 all other entities are added. When a scene is unloaded, the root entity is destroyed along with all its children.
 
+## World Progress
+
+The world progress is the main game loop. It is called by the game instance and progress the world by calling the
+`progress()` function.
+
+### Phases
+
+System phases are called in the following order:
+
+#### flecs::OnStart
+
+#### flecs::OnLoad
+
+#### flecs::PostLoad
+
+* Add UI events taken from the events pool
+* Add control commands from InputBindings
+
+#### flecs::PreUpdate
+
+* Process UI events & Control commands
+  * Hit Test on UI Elements
+
+#### flecs::OnUpdate
+
+* Physics
+* Animation
+* Movement
+* Collision
+
+#### flecs::OnValidate
+
+#### flecs::PostUpdate
+
+* Destroy entities that are no longer needed (e.g. LifetimeOneFrame)
+
+#### flecs::PreStore
+
+* Apply transformations to entities
+
+#### flecs::OnStore
+
+* Render
+
 ## Copyrights & Credits
 
 Music by Karl Casey @ [White Bat Audio](https://www.youtube.com/@WhiteBatAudio) -- Check his music on [YouTube](https://www.youtube.com/@WhiteBatAudio)

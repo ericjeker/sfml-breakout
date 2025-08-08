@@ -1,8 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef GAMESTATE_H
-#define GAMESTATE_H
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -35,4 +33,3 @@ private:
 };
 
 
-#endif

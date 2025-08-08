@@ -1,8 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef INPUTKEY_H
-#define INPUTKEY_H
 
 #include <SFML/Window.hpp>
 
@@ -172,7 +170,3 @@ struct InputKeyHash
         );
     }
 };
-
-
-
-#endif

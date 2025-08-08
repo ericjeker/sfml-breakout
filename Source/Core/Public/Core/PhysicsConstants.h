@@ -1,8 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef PHYSICSCONSTANTS_H
-#define PHYSICSCONSTANTS_H
 
 #include "Configuration.h"
 
@@ -27,4 +25,3 @@ constexpr float NO_FRICTION = 0.f;
 } // namespace PhysicsConstants
 
 
-#endif

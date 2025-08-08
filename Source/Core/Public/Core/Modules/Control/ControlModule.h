@@ -1,8 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef CONTROLMODULE_H
-#define CONTROLMODULE_H
 
 #include <flecs.h>
 
@@ -16,6 +14,3 @@ struct ControlModule
 };
 
 } // namespace Modules
-
-
-#endif

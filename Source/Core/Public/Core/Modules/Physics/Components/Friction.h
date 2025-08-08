@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef FRICTION_H
-#define FRICTION_H
+
+
 
 
 struct Friction
@@ -11,4 +11,4 @@ struct Friction
 };
 
 
-#endif
+

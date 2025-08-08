@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef SPRITE_H
-#define SPRITE_H
+
+
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -31,4 +31,4 @@ struct Sprite
 } // namespace Prefabs
 
 
-#endif
+

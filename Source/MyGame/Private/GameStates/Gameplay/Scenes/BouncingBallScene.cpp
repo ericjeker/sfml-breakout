@@ -2,10 +2,6 @@
 
 #include "BouncingBallScene.h"
 
-#ifdef TRACY_ENABLE
-#include <tracy/Tracy.hpp>
-#endif
-
 #include "Core/Configuration.h"
 #include "Core/Logger.h"
 #include "Core/Modules/Physics/Components/GravitySettings.h"
@@ -17,6 +13,7 @@
 #include "Modules/BouncingBalls/Prefabs/Ball.h"
 
 #include <random>
+#include <tracy/Tracy.hpp>
 
 
 BouncingBallScene::BouncingBallScene(flecs::world& world)

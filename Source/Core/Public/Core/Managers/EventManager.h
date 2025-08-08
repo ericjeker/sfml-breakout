@@ -1,8 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef EVENTMANAGER_H
-#define EVENTMANAGER_H
 
 #include "Core/Logger.h"
 
@@ -117,4 +115,3 @@ private:
 };
 
 
-#endif

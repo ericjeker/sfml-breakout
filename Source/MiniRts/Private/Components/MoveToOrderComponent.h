@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef MOVETOORDERCOMPONENT_H
-#define MOVETOORDERCOMPONENT_H
+
+
 
 #include "Scenes/Component.h"
 
@@ -14,4 +14,4 @@ struct MoveToOrderComponent : Component
 };
 
 
-#endif
+

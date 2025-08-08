@@ -51,7 +51,6 @@ ControlModule::ControlModule(const flecs::world& world)
                         continue;
                     }
 
-
                     // TODO:
                     //   - Add the Command as child_of the entity
                     //   - Add a Seq number to guarantee the sequence of commands

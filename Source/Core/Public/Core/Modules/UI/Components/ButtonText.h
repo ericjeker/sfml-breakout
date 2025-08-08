@@ -1,11 +1,13 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef BUTTONTEXT_H
-#define BUTTONTEXT_H
 
-#include <SFML/System/Vector2.hpp>
+
+
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/System/Vector2.hpp>
+
+#include <string>
 
 
 struct ButtonText
@@ -19,4 +21,4 @@ struct ButtonText
 };
 
 
-#endif
+

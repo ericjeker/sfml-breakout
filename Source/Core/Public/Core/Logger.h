@@ -1,7 +1,6 @@
 // Copyright (c) Eric Jeker. All Rights Reserved.
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#pragma once
 
 #include <string>
 
@@ -71,6 +70,4 @@ void Trace(const std::string& message);
 #define LOG_TRACE(message) Logger::Trace(message)
 #else
 #define LOG_TRACE(message)
-#endif
-
 #endif

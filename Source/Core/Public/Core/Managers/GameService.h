@@ -1,8 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef GAMESERVICES_H
-#define GAMESERVICES_H
 
 #include "Core/Logger.h"
 
@@ -149,4 +147,3 @@ T& Get()
 } // namespace GameService
 
 
-#endif

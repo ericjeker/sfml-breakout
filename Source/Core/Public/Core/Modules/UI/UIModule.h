@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef UIMODULE_H
-#define UIMODULE_H
+
+
 
 #include <flecs.h>
 
@@ -18,4 +18,4 @@ struct UIModule
 }
 
 
-#endif
+

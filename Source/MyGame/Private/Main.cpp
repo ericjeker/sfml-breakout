@@ -1,15 +1,10 @@
 // Copyright (c) Eric Jeker 2025.
 
-#ifdef TRACY_ENABLE
-#include <tracy/Tracy.hpp>
-#endif
-
 #include "Core/Configuration.h"
 #include "Core/GameInstance.h"
 #include "Core/GameStates/GameController.h"
 #include "Core/Managers/AudioManager.h"
 #include "Core/Managers/EventManager.h"
-#include "Core/Managers/FileManager.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Managers/SceneManager.h"
@@ -18,6 +13,7 @@
 #include <SFML/Graphics.hpp>
 
 #include <nlohmann/json.hpp>
+#include <tracy/Tracy.hpp>
 
 /**
  * Entry point of the application. Initializes the necessary components, configures

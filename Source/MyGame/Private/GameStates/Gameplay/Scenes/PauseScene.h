@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef PAUSESCENE_H
-#define PAUSESCENE_H
+
+
 
 #include "Core/Scenes/Scene.h"
 
@@ -18,4 +18,4 @@ public:
 };
 
 
-#endif
+

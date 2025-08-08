@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef MOVEMENTSYSTEM_H
-#define MOVEMENTSYSTEM_H
+
+
 
 #include "Systems/System.h"
 
@@ -12,4 +12,4 @@ class MovementSystem final : public System {
 };
 
 
-#endif
+

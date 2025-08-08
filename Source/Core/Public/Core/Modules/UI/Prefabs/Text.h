@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef TEXT_H
-#define TEXT_H
+
+
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -10,6 +10,8 @@
 #include <flecs.h>
 #include <string>
 
+
+// TODO: Move this to Builders/Factories
 namespace Prefabs
 {
 
@@ -34,4 +36,4 @@ struct Text
 } // namespace Prefabs
 
 
-#endif
+

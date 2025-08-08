@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef MAINMENUSCENE_H
-#define MAINMENUSCENE_H
+
+
 
 #include "Core/Scenes/Scene.h"
 
@@ -16,4 +16,4 @@ public:
 };
 
 
-#endif
+

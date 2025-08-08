@@ -3,11 +3,13 @@
 #include "ControllerDemoScene.h"
 
 #include "Core/Configuration.h"
+#include "Core/GameInstance.h"
 #include "Core/Logger.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
 #include "Core/Modules/Control/Components/Command.h"
 #include "Core/Modules/Control/Components/CommandQueue.h"
+#include "Core/Modules/Control/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Control/Components/PossessedByPlayer.h"
 #include "Core/Modules/Control/Components/Target.h"
 #include "Core/Modules/Control/Singletons/InputBindings.h"
@@ -16,6 +18,8 @@
 #include "Core/Modules/Physics/Components/Gravity.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
+#include "Core/Modules/UI/Components/KeyPressed.h"
+#include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
 #include "Modules/ControlDemo/Components/MoveIntent.h"
 #include "Modules/ControlDemo/Components/PauseIntent.h"
 #include "Modules/ControlDemo/Components/ResumeIntent.h"
@@ -40,20 +44,36 @@ void ControllerDemoScene::Initialize()
     CreatePlayerEntity(world);
 }
 
+void ControllerDemoScene::HandleEvent(const std::optional<sf::Event>& event)
+{
+    if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+    {
+        // We still filter the scan code as to not populate the ECS with useless entities
+        if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
+        {
+            GetWorld().entity().is_a<KeyPressedEvent>().set<KeyPressed>({
+                .code = keyPressed->code,
+                .scancode = keyPressed->scancode,
+                .alt = keyPressed->alt,
+                .control = keyPressed->control,
+                .shift = keyPressed->shift,
+            });
+        }
+    }
+}
+
 void ControllerDemoScene::CreateInputBindings(const flecs::world& world)
 {
     auto moveLeft = world.prefab("Command::MoveLeft").add<Command>().set<MoveIntent>({{-1.f, 0.f}});
     auto moveRight = world.prefab("Command::MoveRight").add<Command>().set<MoveIntent>({{1.f, 0.f}});
     auto moveUp = world.prefab("Command::MoveUp").add<Command>().set<MoveIntent>({{0.f, -1.f}});
     auto moveDown = world.prefab("Command::MoveDown").add<Command>().set<MoveIntent>({{0.f, 1.f}});
-    auto pauseGame = world.prefab("Command::PauseGame").add<Command>().add<PauseIntent>();
 
     world.set<InputBindings>({{
         {InputKey::Keyboard(sf::Keyboard::Key::W), moveUp},
         {InputKey::Keyboard(sf::Keyboard::Key::A), moveLeft},
         {InputKey::Keyboard(sf::Keyboard::Key::S), moveDown},
         {InputKey::Keyboard(sf::Keyboard::Key::D), moveRight},
-        {InputKey::Keyboard(sf::Keyboard::Key::Escape), pauseGame},
     }});
 }
 
@@ -76,33 +96,48 @@ void ControllerDemoScene::CreateMovementSystem(const flecs::world& world)
 
 void ControllerDemoScene::CreateUISystem(const flecs::world& world)
 {
-    // Query for PauseIntent and pause the Scene
-    world.system<const PauseIntent>("PauseSystem")
+    // Query for KeyPressed and pause the Scene
+    world.system<const KeyPressed>("ProcessKeyPressed")
+        .kind(flecs::PostLoad)
         .each(
-            [&](const flecs::entity& cmd, const PauseIntent& p)
+            [&](const flecs::entity& e, const KeyPressed& k)
             {
-                LOG_DEBUG("(PauseSystem)");
+                if (k.scancode == sf::Keyboard::Scancode::Escape)
+                {
+                    world.entity().add<LifetimeOneFrame>().add<Command>().add<PauseIntent>();
+                }
+
+                e.destruct();
+            }
+        )
+        .child_of(GetRootEntity());
+
+    world.system<const PauseIntent>("PauseSystem")
+        .kind(flecs::PreUpdate)
+        .each(
+            [&](const flecs::entity& e, const PauseIntent& p)
+            {
                 auto& sceneManager = GameService::Get<SceneManager>();
                 sceneManager.GetScene<ControllerDemoScene>().Pause();
                 sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
 
                 // Destroy the command entity
-                cmd.destruct();
+                e.destruct();
             }
         )
         .child_of(GetRootEntity());
 
     world.system<const ResumeIntent>("ResumeSystem")
+        .kind(flecs::PreUpdate)
         .each(
-            [&](const flecs::entity& cmd, const ResumeIntent& p)
+            [&](const flecs::entity& e, const ResumeIntent& p)
             {
-                LOG_DEBUG("(ResumeSystem)");
                 auto& sceneManager = GameService::Get<SceneManager>();
                 sceneManager.UnloadScene<PauseScene>();
                 sceneManager.GetScene<ControllerDemoScene>().Resume();
 
                 // Destroy the command entity
-                cmd.destruct();
+                e.destruct();
             }
         )
         .child_of(GetRootEntity());

@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef BUTTON_H
-#define BUTTON_H
+
+
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -10,7 +10,7 @@
 #include <flecs.h>
 #include <string>
 
-
+// TODO: Move this to Builders/Factories
 namespace Prefabs
 {
 
@@ -39,4 +39,4 @@ struct Button
 } // namespace Prefabs
 
 
-#endif
+

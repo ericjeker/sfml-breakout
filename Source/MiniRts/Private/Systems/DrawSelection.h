@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef DRAWSELECTION_H
-#define DRAWSELECTION_H
+
+
 
 #include "Systems/System.h"
 
@@ -12,4 +12,4 @@ class DrawSelection final : public System {
 };
 
 
-#endif
+

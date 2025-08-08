@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef SHADERUNIFORM_H
-#define SHADERUNIFORM_H
+
+
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -29,4 +29,4 @@ struct ShaderUniform
 };
 
 
-#endif
+

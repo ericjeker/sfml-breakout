@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef SHADERRENDERABLE_H
-#define SHADERRENDERABLE_H
+
+
 
 #include <SFML/Graphics/Shader.hpp>
 
@@ -15,4 +15,4 @@ struct ShaderRenderable
 };
 
 
-#endif
+

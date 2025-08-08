@@ -1,8 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef AUDIOMANAGER_H
-#define AUDIOMANAGER_H
 
 #include "ResourceManager.h"
 
@@ -55,4 +53,3 @@ private:
 };
 
 
-#endif

@@ -16,7 +16,11 @@
 #include "Core/Modules/UI/Components/MousePosition.h"
 #include "Core/Modules/UI/Components/MousePressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
+#include "Core/Modules/UI/Components/KeyPressed.h"
+#include "Core/Modules/UI/Components/KeyReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
+#include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
+#include "Core/Modules/UI/Prefabs/KeyReleasedEvent.h"
 #include "Core/Modules/UI/Prefabs/MousePressedEvent.h"
 #include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 
@@ -28,6 +32,8 @@ UIModule::UIModule(const flecs::world& world)
     // --- Declare Prefabs ---
     world.prefab<MousePressedEvent>().add<LifetimeOneFrame>().add<MousePressed>();
     world.prefab<MouseReleasedEvent>().add<LifetimeOneFrame>().add<MouseReleased>();
+    world.prefab<KeyPressedEvent>().add<LifetimeOneFrame>().add<KeyPressed>();
+    world.prefab<KeyReleasedEvent>().add<LifetimeOneFrame>().add<KeyReleased>();
 
     // --- Declare Components ---
     world.component<ButtonBackground>();

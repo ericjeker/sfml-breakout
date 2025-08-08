@@ -5,10 +5,8 @@
 
 
 
-struct ResumeGame
+struct KeyPressedEvent
 {
-
 };
-
 
 

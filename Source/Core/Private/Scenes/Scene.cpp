@@ -1,13 +1,12 @@
 // Copyright (c) Eric Jeker 2025.
 
-#ifdef TRACY_ENABLE
-#include <tracy/Tracy.hpp>
-#endif
+#include "Core/Scenes/Scene.h"
 
 #include "Core/Logger.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Modules/Scene/Components/ScenePaused.h"
-#include "Core/Scenes/Scene.h"
+
+#include <tracy/Tracy.hpp>
 
 
 Scene::Scene(flecs::world& world)

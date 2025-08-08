@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef SCENE_H
-#define SCENE_H
+
+
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -69,4 +69,4 @@ private:
     bool _isPaused = false;
 };
 
-#endif
+

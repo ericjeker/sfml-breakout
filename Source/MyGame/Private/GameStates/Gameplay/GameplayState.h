@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef GAMEPLAYSTATE_H
-#define GAMEPLAYSTATE_H
+
+
 
 #include "Core/GameStates/GameState.h"
 #include "Core/Managers/EventManager.h"
@@ -29,4 +29,4 @@ private:
         GameService::Get<SceneManager>().GetScene<ControllerDemoScene>().Resume();
     };
 };
-#endif
+

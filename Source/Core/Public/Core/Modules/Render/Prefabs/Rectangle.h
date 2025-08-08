@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef RECTANGLE_H
-#define RECTANGLE_H
+
+
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -32,4 +32,4 @@ struct Rectangle
 } // namespace Prefabs
 
 
-#endif
+

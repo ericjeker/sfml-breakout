@@ -1,8 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef GAMEINSTANCE_H
-#define GAMEINSTANCE_H
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -39,4 +37,3 @@ private:
 };
 
 
-#endif

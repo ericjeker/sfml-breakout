@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef BUTTONBACKGROUND_H
-#define BUTTONBACKGROUND_H
+
+
 
 #include <SFML/Graphics.hpp>
 
@@ -15,4 +15,4 @@ struct ButtonBackground
 };
 
 
-#endif
+

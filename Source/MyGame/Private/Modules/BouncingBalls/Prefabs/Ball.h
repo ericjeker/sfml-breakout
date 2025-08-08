@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef BALL_H
-#define BALL_H
+
+
 
 #include "Core/PhysicsConstants.h"
 
@@ -41,4 +41,4 @@ struct Ball
 
 } // namespace Prefabs
 
-#endif
+

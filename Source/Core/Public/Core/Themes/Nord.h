@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker. All Rights Reserved.
 
 #pragma once
-#ifndef NORD_H
-#define NORD_H
+
+
 
 #include <SFML/Graphics/Color.hpp>
 
@@ -39,4 +39,4 @@ struct NordTheme
     static constexpr auto Aurora5 = sf::Color(180, 142, 173); // #b48ead (Purple)
 };
 
-#endif
+

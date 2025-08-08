@@ -1,8 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef GAMECONTROLLER_H
-#define GAMECONTROLLER_H
 
 #include "GameState.h"
 
@@ -42,4 +40,3 @@ private:
 };
 
 
-#endif

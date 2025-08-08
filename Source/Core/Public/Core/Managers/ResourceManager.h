@@ -1,8 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef RESOURCEMANAGER_H
-#define RESOURCEMANAGER_H
 
 #include "Core/Logger.h"
 
@@ -71,4 +69,3 @@ private:
     std::unordered_map<std::string, ResourceVariant> _resources;
 };
 
-#endif

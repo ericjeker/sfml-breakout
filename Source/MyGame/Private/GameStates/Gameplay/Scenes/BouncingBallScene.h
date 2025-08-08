@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef BOUNCINGBALLFLECSSCENE_H
-#define BOUNCINGBALLFLECSSCENE_H
+
+
 
 #include "Core/Scenes/Scene.h"
 
@@ -20,4 +20,4 @@ private:
 };
 
 
-#endif
+

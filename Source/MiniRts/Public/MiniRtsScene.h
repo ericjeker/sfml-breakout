@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
 #pragma once
-#ifndef MINIRTSSCENE_H
-#define MINIRTSSCENE_H
+
+
 
 
 #include "Managers/EventManager.h"
@@ -28,4 +28,4 @@ private:
 };
 
 
-#endif
+
