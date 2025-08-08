@@ -1,18 +1,19 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "ControllerDemoScene.h"
+#include "Scenes/ControllerDemo/ControllerDemoScene.h"
 
 #include "Core/Configuration.h"
+#include "Core/Events/DeferredEvent.h"
 #include "Core/GameInstance.h"
 #include "Core/Logger.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
 #include "Core/Modules/Control/Components/Command.h"
 #include "Core/Modules/Control/Components/CommandQueue.h"
-#include "Core/Modules/Control/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Control/Components/PossessedByPlayer.h"
 #include "Core/Modules/Control/Components/Target.h"
 #include "Core/Modules/Control/Singletons/InputBindings.h"
+#include "Core/Modules/Lifecycle/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Physics/Components/Acceleration.h"
 #include "Core/Modules/Physics/Components/Friction.h"
 #include "Core/Modules/Physics/Components/Gravity.h"
@@ -20,10 +21,9 @@
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
-#include "Modules/ControlDemo/Components/MoveIntent.h"
-#include "Modules/ControlDemo/Components/PauseIntent.h"
-#include "Modules/ControlDemo/Components/ResumeIntent.h"
-#include "PauseScene.h"
+#include "Scenes/ControllerDemo/Components/MoveIntent.h"
+#include "Scenes/ControllerDemo/Components/PauseIntent.h"
+#include "Scenes/Pause/PauseScene.h"
 
 
 ControllerDemoScene::ControllerDemoScene(flecs::world& world)
@@ -37,6 +37,8 @@ void ControllerDemoScene::Initialize()
     LOG_DEBUG("(ControllerDemoScene:Initialize)");
 
     const auto& world = GetWorld();
+
+    // TODO: Asserts that necessary module are present in the world
 
     CreateInputBindings(world);
     CreateMovementSystem(world);
@@ -100,11 +102,11 @@ void ControllerDemoScene::CreateUISystem(const flecs::world& world)
     world.system<const KeyPressed>("ProcessKeyPressed")
         .kind(flecs::PostLoad)
         .each(
-            [&](const flecs::entity& e, const KeyPressed& k)
+            [](const flecs::entity& e, const KeyPressed& k)
             {
                 if (k.scancode == sf::Keyboard::Scancode::Escape)
                 {
-                    world.entity().add<LifetimeOneFrame>().add<Command>().add<PauseIntent>();
+                    e.world().entity().add<LifetimeOneFrame>().add<Command>().add<PauseIntent>();
                 }
 
                 e.destruct();
@@ -117,24 +119,12 @@ void ControllerDemoScene::CreateUISystem(const flecs::world& world)
         .each(
             [&](const flecs::entity& e, const PauseIntent& p)
             {
-                auto& sceneManager = GameService::Get<SceneManager>();
-                sceneManager.GetScene<ControllerDemoScene>().Pause();
-                sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
-
-                // Destroy the command entity
-                e.destruct();
-            }
-        )
-        .child_of(GetRootEntity());
-
-    world.system<const ResumeIntent>("ResumeSystem")
-        .kind(flecs::PreUpdate)
-        .each(
-            [&](const flecs::entity& e, const ResumeIntent& p)
-            {
-                auto& sceneManager = GameService::Get<SceneManager>();
-                sceneManager.UnloadScene<PauseScene>();
-                sceneManager.GetScene<ControllerDemoScene>().Resume();
+                e.world().entity().set<DeferredEvent>({[]
+                                                       {
+                                                           auto& sceneManager = GameService::Get<SceneManager>();
+                                                           sceneManager.GetScene<ControllerDemoScene>().Pause();
+                                                           sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
+                                                       }});
 
                 // Destroy the command entity
                 e.destruct();
@@ -148,21 +138,21 @@ void ControllerDemoScene::CreatePlayerEntity(const flecs::world& world)
     constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
     constexpr float CENTER_Y = Configuration::WINDOW_SIZE.y / 2;
 
-    const flecs::entity entity = Prefabs::Rectangle::Create(
-                                     world,
-                                     {
-                                         .size = {100.f, 20.f},
-                                         .color = sf::Color::Red,
-                                         .origin = {0.5f, 0.5f},
-                                         .position = {CENTER_X, CENTER_Y},
-                                         .zOrder = 0.f,
-                                     }
+    Prefabs::Rectangle::Create(
+        world,
+        {
+            .size = {100.f, 20.f},
+            .color = sf::Color::Red,
+            .origin = {0.5f, 0.5f},
+            .position = {CENTER_X, CENTER_Y},
+            .zOrder = 0.f,
+        }
     )
-                                     .child_of(GetRootEntity());
-
-    entity.add<PossessedByPlayer>().set<CommandQueue>({});
-    entity.set<Acceleration>({});
-    entity.set<Friction>({.friction = 10.f});
-    entity.set<Gravity>({PhysicsConstants::NO_GRAVITY});
-    entity.set<Velocity>({});
+        .child_of(GetRootEntity())
+        .add<PossessedByPlayer>()
+        .set<CommandQueue>({})
+        .set<Acceleration>({})
+        .set<Friction>({.friction = 10.f})
+        .set<Gravity>({PhysicsConstants::NO_GRAVITY})
+        .set<Velocity>({});
 }

@@ -2,17 +2,17 @@
 
 #include "MyGame.h"
 
-#include "Core/GameStates/GameController.h"
+#include "Core/GameStates/GameStateManager.h"
 #include "Core/Logger.h"
 #include "Core/Managers/AudioManager.h"
+#include "Core/Managers/GameService.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Control/ControlModule.h"
+#include "Core/Modules/Lifecycle/LifecycleModule.h"
 #include "Core/Modules/Physics/PhysicsModule.h"
 #include "Core/Modules/Render/RenderModule.h"
 #include "Core/Modules/Scene/SceneModule.h"
 #include "Core/Modules/UI/UIModule.h"
-#include "Events/NavigateToMainMenu.h"
-#include "Events/StartGame.h"
 #include "GameStates/MainMenu/MainMenuState.h"
 
 void MyGame::Initialize()
@@ -21,9 +21,10 @@ void MyGame::Initialize()
     LOG_DEBUG("(MyGame::Initialization): Load Resources");
     GameService::Get<ResourceManager>().LoadResourcesFromManifest("Assets/Manifest.json");
 
-    // --- Initialize the World with global systems and components ---
+    // --- Initialize the World with global systems and singletons ---
     // clang-format off
     auto& world = GetWorld();
+    world.import<Modules::LifecycleModule>();
     world.import<Modules::SceneModule>();
     world.import<Modules::UIModule>();
     world.import<Modules::ControlModule>();
@@ -33,15 +34,10 @@ void MyGame::Initialize()
 
     // --- Load the Main Menu State ---
     LOG_DEBUG("(MyGame::Initialization): Load the Main Menu State");
-    GameService::Get<GameController>().ChangeState(std::make_unique<MainMenuState>(world));
+    GameService::Get<GameStateManager>().ChangeState(std::make_unique<MainMenuState>(world));
 
     // --- Start the main theme ---
     // GameService::Get<AudioManager>().PlayMusic("8mm");
-
-    // --- Add global event listeners ---
-    GameService::Get<EventManager>().Subscribe<ExitGame>(_exitGameListener);
-    GameService::Get<EventManager>().Subscribe<StartGame>(_startGameListener);
-    GameService::Get<EventManager>().Subscribe<NavigateToMainMenu>(_returnToMainMenuListener);
 }
 
 void MyGame::Shutdown()

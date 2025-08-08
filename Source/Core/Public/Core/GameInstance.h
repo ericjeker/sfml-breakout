@@ -22,6 +22,7 @@ public:
      */
     void Run(sf::RenderWindow& renderWindow) const;
     static void HandleEvents(sf::RenderWindow& renderWindow);
+    static void RunDeferredEvents(const flecs::world& world);
 
     void RequestExit();
     [[nodiscard]] bool ShouldExit() const;

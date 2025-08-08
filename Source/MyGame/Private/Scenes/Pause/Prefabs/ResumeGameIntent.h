@@ -2,14 +2,11 @@
 
 #pragma once
 
-
-
-
-struct StartGame
+namespace Prefabs
 {
 
+struct ResumeGameIntent
+{
 };
 
-
-
-
+}

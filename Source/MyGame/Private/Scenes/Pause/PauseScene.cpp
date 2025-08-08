@@ -1,36 +1,32 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "PauseScene.h"
+#include "Scenes/Pause/PauseScene.h"
 
+#include "Components/NavigateToMainMenuIntent.h"
+#include "Components/ResumeGameIntent.h"
 #include "Core/Configuration.h"
+#include "Core/Events/DeferredEvent.h"
+#include "Core/GameStates/GameStateManager.h"
 #include "Core/Logger.h"
 #include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
-#include "Core/Managers/ResourceManager.h"
-#include "Core/Modules/Render/Components/Size.h"
-#include "Core/Modules/Render/Components/Transform.h"
+#include "Core/Modules/Control/Components/Command.h"
+#include "Core/Modules/Lifecycle/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
-#include "Core/Modules/Render/RenderModule.h"
-#include "Core/Modules/UI/Components/Clickable.h"
-#include "Core/Modules/UI/Components/EventTrigger.h"
-#include "Core/Modules/UI/Components/Interactable.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
-#include "Events/NavigateToMainMenu.h"
-#include "Events/ResumeGame.h"
-
-#include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/Text.hpp>
-
+#include "GameStates/Gameplay/GameplayState.h"
+#include "GameStates/MainMenu/MainMenuState.h"
+#include "Prefabs/NavigateToMainMenuIntent.h"
+#include "Prefabs/ResumeGameIntent.h"
 
 PauseScene::PauseScene(flecs::world& world)
     : Scene(world)
 {
 }
-
 
 void PauseScene::Initialize()
 {
@@ -40,7 +36,49 @@ void PauseScene::Initialize()
     constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
     constexpr float CENTER_Y = Configuration::WINDOW_SIZE.y / 2;
 
-    const auto& world = GetWorld();
+    auto& world = GetWorld();
+
+    // --- Declare local prefabs ---
+    world.prefab<Prefabs::NavigateToMainMenuIntent>()
+        .add<LifetimeOneFrame>()
+        .add<Command>()
+        .add<NavigateToMainMenuIntent>()
+        .child_of(GetRootEntity());
+
+    world.prefab<Prefabs::ResumeGameIntent>().add<LifetimeOneFrame>().add<Command>().add<ResumeGameIntent>().child_of(
+        GetRootEntity()
+    );
+
+    world.system<const NavigateToMainMenuIntent>()
+        .each(
+            [&](const flecs::iter& it, size_t, const NavigateToMainMenuIntent i)
+            {
+                it.world().entity().set<DeferredEvent>(
+                    {.callback = [&]
+                    {
+                        GameService::Get<GameStateManager>().ChangeState(std::make_unique<MainMenuState>(world));
+                    }}
+                );
+            }
+        )
+        .child_of(GetRootEntity());
+
+    world.system<const ResumeGameIntent>()
+        .each(
+            [](const flecs::iter& it, size_t, const ResumeGameIntent i)
+            {
+                it.world().entity().set<DeferredEvent>(
+                    {.callback =
+                         [&]
+                     {
+                         GameService::Get<SceneManager>().UnloadScene<PauseScene>();
+                         GameService::Get<SceneManager>().GetScene<ControllerDemoScene>().Resume();
+                     }}
+                );
+            }
+        )
+        .child_of(GetRootEntity());
+
 
     float zOrder = 0.f;
 
@@ -82,7 +120,7 @@ void PauseScene::Initialize()
             .backgroundColor = sf::Color::Transparent,
             .position = {CENTER_X, CENTER_Y},
             .zOrder = ++zOrder,
-            .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<ResumeGame>({}, this); },
+            .onClick = [](const flecs::world& stage) { stage.entity().is_a<Prefabs::ResumeGameIntent>(); },
         }
     )
         .child_of(GetRootEntity());
@@ -98,7 +136,7 @@ void PauseScene::Initialize()
             .backgroundColor = sf::Color::Transparent,
             .position = {CENTER_X, CENTER_Y + 100},
             .zOrder = ++zOrder,
-            .onClick = [this]() { GameService::Get<EventManager>().EmitDeferred<NavigateToMainMenu>({}, this); },
+            .onClick = [](const flecs::world& stage) { stage.entity().is_a<Prefabs::NavigateToMainMenuIntent>(); },
         }
     )
         .child_of(GetRootEntity());

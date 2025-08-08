@@ -3,14 +3,14 @@
 #include "BouncingBallScene.h"
 
 #include "Core/Configuration.h"
-#include "Core/Logger.h"
-#include "Core/Modules/Physics/Components/GravitySettings.h"
+#include "Core/Modules/Physics/Components/Collider.h"
+#include "Core/Modules/Physics/Components/Velocity.h"
+#include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
 #include "Core/Modules/Render/Prefabs/Sprite.h"
 #include "Core/PhysicsConstants.h"
 #include "Core/Themes/Nord.h"
-#include "Modules/BouncingBalls/BouncingBallsModule.h"
-#include "Modules/BouncingBalls/Prefabs/Ball.h"
+#include "Scenes/BouncingBall/Prefabs/Ball.h"
 
 #include <random>
 #include <tracy/Tracy.hpp>
@@ -26,16 +26,10 @@ void BouncingBallScene::Initialize()
     Scene::Initialize();
 
     // --- Get the world and import the modules ---
-    auto& world = GetWorld();
+    const auto& world = GetWorld();
 
-    // Clang Format is confused...
-    // clang-format off
-    world.import<Modules::BouncingBallsModule>().child_of(GetRootEntity());
-    // clang-format on
-
-    world.set<GravitySettings>(
-        {.gravity = PhysicsConstants::NO_GRAVITY, .pixelsPerCentimeter = PhysicsConstants::PIXELS_PER_CENTIMETER}
-    );
+    // --- Declare local systems ---
+    world.system<Transform, Velocity, Collider>().kind(flecs::OnStore).each(ProcessScreenBounce).child_of(GetRootEntity());
 
     float zOrder = 0.f;
 
@@ -85,5 +79,33 @@ void BouncingBallScene::CreateBalls(const flecs::world& world, float zOrder)
             }
         )
             .child_of(GetRootEntity());
+    }
+}
+
+
+void BouncingBallScene::ProcessScreenBounce(Transform& t, Velocity& v, const Collider& c)
+{
+    const float radius = c.radius;
+
+    if (t.position.x - radius < 0.f)
+    {
+        v.velocity.x *= -1.f;
+        t.position.x = radius;
+    }
+    else if (t.position.x + radius > Configuration::WINDOW_SIZE.x)
+    {
+        v.velocity.x *= -1.f;
+        t.position.x = Configuration::WINDOW_SIZE.x - radius;
+    }
+
+    if (t.position.y - radius < 0.f)
+    {
+        v.velocity.y *= -1.f;
+        t.position.y = radius;
+    }
+    else if (t.position.y + radius > Configuration::WINDOW_SIZE.y)
+    {
+        v.velocity.y *= -1.f;
+        t.position.y = Configuration::WINDOW_SIZE.y - radius;
     }
 }

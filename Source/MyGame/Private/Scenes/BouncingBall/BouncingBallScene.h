@@ -3,7 +3,9 @@
 #pragma once
 
 
-
+#include "Core/Modules/Physics/Components/Collider.h"
+#include "Core/Modules/Physics/Components/Velocity.h"
+#include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Scenes/Scene.h"
 
 #include <flecs.h>
@@ -17,6 +19,7 @@ public:
 
 private:
     void CreateBalls(const flecs::world& world, float zOrder);
+    static void ProcessScreenBounce(Transform& t, Velocity& v, const Collider& c);
 };
 
 

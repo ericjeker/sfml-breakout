@@ -2,23 +2,12 @@
 
 #include "Core/Modules/Control/ControlModule.h"
 
+#include "Core/Modules/Lifecycle/Components/LifetimeOneFrame.h"
 #include "Core/Logger.h"
 #include "Core/Modules/Control/Components/CommandQueue.h"
-#include "Core/Modules/Control/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Control/Components/PossessedByPlayer.h"
 #include "Core/Modules/Control/Components/Target.h"
 #include "Core/Modules/Control/Singletons/InputBindings.h"
-
-
-namespace
-{
-
-void DestroyEntity(const flecs::entity e, const LifetimeOneFrame& lifetime)
-{
-    e.destruct();
-}
-
-} // namespace
 
 
 namespace Modules
@@ -29,11 +18,9 @@ ControlModule::ControlModule(const flecs::world& world)
     world.component<PossessedByPlayer>();
     world.component<CommandQueue>();
     world.component<Command>();
-    world.component<LifetimeOneFrame>();
 
     world.singleton<InputBindings>();
 
-    world.system<const LifetimeOneFrame>("LifetimeSystem").kind(flecs::PostUpdate).each(DestroyEntity);
     world.system<const InputBindings>("InputSystem")
         .term_at(0)
         .singleton()

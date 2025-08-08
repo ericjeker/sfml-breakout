@@ -27,7 +27,8 @@ be active at the same time using a push/pop system.
 ## GameState
 
 Hold the current game mode, encapsulate state-specific behavior and data. The GameState also manages which scene should
-be active given its particular state.
+be active given its particular state. There can only be one state active at a time, but multiple scenes can be active at
+the same time.
 
 The GameState to Scene relationship can be:
 
@@ -47,6 +48,29 @@ Scenes are initialized in the `SceneManager::LoadScene()` function.
 
 A scene is a cohesive set of game objects (entities) add to the Flecs world. Each scene has its own root entity to which
 all other entities are added. When a scene is unloaded, the root entity is destroyed along with all its children.
+
+## Flecs Architecture
+
+### Modules
+
+Modules are the main components of the game. They are responsible for loading and unloading the resources needed by the
+game. They are global and are not tied to a specific scene.
+
+These modules are imported during initialization of the game instance.
+
+Examples: Control, Physics, Render, UI, Scene
+
+### Game States
+
+Game states will toggle singletons and systems on and off.
+
+### Scenes
+
+Scenes each hold a root entity. On initialization, they will instantiate entities and prefabs and register scene-local
+systems when necessary. The scene-local systems will be unregistered when the scene is unloaded. They operate only on
+the local entities.
+
+The root entity will be destroyed when the scene is unloaded, cascading to all its children.
 
 ## World Progress
 
@@ -91,6 +115,10 @@ System phases are called in the following order:
 #### flecs::OnStore
 
 * Render
+
+#### flecs::PostFrame
+
+* End of frame events
 
 ## Copyrights & Credits
 

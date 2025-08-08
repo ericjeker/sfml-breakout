@@ -3,7 +3,6 @@
 #pragma once
 
 
-
 #include "Core/Scenes/Scene.h"
 
 class MainMenuScene final : public Scene
@@ -13,7 +12,8 @@ public:
 
     void Initialize() override;
     void HandleEvent(const std::optional<sf::Event>& event) override;
+
+private:
+    void CreateLocalSystems(flecs::world& world);
+    void CreateUIEntities(const flecs::world& world);
 };
-
-
-

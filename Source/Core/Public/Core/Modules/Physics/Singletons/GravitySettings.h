@@ -2,16 +2,11 @@
 
 #pragma once
 
-
-
 #include <SFML/System/Vector2.hpp>
 
-
-struct GravitySettings {
+struct GravitySettings
+{
     sf::Vector2f gravity;
-    float pixelsPerCentimeter;
+    float pixelsPerCentimeter{};
     bool enabled = true;
 };
-
-
-

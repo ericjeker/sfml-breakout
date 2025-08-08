@@ -1,8 +1,8 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Core/GameStates/GameController.h"
+#include "Core/GameStates/GameStateManager.h"
 
-void GameController::PushState(std::unique_ptr<GameState> state)
+void GameStateManager::PushState(std::unique_ptr<GameState> state)
 {
     if (!_stateStack.empty())
     {
@@ -13,7 +13,7 @@ void GameController::PushState(std::unique_ptr<GameState> state)
     _stateStack.top()->Enter();
 }
 
-void GameController::PopState()
+void GameStateManager::PopState()
 {
     if (_stateStack.empty())
     {
@@ -29,7 +29,7 @@ void GameController::PopState()
     }
 }
 
-void GameController::ChangeState(std::unique_ptr<GameState> state)
+void GameStateManager::ChangeState(std::unique_ptr<GameState> state)
 {
     if (!_stateStack.empty())
     {
@@ -41,7 +41,7 @@ void GameController::ChangeState(std::unique_ptr<GameState> state)
     _stateStack.top()->Enter();
 }
 
-void GameController::HandleEvent(const std::optional<sf::Event>& event)
+void GameStateManager::HandleEvent(const std::optional<sf::Event>& event)
 {
     if (_stateStack.empty())
     {

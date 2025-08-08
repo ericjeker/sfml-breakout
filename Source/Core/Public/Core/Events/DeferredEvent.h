@@ -2,15 +2,10 @@
 
 #pragma once
 
-
-
 #include <functional>
 
 
-struct EventTrigger
+struct DeferredEvent
 {
     std::function<void()> callback;
 };
-
-
-

@@ -5,9 +5,9 @@
 #include "Core/Logger.h"
 #include "Core/Managers/SceneManager.h"
 #include "Events/ResumeGame.h"
-#include "Scenes/ControllerDemoScene.h"
-#include "Scenes/DebugScene.h"
-#include "Scenes/PauseScene.h"
+#include "Scenes/ControllerDemo/ControllerDemoScene.h"
+#include "Scenes/Debug/DebugScene.h"
+#include "Scenes/Pause/PauseScene.h"
 
 GameplayState::GameplayState(flecs::world& world)
     : GameState(world)

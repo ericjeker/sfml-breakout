@@ -11,9 +11,9 @@
 
 
 /**
- * @class: GameController
+ * @class: GameStateManager
  *
- * @short Game Controller with a stack state pattern.
+ * @short Manage game states with a stack state pattern.
  *
  * Given we use a Stack State, only the top State is Updated.
  *
@@ -23,7 +23,7 @@
  * - Dynamic Loading, the GameState is identical but loaded with a different manifest file
  * - Multiple Scene per State: the GameState loads different scenes by itself
  */
-class GameController
+class GameStateManager
 {
 public:
     // State stack management

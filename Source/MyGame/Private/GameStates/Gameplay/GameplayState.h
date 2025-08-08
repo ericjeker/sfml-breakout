@@ -3,14 +3,13 @@
 #pragma once
 
 
-
+#include "../../Scenes/ControllerDemo/ControllerDemoScene.h"
+#include "../../Scenes/Pause/PauseScene.h"
 #include "Core/GameStates/GameState.h"
 #include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
 #include "Events/ResumeGame.h"
-#include "Scenes/ControllerDemoScene.h"
-#include "Scenes/PauseScene.h"
 
 
 class GameplayState final : public GameState

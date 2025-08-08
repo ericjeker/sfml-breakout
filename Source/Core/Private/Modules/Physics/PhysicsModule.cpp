@@ -2,13 +2,14 @@
 
 #include "Core/Modules/Physics/PhysicsModule.h"
 
-#include "Core/PhysicsConstants.h"
+#include "../../../Public/Core/Modules/Physics/Singletons/GravitySettings.h"
 #include "Core/Modules/Physics/Components/Acceleration.h"
 #include "Core/Modules/Physics/Components/Collider.h"
 #include "Core/Modules/Physics/Components/Friction.h"
 #include "Core/Modules/Physics/Components/Gravity.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
 #include "Core/Modules/Render/Components/Transform.h"
+#include "Core/PhysicsConstants.h"
 
 #include <numbers>
 #include <tracy/Tracy.hpp>
@@ -91,6 +92,10 @@ namespace Modules
 
 PhysicsModule::PhysicsModule(const flecs::world& world)
 {
+    world.set<GravitySettings>(
+        {.gravity = PhysicsConstants::NO_GRAVITY, .pixelsPerCentimeter = PhysicsConstants::PIXELS_PER_CENTIMETER}
+    );
+
     world.system<const Gravity, Velocity>("GravitySystem").each(GravitySystem);
     world.system<const Friction, Velocity>("FrictionSystem").each(FrictionSystem);
     world.system<Acceleration, Velocity>("AccelerationSystem").each(AccelerationSystem);

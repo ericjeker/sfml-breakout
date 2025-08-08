@@ -1,6 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "DebugScene.h"
+#include "Scenes/Debug/DebugScene.h"
 
 #include "Core/Managers/GameService.h"
 #include "Core/Modules/Render/Components/TextRenderable.h"
@@ -9,7 +9,6 @@
 
 #include <Core/Themes/Nord.h>
 
-// Local systems, or I could create a DebugSceneModule
 namespace
 {
 
@@ -37,15 +36,17 @@ DebugScene::DebugScene(flecs::world& world)
 {
 }
 
-
 void DebugScene::Initialize()
 {
     Scene::Initialize();
 
     const auto& world = GetWorld();
 
+    // --- Systems ---
+    world.system<const TextRenderable, const FPS>().each(CalculateFPS).child_of(GetRootEntity());
+
     // --- Resources ---
-    const flecs::entity& entity = Prefabs::Text::Create(
+    Prefabs::Text::Create(
         world,
         {
             .text = "FPS: ",
@@ -55,10 +56,8 @@ void DebugScene::Initialize()
             .origin = {0.f, 0.f},
             .position = {5.f, 5.f},
         }
-    ).child_of(GetRootEntity());
+    )
+        .child_of(GetRootEntity())
+        .add<FPS>();
 
-    // Tag the text so we can easily edit it
-    entity.add<FPS>().child_of(GetRootEntity());
-
-    world.system<const TextRenderable, const FPS>().each(CalculateFPS).child_of(GetRootEntity());
 }

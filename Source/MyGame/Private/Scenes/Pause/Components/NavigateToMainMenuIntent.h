@@ -2,13 +2,6 @@
 
 #pragma once
 
-
-
-
-struct ExitGame
+struct NavigateToMainMenuIntent
 {
-
 };
-
-
-

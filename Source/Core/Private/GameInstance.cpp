@@ -2,7 +2,8 @@
 
 #include "Core/GameInstance.h"
 
-#include "Core/GameStates/GameController.h"
+#include "../Public/Core/Events/DeferredEvent.h"
+#include "Core/GameStates/GameStateManager.h"
 #include "Core/Logger.h"
 #include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
@@ -14,6 +15,7 @@
 void GameInstance::Run(sf::RenderWindow& renderWindow) const
 {
     LOG_DEBUG("(GameInstance::Run): Starting game loop");
+    auto& world = GetWorld();
 
     sf::Clock clock;
     while (renderWindow.isOpen() && !ShouldExit())
@@ -28,11 +30,12 @@ void GameInstance::Run(sf::RenderWindow& renderWindow) const
 
         // Progresses the world
         renderWindow.clear();
-        GetWorld().progress(deltaTime);
+        world.progress(deltaTime);
         renderWindow.display();
 
         // Process deferred events at the end of the frame
         GameService::Get<EventManager>().ProcessDeferredEvents();
+        RunDeferredEvents(world);
 
         FrameMark;
     }
@@ -56,9 +59,44 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
         }
 
         // We delegate the event to the game controller
-        GameService::Get<GameController>().HandleEvent(event);
+        GameService::Get<GameStateManager>().HandleEvent(event);
         GameService::Get<SceneManager>().HandleEvent(event);
     }
+}
+
+void GameInstance::RunDeferredEvents(const flecs::world& world)
+{
+    ZoneScopedN("GameInstance::RunDeferredEvents");
+
+    // We will collect all the callbacks and entities to destroy here.
+    // This is done because Flecs can't destroy an entity while it's iterating.
+    std::vector<flecs::entity> toDelete;
+    std::vector<std::function<void()>> callbacks;
+    callbacks.reserve(32);
+    toDelete.reserve(32);
+
+    // Loop the entities
+    world.each<DeferredEvent>(
+        [&](flecs::entity e, const DeferredEvent& ev)
+        {
+            callbacks.emplace_back(ev.callback);
+            toDelete.emplace_back(e);
+        }
+    );
+
+    // Run the callbacks
+    for (auto& cb : callbacks)
+    {
+        cb();
+    }
+
+    // Destroy the entities
+    world.defer_begin();
+    for (auto e : toDelete)
+    {
+        e.destruct();
+    }
+    world.defer_end();
 }
 
 void GameInstance::RequestExit()

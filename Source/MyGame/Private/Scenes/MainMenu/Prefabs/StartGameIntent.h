@@ -2,14 +2,11 @@
 
 #pragma once
 
-
-
-
-struct NavigateToMainMenu
+namespace Prefabs
 {
 
+struct StartGameIntent
+{
 };
 
-
-
-
+}

@@ -2,22 +2,22 @@
 
 #include "Core/Modules/UI/UIModule.h"
 
+#include "../../../Public/Core/Events/Event.h"
+#include "../../../Public/Core/Modules/Lifecycle/Components/LifetimeOneFrame.h"
 #include "Core/Managers/GameService.h"
-#include "Core/Modules/Control/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Components/Size.h"
 #include "Core/Modules/Render/Components/TextRenderable.h"
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Modules/UI/Components/ButtonBackground.h"
 #include "Core/Modules/UI/Components/ButtonText.h"
 #include "Core/Modules/UI/Components/Clickable.h"
-#include "Core/Modules/UI/Components/EventTrigger.h"
 #include "Core/Modules/UI/Components/Hoverable.h"
 #include "Core/Modules/UI/Components/Interactable.h"
+#include "Core/Modules/UI/Components/KeyPressed.h"
+#include "Core/Modules/UI/Components/KeyReleased.h"
 #include "Core/Modules/UI/Components/MousePosition.h"
 #include "Core/Modules/UI/Components/MousePressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
-#include "Core/Modules/UI/Components/KeyPressed.h"
-#include "Core/Modules/UI/Components/KeyReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
 #include "Core/Modules/UI/Prefabs/KeyReleasedEvent.h"
@@ -70,8 +70,8 @@ UIModule::UIModule(const flecs::world& world)
                 }
 
                 // Query the world for all entities that are Clickable and have the necessary components
-                it.world().query<const Clickable, const EventTrigger, const Transform, const Size>().each(
-                    [&](const Clickable& clickable, const EventTrigger& eventTrigger, const Transform& t, const Size& s)
+                it.world().query<const Clickable, const Event, const Transform, const Size>().each(
+                    [&](const Clickable& clickable, const Event& eventTrigger, const Transform& t, const Size& s)
                     {
                         sf::FloatRect bounds;
                         bounds.size = s.size;
@@ -92,7 +92,7 @@ UIModule::UIModule(const flecs::world& world)
                         if (bounds.contains(sf::Vector2f(mouseReleased.position)))
                         {
                             // The mouse press hit this clickable entity
-                            eventTrigger.callback();
+                            eventTrigger.callback(it.world());
                         }
                     }
                 );

@@ -2,12 +2,6 @@
 
 #pragma once
 
-
-
-
-class ControlDemoModule {
-
+struct ExitGameIntent
+{
 };
-
-
-

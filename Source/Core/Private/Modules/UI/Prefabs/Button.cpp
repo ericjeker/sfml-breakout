@@ -2,6 +2,7 @@
 
 #include "Core/Modules/UI/Prefabs/Button.h"
 
+#include "Core/Events/Event.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Render/Components/RectangleRenderable.h"
@@ -12,7 +13,6 @@
 #include "Core/Modules/UI/Components/ButtonBackground.h"
 #include "Core/Modules/UI/Components/ButtonText.h"
 #include "Core/Modules/UI/Components/Clickable.h"
-#include "Core/Modules/UI/Components/EventTrigger.h"
 #include "Core/Modules/UI/Components/Interactable.h"
 
 
@@ -55,7 +55,7 @@ flecs::entity Button::Create(const flecs::world& world, const ButtonParams& para
 
     if (params.onClick)
     {
-        buttonEntity.set<EventTrigger>({.callback = params.onClick});
+        buttonEntity.set<Event>({.callback = params.onClick});
     }
 
     // --- Create the background entity as a child of the reactive zone ---
