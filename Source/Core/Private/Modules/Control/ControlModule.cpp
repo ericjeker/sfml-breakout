@@ -2,12 +2,12 @@
 
 #include "Core/Modules/Control/ControlModule.h"
 
-#include "Core/Modules/Lifecycle/Components/LifetimeOneFrame.h"
 #include "Core/Logger.h"
 #include "Core/Modules/Control/Components/CommandQueue.h"
 #include "Core/Modules/Control/Components/PossessedByPlayer.h"
 #include "Core/Modules/Control/Components/Target.h"
 #include "Core/Modules/Control/Singletons/InputBindings.h"
+#include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 
 
 namespace Modules
@@ -41,7 +41,6 @@ ControlModule::ControlModule(const flecs::world& world)
                     // TODO:
                     //   - Add the Command as child_of the entity
                     //   - Add a Seq number to guarantee the sequence of commands
-                    LOG_DEBUG("(ControlModule::InputSystem): InputKey is activated, adding prefab.");
                     q.each([&](flecs::entity e, const PossessedByPlayer& p)
                            { it.world().entity().is_a(prefab).add<LifetimeOneFrame>().add<Target>().set<Target>({e}); });
                 }

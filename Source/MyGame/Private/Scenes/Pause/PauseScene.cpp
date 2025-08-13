@@ -11,7 +11,7 @@
 #include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Modules/Control/Components/Command.h"
-#include "Core/Modules/Lifecycle/Components/LifetimeOneFrame.h"
+#include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
@@ -22,6 +22,7 @@
 #include "GameStates/MainMenu/MainMenuState.h"
 #include "Prefabs/NavigateToMainMenuIntent.h"
 #include "Prefabs/ResumeGameIntent.h"
+#include "Scenes/ControllerDemo/ControllerDemoScene.h"
 
 PauseScene::PauseScene(flecs::world& world)
     : Scene(world)

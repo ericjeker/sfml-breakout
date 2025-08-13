@@ -3,7 +3,7 @@
 #include "Core/Modules/UI/UIModule.h"
 
 #include "../../../Public/Core/Events/Event.h"
-#include "../../../Public/Core/Modules/Lifecycle/Components/LifetimeOneFrame.h"
+#include "../../../Public/Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Modules/Render/Components/Size.h"
 #include "Core/Modules/Render/Components/TextRenderable.h"

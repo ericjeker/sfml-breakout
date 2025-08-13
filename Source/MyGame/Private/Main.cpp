@@ -53,7 +53,6 @@ int main()
     // TODO: NetworkManager
 
     // --- Create the game instance ---
-    LOG_DEBUG("(Main::main): Creating the GameInstance");
     MyGame gameInstance{};
 
     // --- Register the game instance as a service ---
@@ -62,8 +61,6 @@ int main()
     gameInstance.Initialize();
     gameInstance.Run(window);
     gameInstance.Shutdown();
-
-    LOG_DEBUG("(Main::main): Bye bye!");
 
     return 0;
 }

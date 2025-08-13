@@ -3,8 +3,8 @@
 #include "GameplayState.h"
 
 #include "Core/Logger.h"
+#include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
-#include "Events/ResumeGame.h"
 #include "Scenes/ControllerDemo/ControllerDemoScene.h"
 #include "Scenes/Debug/DebugScene.h"
 #include "Scenes/Pause/PauseScene.h"
@@ -26,9 +26,6 @@ void GameplayState::Enter()
     LOG_DEBUG("(GameplayState::Enter): Loading Controller");
     sceneManager.LoadScene<ControllerDemoScene>(SceneLoadMode::Single);
     sceneManager.LoadScene<DebugScene>(SceneLoadMode::Additive);
-
-    // --- Add the Listeners ---
-    GameService::Get<EventManager>().Subscribe<ResumeGame>(_resumeGameListener);
 }
 
 void GameplayState::Exit()

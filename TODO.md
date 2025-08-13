@@ -8,21 +8,21 @@
 - [x] AudioManager
 - [ ] CameraManager, CameraSystem, Scrolling, Culling (?)
 - [ ] Reusable ObjectPool
-- [ ] CommandRegistry, CommandSystem, Controllers
+- [x] CommandRegistry, CommandSystem, Controllers
   - Right now there is no abstraction between the SFML events and the action, so we cannot map
     them to different keys or actions. There is no notion of AIController or NetworkController either.
 - [ ] UIManager, GraphScene, SceneNode (this is handled by Flecs)
 
 ## Features
 
+- [ ] SpatialPartitioning (grid)
 - [ ] Load scenes, entities, components, systems from serialized files
 - [x] CollisionSystem with collision shape (circle, rectangle)
   - [ ] Add other types of Collider
-- [ ] SpatialPartitioning (grid)
-- [ ] SpriteRenderer
+- [x] SpriteRenderer
   - [ ] TileMap
   - [ ] SpriteAnimation
-- [ ] ControllerSystem (PlayerController, AIController, NetworkController)
+- [x] ControllerSystem (PlayerController, AIController, NetworkController)
   - [ ] Behaviors (State Machine, Behavior Tree)
   - [ ] Possession
 - [ ] AnimationSystem, SpriteAnimations
@@ -31,7 +31,7 @@
 
 ## Bugs / Improvements
 
-- [ ] ScreenBouncing doesn't account for drawable size
+- [x] ScreenBouncing doesn't account for drawable size
 - [x] Integrate Tracy for profiling
 - [x] MainMenuState contains everything, it should be a game selector with an FSM
 - [x] Use namespaces to encapsulate modules?

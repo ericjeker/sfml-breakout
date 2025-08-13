@@ -7,9 +7,9 @@
 namespace Modules
 {
 
-struct LifecycleModule
+struct LifetimeModule
 {
-    explicit LifecycleModule(const flecs::world& world);
+    explicit LifetimeModule(const flecs::world& world);
 };
 
 } // namespace Modules

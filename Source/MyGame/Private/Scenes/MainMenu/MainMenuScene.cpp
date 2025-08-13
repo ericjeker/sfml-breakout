@@ -11,7 +11,7 @@
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Control/Components/Command.h"
-#include "Core/Modules/Lifecycle/Components/LifetimeOneFrame.h"
+#include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MousePressed.h"
@@ -67,6 +67,7 @@ void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
     {
         if (mouseReleased->button == sf::Mouse::Button::Left)
         {
+            // MouseReleasedEvent is treated by the UIInputSystem that will do a hit test on clickable elements
             GetWorld().entity().is_a<MouseReleasedEvent>().set<MouseReleased>(
                 {.position = mouseReleased->position, .button = mouseReleased->button}
             );
@@ -101,7 +102,8 @@ void MainMenuScene::CreateLocalSystems(flecs::world& world)
                     {.callback = [&] { GameService::Get<GameInstance>().RequestExit(); }}
                 );
             }
-        );
+        )
+        .child_of(GetRootEntity());
 
     world.system<const StartGameIntent>("StartGameSystem")
         .each(
@@ -112,7 +114,8 @@ void MainMenuScene::CreateLocalSystems(flecs::world& world)
                      { GameService::Get<GameStateManager>().ChangeState(std::make_unique<GameplayState>(world)); }}
                 );
             }
-        );
+        )
+        .child_of(GetRootEntity());
 }
 
 void MainMenuScene::CreateUIEntities(const flecs::world& world)

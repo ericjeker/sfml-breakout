@@ -3,6 +3,7 @@
 #include "Core/Modules/Render/RenderModule.h"
 
 #include "Core/Managers/GameService.h"
+#include "Core/Modules/Particles/Components/Particle.h"
 #include "Core/Modules/Render/Components/CircleRenderable.h"
 #include "Core/Modules/Render/Components/RectangleRenderable.h"
 #include "Core/Modules/Render/Components/ShaderUniform.h"
@@ -14,6 +15,7 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
+#include <map>
 #include <tracy/Tracy.hpp>
 
 
@@ -70,6 +72,19 @@ void RenderSprite(const SpriteRenderable& s)
     window.draw(*s.sprite);
 }
 
+/**
+ * TODO: this is very inefficient... drawing particles one by one...
+ */
+void RenderParticle(const Transform& t)
+{
+    sf::VertexArray vertices{sf::PrimitiveType::Points, 1};
+    vertices[0].position = t.position;
+    vertices[0].color = sf::Color::White;
+
+    auto& window = GameService::Get<sf::RenderWindow>();
+    window.draw(vertices);
+}
+
 // void RenderShader(const ShaderRenderable& s, const ShaderUniforms& us)
 // {
 //     if (!sf::Shader::isAvailable())
@@ -97,6 +112,32 @@ void RenderSprite(const SpriteRenderable& s)
 //     window.draw(*s.target, states);
 // }
 
+void RenderAllParticles(const flecs::iter& it)
+{
+    ZoneScopedN("RenderModule::RenderAllParticles");
+
+    // Collect all particle positions in one pass
+    std::vector<sf::Vector2f> particlePositions;
+    it.world().each([&](const flecs::entity e, const Transform& t, const Particle& p) {
+        // TODO: Frustum culling, test if particle is visible
+        particlePositions.push_back(t.position);
+    });
+
+    if (particlePositions.empty()) return;
+
+    // Create one big vertex array for ALL particles
+    sf::VertexArray vertices{sf::PrimitiveType::Points, particlePositions.size()};
+
+    for (size_t i = 0; i < particlePositions.size(); ++i) {
+        vertices[i].position = particlePositions[i];
+        vertices[i].color = sf::Color::White;
+    }
+
+    // Single draw call for ALL particles!
+    auto& window = GameService::Get<sf::RenderWindow>();
+    window.draw(vertices);
+}
+
 struct RenderableEntry
 {
     float zOrder;
@@ -107,7 +148,11 @@ void Render(const flecs::iter& it)
 {
     ZoneScopedN("RenderModule::Render");
 
+    // TODO: Reserve vector
     std::vector<RenderableEntry> renderables;
+
+    // TODO: Map by ZOrder and Renderable type so we can draw all of them at the same time on one single layer
+    // std::map<float, std::vector<flecs::entity>> renderablesByZOrder;
 
     // Collect all the renderable entities
     it.world().each([&](const flecs::entity e, const Transform& t, const SpriteRenderable& s, const ZOrder& zOrder)
@@ -117,6 +162,8 @@ void Render(const flecs::iter& it)
     it.world().each([&](const flecs::entity e, const Transform& t, const RectangleRenderable& r, const ZOrder& zOrder)
                     { renderables.push_back({zOrder.zOrder, e}); });
     it.world().each([&](const flecs::entity e, const Transform& t, const TextRenderable& text, const ZOrder& zOrder)
+                    { renderables.push_back({zOrder.zOrder, e}); });
+    it.world().each([&](const flecs::entity e, const Transform& t, const Particle& p, const ZOrder& zOrder)
                     { renderables.push_back({zOrder.zOrder, e}); });
 
     // Sort the collected renderable entities by their ZOrder value
@@ -140,6 +187,10 @@ void Render(const flecs::iter& it)
         else if (currentEntity.has<TextRenderable>())
         {
             RenderText(currentEntity.get<TextRenderable>());
+        }
+        else if (currentEntity.has<Particle>())
+        {
+            RenderParticle(currentEntity.get<Transform>());
         }
     }
 }
@@ -168,6 +219,7 @@ RenderModule::RenderModule(const flecs::world& world)
 
     // Render all the Renderable Components
     world.system().kind(flecs::OnStore).run(Render);
+    world.system().kind(flecs::OnStore).run(RenderAllParticles);
 }
 
 } // namespace Modules

@@ -13,14 +13,20 @@
 #include "Core/Modules/Control/Components/PossessedByPlayer.h"
 #include "Core/Modules/Control/Components/Target.h"
 #include "Core/Modules/Control/Singletons/InputBindings.h"
-#include "Core/Modules/Lifecycle/Components/LifetimeOneFrame.h"
+#include "Core/Modules/Lifetime/Components/Lifetime.h"
+#include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
+#include "Core/Modules/Particles/Components/ParticleEmitter.h"
+#include "Core/Modules/Particles/Prefabs/Particle.h"
 #include "Core/Modules/Physics/Components/Acceleration.h"
 #include "Core/Modules/Physics/Components/Friction.h"
 #include "Core/Modules/Physics/Components/Gravity.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
+#include "Core/Modules/Render/Components/Transform.h"
+#include "Core/Modules/Render/Components/ZOrder.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
+#include "Core/Utils/Random.h"
 #include "Scenes/ControllerDemo/Components/MoveIntent.h"
 #include "Scenes/ControllerDemo/Components/PauseIntent.h"
 #include "Scenes/Pause/PauseScene.h"
@@ -60,6 +66,63 @@ void ControllerDemoScene::HandleEvent(const std::optional<sf::Event>& event)
                 .control = keyPressed->control,
                 .shift = keyPressed->shift,
             });
+        }
+    }
+    else if (const auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>())
+    {
+        if (mouseReleased->button == sf::Mouse::Button::Left)
+        {
+            // Create a custom particle generator for explosive particles
+            auto explosiveGenerator = [](flecs::world world, const Transform& emitterPos) -> flecs::entity
+            {
+                // Create particles that shoot outward in all directions
+                const float angle = Random::UniformFloat(0.f, 360.f);
+                const float speed = Random::UniformFloat(50.f, 200.f);
+                const sf::Vector2f velocity =
+                    {static_cast<float>(std::cos(angle * M_PI / 180.f) * speed),
+                     static_cast<float>(std::sin(angle * M_PI / 180.f) * speed)};
+
+                return world.entity()
+                    .is_a<Prefabs::Particle>()
+                    .set<Velocity>({velocity})
+                    .set<ZOrder>({1000.f})
+                    .set<Transform>({.position = emitterPos.position})
+                    .set<Lifetime>({Random::UniformFloat(1.0f, 3.0f)});
+            };
+
+            GetWorld()
+                .entity()
+                .set<ParticleEmitter>({.ratePerSecond = 200.f, .maxParticles = 500, .generator = explosiveGenerator})
+                .set<Lifetime>({0.2f})
+                .set<Transform>({.position = sf::Vector2f{mouseReleased->position}});
+        }
+        else if (mouseReleased->button == sf::Mouse::Button::Right)
+        {
+            // Create a different type of particle generator for fountain effect
+            auto fountainGenerator = [](flecs::world world, const Transform& emitterPos) -> flecs::entity
+            {
+                // Create particles that shoot upward like a fountain
+                const float angle = Random::UniformFloat(-30.f, 30.f); // Narrow upward cone
+                const float speed = Random::UniformFloat(100.f, 300.f);
+                const sf::Vector2f velocity = {
+                    static_cast<float>(std::sin(angle * M_PI / 180.f) * speed),
+                    static_cast<float>(-std::cos(angle * M_PI / 180.f) * speed) // Negative Y for upward
+                };
+
+                return world.entity()
+                    .is_a<Prefabs::Particle>()
+                    .set<Velocity>({velocity})
+                    .set<ZOrder>({1000.f})
+                    .set<Transform>({.position = emitterPos.position})
+                    .set<Lifetime>({Random::UniformFloat(2.0f, 4.0f)})
+                    .set<Gravity>({{0.f, 200.f}});
+            };
+
+            GetWorld()
+                .entity()
+                .set<ParticleEmitter>({.ratePerSecond = 30000.f, .maxParticles = 30000, .generator = fountainGenerator})
+                .set<Lifetime>({1.f})
+                .set<Transform>({.position = sf::Vector2f{mouseReleased->position}});
         }
     }
 }
