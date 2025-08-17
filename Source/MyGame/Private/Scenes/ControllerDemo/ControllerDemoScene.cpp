@@ -31,6 +31,8 @@
 #include "Scenes/ControllerDemo/Components/PauseIntent.h"
 #include "Scenes/Pause/PauseScene.h"
 
+#include <cmath>
+
 
 ControllerDemoScene::ControllerDemoScene(flecs::world& world)
     : Scene(world)

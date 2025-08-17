@@ -4,6 +4,8 @@
 
 #include <SFML/Window.hpp>
 
+#include <functional>
+
 
 /**
  * @class InputKey

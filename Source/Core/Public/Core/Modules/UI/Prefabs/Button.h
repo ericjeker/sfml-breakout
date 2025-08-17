@@ -8,6 +8,7 @@
 #include <SFML/System/Vector2.hpp>
 
 #include <flecs.h>
+#include <functional>
 #include <string>
 
 // TODO: Move this to Builders/Factories
