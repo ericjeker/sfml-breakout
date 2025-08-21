@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.31)
-project(sfml_sandbox_008_animations)
+project(UmbrellaProject)
 
 # --- CMake Configuration ---
 set(CMAKE_CXX_STANDARD 20)
@@ -21,19 +21,7 @@ endif ()
 
 # --- Add the Source and Vendor subdirectories ---
 add_subdirectory(Vendor)
-add_subdirectory(Source)
+add_subdirectory(Core)
 
-# --- Copy the Assets folder ---
-file(
-        COPY
-        ${CMAKE_SOURCE_DIR}/Assets
-        DESTINATION
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-)
-
-# --- Installation Rules ---
-install(TARGETS MyGame
-    RUNTIME DESTINATION bin  # For .exe/.dll
-    LIBRARY DESTINATION lib  # For .lib
-    ARCHIVE DESTINATION lib  # For .a
-)
+# --- Games or Sub-Projects ---
+add_subdirectory(Breakout)

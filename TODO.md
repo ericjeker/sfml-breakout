@@ -11,7 +11,7 @@
 - [x] CommandRegistry, CommandSystem, Controllers
   - Right now there is no abstraction between the SFML events and the action, so we cannot map
     them to different keys or actions. There is no notion of AIController or NetworkController either.
-- [ ] UIManager, GraphScene, SceneNode (this is handled by Flecs)
+- [x] UIManager, GraphScene, SceneNode (this is handled by Flecs)
 
 ## Features
 
@@ -26,7 +26,7 @@
   - [ ] Behaviors (State Machine, Behavior Tree)
   - [ ] Possession
 - [ ] AnimationSystem, SpriteAnimations
-- [ ] ParticleSystem
+- [x] ParticleSystem
 - [ ] ShaderEffects
 
 ## Bugs / Improvements
@@ -48,7 +48,7 @@
 ### 1. Rendering Optimizations
 
 - [ ] Batch rendering: Instead of drawing each entity individually, use `sf::VertexArray` or `sf::VertexBuffer` to draw multiple entities in a single draw call
-- [ ] Culling: Only render what is visible on screen
+- [ ] Frustum Culling: Only render what is visible on screen
 - [ ] Sprite batching: Use texture atlases and batch similar sprites together
 
 ### 2. Resourcement Management
@@ -57,25 +57,33 @@
 
 ### 2. Physics Optimizations
 
-- Spatial partitioning: Use a spatial hash grid, quadtree, or broad-phase collision detection
-- Object pooling: Reuse entity objects instead of creating/destroying them
+- [ ] Spatial partitioning: Use a spatial hash grid, quadtree, or broad-phase collision detection
+- [ ] Object pooling: Reuse entity objects instead of creating/destroying them
 
 ### 3. Flecs Optimizations
 
-- Create modules instead of individual scenes, each scene can be a module
-- Have a single world handling everything so that the game state can be stored in it too
+- [ ] ~~Create modules instead of individual scenes, each scene can be a module~~
+- [x] Have a single world handling everything so that the game state can be stored in it too
 
 ### 4. SFML-Specific Optimizations
 
-- Reduce state changes: Minimize texture binding and shader changes
-- Use sf::Transform: Cache transformation matrices instead of recalculating them
-- Profile with sf::Clock: Measure actual frame times to identify bottlenecks
+- [ ] Reduce state changes: Minimize texture binding and shader changes
+- [ ] Use sf::Transform: Cache transformation matrices instead of recalculating them
+- [ ] ~~Profile with sf::Clock: Measure actual frame times to identify bottlenecks~~
 
 ### 5. General C++ Optimizations
 
-- Avoid dynamic allocation: Use object pools and stack allocation where possible
-- Profile-guided optimization: Use profilers to identify hotspots
-- Compiler flags: Use `-O3` and appropriate optimization flags
+- [ ] Avoid dynamic allocation: Use object pools and stack allocation where possible
+- [x] Profile-guided optimization: Use profilers to identify hotspots
+- [ ] Compiler flags: Use `-O3` and appropriate optimization flags
+
+### 6. Polish
+
+- 🎨 **Art & Animation** sprites, textures, smooth animations
+- 🎵 **Audio Integration** music, sound effects, audio mixing
+- 🎮 **Game Design** balanced gameplay, progression, user experience
+- ✨ **Polish** particles effects, screen transitions, juice
+- 📱 **UI/UX Design** menus, HUD, responsive interface
 
 ## Games
 
@@ -86,10 +94,10 @@
 
 #### Visual Enhancements
 
-- Trail Effects: Add particle trails behind each ball that fade over time
-- Color Variations: Make balls change color based on velocity, or cycle through colors
-- Size Variations: Create balls of different sizes with different physics properties
-- Lighting Effects: Add a simple bloom or glow effect around the balls
+- 🎨 Trail Effects: Add particle trails behind each ball that fade over time
+- 🎨 Color Variations: Make balls change color based on velocity, or cycle through colors
+- 🎨 Size Variations: Create balls of different sizes with different physics properties
+- ✨ Lighting Effects: Add a simple bloom or glow effect around the balls
 
 #### Interactive Features
 
@@ -106,7 +114,7 @@
 
 #### Physics Enhancements
 
-- Ball-to-Ball Collisions: Implement elastic collisions between balls
+- [x] Ball-to-Ball Collisions: Implement elastic collisions between balls
 - Different Materials: Give balls different bounce coefficients and friction
 - Air Resistance: Add drag force that increases with velocity
 - Magnetic/Electric Forces: Add attraction/repulsion between certain balls
