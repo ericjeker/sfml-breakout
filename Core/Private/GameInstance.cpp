@@ -2,12 +2,12 @@
 
 #include "Core/GameInstance.h"
 
-#include "../Public/Core/Events/DeferredEvent.h"
-#include "Core/GameStates/GameStateManager.h"
-#include "Core/Logger.h"
+#include "Core/Events/DeferredEvent.h"
 #include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
+#include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/SceneManager.h"
+#include "Core/Utils/Logger.h"
 
 #include <tracy/Tracy.hpp>
 
@@ -76,13 +76,10 @@ void GameInstance::RunDeferredEvents(const flecs::world& world)
     toDelete.reserve(32);
 
     // Loop the entities
-    world.each<DeferredEvent>(
-        [&](flecs::entity e, const DeferredEvent& ev)
-        {
-            callbacks.emplace_back(ev.callback);
-            toDelete.emplace_back(e);
-        }
-    );
+    world.each<DeferredEvent>([&](flecs::entity e, const DeferredEvent& ev) {
+        callbacks.emplace_back(ev.callback);
+        toDelete.emplace_back(e);
+    });
 
     // Run the callbacks
     for (auto& cb : callbacks)

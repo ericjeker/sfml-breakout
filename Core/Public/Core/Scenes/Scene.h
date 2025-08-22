@@ -2,8 +2,6 @@
 
 #pragma once
 
-
-
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 
@@ -40,10 +38,6 @@ public:
     [[nodiscard]] bool IsLoaded() const;
     void SetLoaded(bool loaded);
 
-    [[nodiscard]] bool IsPaused() const;
-    void Pause();
-    void Resume();
-
     // --- Scene Description ---
     [[nodiscard]] const std::string& GetName() const;
     [[nodiscard]] const std::string& GetPath() const;
@@ -66,7 +60,6 @@ private:
     flecs::entity _rootEntity;
 
     bool _isLoaded = false;
-    bool _isPaused = false;
 };
 
 

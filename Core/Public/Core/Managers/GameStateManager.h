@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "GameState.h"
+#include "Core/GameStates/GameState.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 

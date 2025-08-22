@@ -2,7 +2,7 @@
 
 #include "Core/Scenes/Scene.h"
 
-#include "Core/Logger.h"
+#include "Core/Utils/Logger.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Modules/Scene/Components/ScenePaused.h"
 
@@ -16,7 +16,7 @@ Scene::Scene(flecs::world& world)
 
 void Scene::Initialize()
 {
-    LOG_DEBUG("(Scene:Initialize): Create a the root entity");
+    LOG_DEBUG(std::format("({}:Initialize): Create the root entity", typeid(*this).name()));
     _rootEntity = GetWorld().entity();
     _rootEntity.add<ScenePaused>().disable<ScenePaused>();
 }
@@ -25,12 +25,15 @@ void Scene::Shutdown()
 {
     if (GetRootEntity() == flecs::entity::null() || !GetWorld().exists(GetRootEntity()))
     {
-        LOG_DEBUG("(Scene:Shutdown): No root entity");
         return;
     }
 
-    LOG_DEBUG("(Scene:Shutdown): Deferring root entity destruction");
-    GetWorld().defer([&] { GetWorld().delete_with(flecs::ChildOf, GetRootEntity()); });
+    LOG_DEBUG(std::format("({}:Shutdown): Deferring root entity destruction", typeid(*this).name()));
+    GetWorld().defer([&] {
+        LOG_DEBUG(std::format("({}:Shutdown): Destroying root entity", typeid(*this).name()));
+        GetWorld().delete_with(flecs::ChildOf, GetRootEntity());
+        GetRootEntity().destruct();
+    });
 }
 
 void Scene::HandleEvent(const std::optional<sf::Event>& event)
@@ -45,23 +48,6 @@ bool Scene::IsLoaded() const
 void Scene::SetLoaded(const bool loaded)
 {
     _isLoaded = loaded;
-}
-
-bool Scene::IsPaused() const
-{
-    return _isPaused;
-}
-
-void Scene::Pause()
-{
-    _isPaused = true;
-    GetRootEntity().enable<ScenePaused>();
-}
-
-void Scene::Resume()
-{
-    _isPaused = false;
-    GetRootEntity().disable<ScenePaused>();
 }
 
 const std::string& Scene::GetName() const

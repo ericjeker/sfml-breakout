@@ -25,3 +25,11 @@ add_subdirectory(Core)
 
 # --- Games or Sub-Projects ---
 add_subdirectory(Breakout)
+
+install(TARGETS Breakout
+        EXPORT Breakout
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/test
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)

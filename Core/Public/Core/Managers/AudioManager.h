@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ResourceManager.h"
+#include "Core/Managers/ResourceManager.h"
 
 #include <string>
 

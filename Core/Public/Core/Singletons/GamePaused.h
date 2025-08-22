@@ -2,11 +2,8 @@
 
 #pragma once
 
-namespace Prefabs
-{
 
-struct ResumeGameIntent
+struct GamePaused
 {
+    bool isPaused = false;
 };
-
-}

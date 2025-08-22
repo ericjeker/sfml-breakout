@@ -2,11 +2,12 @@
 
 #include "GameplayState.h"
 
-#include "Core/Logger.h"
+#include "Core/GameStates/GameState.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
-#include "Scenes/ControllerDemo/ControllerDemoScene.h"
 #include "Scenes/Debug/DebugScene.h"
+#include "Scenes/GameOver/GameOverScene.h"
+#include "Scenes/Gameplay/GameplayScene.h"
 #include "Scenes/Pause/PauseScene.h"
 
 GameplayState::GameplayState(flecs::world& world)
@@ -18,21 +19,22 @@ void GameplayState::Enter()
 {
     auto& sceneManager = GameService::Get<SceneManager>();
 
-    LOG_DEBUG("(GameplayState::GameplayState): Adding scenes to the SceneManager");
-    sceneManager.AddScene<ControllerDemoScene>(std::make_unique<ControllerDemoScene>(GetWorld()));
-    sceneManager.AddScene<PauseScene>(std::make_unique<PauseScene>(GetWorld()));
+    // --- Add scenes to the game state ---
     sceneManager.AddScene<DebugScene>(std::make_unique<DebugScene>(GetWorld()));
+    sceneManager.AddScene<GameplayScene>(std::make_unique<GameplayScene>(GetWorld()));
+    sceneManager.AddScene<GameOverScene>(std::make_unique<GameOverScene>(GetWorld()));
+    sceneManager.AddScene<PauseScene>(std::make_unique<PauseScene>(GetWorld()));
 
-    LOG_DEBUG("(GameplayState::Enter): Loading Controller");
-    sceneManager.LoadScene<ControllerDemoScene>(SceneLoadMode::Single);
+    // --- Load the default scene ---
+    sceneManager.LoadScene<GameplayScene>(SceneLoadMode::Single);
     sceneManager.LoadScene<DebugScene>(SceneLoadMode::Additive);
 }
 
 void GameplayState::Exit()
 {
-    LOG_DEBUG("(GameplayState::Exit): Clean up scene manager and unsubscribe");
+    // --- Clean-up scenes ---
     auto& sceneManager = GameService::Get<SceneManager>();
-    sceneManager.RemoveScene<ControllerDemoScene>();
+    sceneManager.RemoveScene<GameplayScene>();
     sceneManager.RemoveScene<PauseScene>();
     sceneManager.RemoveScene<DebugScene>();
 }
@@ -43,8 +45,11 @@ void GameplayState::HandleEvent(const std::optional<sf::Event>& event)
 
     if (event->is<sf::Event::FocusLost>())
     {
-        sceneManager.GetScene<ControllerDemoScene>().Pause();
-        sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
+        //sceneManager.GetScene<GameplayScene>().Pause();
+        if (!sceneManager.GetScene<PauseScene>().IsLoaded() && !sceneManager.GetScene<GameOverScene>().IsLoaded())
+        {
+            sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
+        }
     }
     else if (event->is<sf::Event::FocusGained>())
     {

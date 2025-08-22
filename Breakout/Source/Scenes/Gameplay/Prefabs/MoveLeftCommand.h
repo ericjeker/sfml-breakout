@@ -5,7 +5,7 @@
 namespace Prefabs
 {
 
-struct NavigateToMainMenuIntent
+struct MoveLeftCommand
 {
 };
 

@@ -3,9 +3,7 @@
 #pragma once
 
 
-
-
-struct PauseIntent
+struct PauseGameIntent
 {
 };
 

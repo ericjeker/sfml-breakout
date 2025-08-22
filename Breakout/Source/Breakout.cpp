@@ -2,10 +2,9 @@
 
 #include "Breakout.h"
 
-#include "Core/GameStates/GameStateManager.h"
-#include "Core/Logger.h"
 #include "Core/Managers/AudioManager.h"
 #include "Core/Managers/GameService.h"
+#include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Control/ControlModule.h"
 #include "Core/Modules/Lifetime/LifetimeModule.h"
@@ -14,6 +13,8 @@
 #include "Core/Modules/Render/RenderModule.h"
 #include "Core/Modules/Scene/SceneModule.h"
 #include "Core/Modules/UI/UIModule.h"
+#include "Core/Singletons/GamePaused.h"
+#include "Core/Utils/Logger.h"
 #include "GameStates/MainMenu/MainMenuState.h"
 
 void Breakout::Initialize()
@@ -33,6 +34,9 @@ void Breakout::Initialize()
     world.import<Modules::RenderModule>();
     world.import<Modules::ParticlesModule>();
     // clang-format on
+
+    // --- Add the GamePaused singleton ---
+    //world.add<GamePaused>({});
 
     // --- Load the Main Menu State ---
     LOG_DEBUG("(Breakout::Initialization): Load the Main Menu State");

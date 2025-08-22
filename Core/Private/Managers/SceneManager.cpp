@@ -23,7 +23,7 @@ void SceneManager::HandleEvent(const std::optional<sf::Event>& event)
     for (const auto& typeIdx : _sceneOrder)
     {
         const auto& scene = _scenes.at(typeIdx);
-        if (!scene->IsLoaded() || scene->IsPaused())
+        if (!scene->IsLoaded())
         {
             continue;
         }

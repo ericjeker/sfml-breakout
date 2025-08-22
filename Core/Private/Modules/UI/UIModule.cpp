@@ -2,9 +2,9 @@
 
 #include "Core/Modules/UI/UIModule.h"
 
-#include "../../../Public/Core/Events/Event.h"
-#include "../../../Public/Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
+#include "Core/Events/Event.h"
 #include "Core/Managers/GameService.h"
+#include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Components/Size.h"
 #include "Core/Modules/Render/Components/TextRenderable.h"
 #include "Core/Modules/Render/Components/Transform.h"
@@ -46,58 +46,36 @@ UIModule::UIModule(const flecs::world& world)
     // --- Declare Singletons ---
     world.singleton<MousePosition>();
 
-    world.system("UIInputSystem")
-        .kind(flecs::PostLoad)
-        .run(
-            [](const flecs::iter& it)
-            {
-                const auto& renderWindow = GameService::Get<sf::RenderWindow>();
-                const auto pos = sf::Mouse::getPosition(renderWindow);
-                it.world().set<MousePosition>({.position = pos});
-            }
-        );
-
+    world.system("UIInputSystem").kind(flecs::PostLoad).run([](const flecs::iter& it) {
+        const auto& renderWindow = GameService::Get<sf::RenderWindow>();
+        const auto pos = sf::Mouse::getPosition(renderWindow);
+        it.world().set<MousePosition>({.position = pos});
+    });
 
     world.system<const MouseReleased>("UIHitTest")
         .kind(flecs::PreUpdate)
-        .each(
-            [&](const flecs::iter& it, size_t index, const MouseReleased& mouseReleased)
+        .each([&](const flecs::iter& it, size_t index, const MouseReleased& mouseReleased) {
+            // We have a mouseReleased event. Now, find any clickable entities that were hit.
+            if (mouseReleased.button != sf::Mouse::Button::Left)
             {
-                // We have a mouseReleased event. Now, find any clickable entities that were hit.
-                if (mouseReleased.button != sf::Mouse::Button::Left)
-                {
-                    return;
-                }
-
-                // Query the world for all entities that are Clickable and have the necessary components
-                it.world().query<const Clickable, const Event, const Transform, const Size>().each(
-                    [&](const Clickable& clickable, const Event& eventTrigger, const Transform& t, const Size& s)
-                    {
-                        sf::FloatRect bounds;
-                        bounds.size = s.size;
-                        bounds.position = t.position;
-
-                        LOG_DEBUG(
-                            std::format(
-                                "(MainMenuScene) Mouse pos: ({}, {}), Bounds: pos({}, {}), size({}, {})",
-                                mouseReleased.position.x,
-                                mouseReleased.position.y,
-                                bounds.position.x,
-                                bounds.position.y,
-                                bounds.size.x,
-                                bounds.size.y
-                            )
-                        );
-
-                        if (bounds.contains(sf::Vector2f(mouseReleased.position)))
-                        {
-                            // The mouse press hit this clickable entity
-                            eventTrigger.callback(it.world());
-                        }
-                    }
-                );
+                return;
             }
-        );
+
+            // Query the world for all entities that are Clickable and have the necessary components
+            it.world().query<const Clickable, const Event, const Transform, const Size>().each(
+                [&](const Clickable& clickable, const Event& eventTrigger, const Transform& t, const Size& s) {
+                    sf::FloatRect bounds;
+                    bounds.size = s.size;
+                    bounds.position = t.position;
+
+                    if (bounds.contains(sf::Vector2f(mouseReleased.position)))
+                    {
+                        // The mouse press hit this clickable entity
+                        eventTrigger.callback(it.world());
+                    }
+                }
+            );
+        });
 }
 
 } // namespace Modules

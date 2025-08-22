@@ -2,14 +2,16 @@
 
 #include "Core/Modules/Physics/PhysicsModule.h"
 
-#include "../../../Public/Core/Modules/Physics/Singletons/GravitySettings.h"
 #include "Core/Modules/Physics/Components/Acceleration.h"
 #include "Core/Modules/Physics/Components/CircleCollider.h"
 #include "Core/Modules/Physics/Components/Friction.h"
 #include "Core/Modules/Physics/Components/Gravity.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
+#include "Core/Modules/Physics/Singletons/GravitySettings.h"
 #include "Core/Modules/Render/Components/Transform.h"
+#include "Core/Modules/Scene/Components/ScenePaused.h"
 #include "Core/PhysicsConstants.h"
+#include "Core/Singletons/GamePaused.h"
 
 #include <numbers>
 #include <tracy/Tracy.hpp>
@@ -47,8 +49,7 @@ void CollisionSystem(const flecs::iter& it, const size_t idx, Transform& t, Velo
     ZoneScoped;
 
     it.world().query<Transform, Velocity, const CircleCollider>().each(
-        [&](const flecs::entity other, Transform& t2, Velocity& v2, const CircleCollider& c2)
-        {
+        [&](const flecs::entity other, Transform& t2, Velocity& v2, const CircleCollider& c2) {
             if (other == it.entity(idx))
             {
                 return;
@@ -92,6 +93,8 @@ namespace Modules
 
 PhysicsModule::PhysicsModule(const flecs::world& world)
 {
+    world.component<Velocity>().add(flecs::CanToggle);
+
     world.set<GravitySettings>(
         {.gravity = PhysicsConstants::NO_GRAVITY, .pixelsPerCentimeter = PhysicsConstants::PIXELS_PER_CENTIMETER}
     );

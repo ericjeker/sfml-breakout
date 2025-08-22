@@ -123,12 +123,14 @@ void RenderAllParticles(const flecs::iter& it)
         particlePositions.push_back(t.position);
     });
 
-    if (particlePositions.empty()) return;
+    if (particlePositions.empty())
+        return;
 
     // Create one big vertex array for ALL particles
     sf::VertexArray vertices{sf::PrimitiveType::Points, particlePositions.size()};
 
-    for (size_t i = 0; i < particlePositions.size(); ++i) {
+    for (size_t i = 0; i < particlePositions.size(); ++i)
+    {
         vertices[i].position = particlePositions[i];
         vertices[i].color = sf::Color::White;
     }
@@ -154,17 +156,38 @@ void Render(const flecs::iter& it)
     // TODO: Map by ZOrder and Renderable type so we can draw all of them at the same time on one single layer
     // std::map<float, std::vector<flecs::entity>> renderablesByZOrder;
 
+    const auto world = it.world();
     // Collect all the renderable entities
-    it.world().each([&](const flecs::entity e, const Transform& t, const SpriteRenderable& s, const ZOrder& zOrder)
-                    { renderables.push_back({zOrder.zOrder, e}); });
-    it.world().each([&](const flecs::entity e, const Transform& t, const CircleRenderable& c, const ZOrder& zOrder)
-                    { renderables.push_back({zOrder.zOrder, e}); });
-    it.world().each([&](const flecs::entity e, const Transform& t, const RectangleRenderable& r, const ZOrder& zOrder)
-                    { renderables.push_back({zOrder.zOrder, e}); });
-    it.world().each([&](const flecs::entity e, const Transform& t, const TextRenderable& text, const ZOrder& zOrder)
-                    { renderables.push_back({zOrder.zOrder, e}); });
-    it.world().each([&](const flecs::entity e, const Transform& t, const Particle& p, const ZOrder& zOrder)
-                    { renderables.push_back({zOrder.zOrder, e}); });
+    world.query_builder<const Transform, const SpriteRenderable, const ZOrder>()
+        .with(flecs::Disabled)
+        .optional()
+        .each([&](const flecs::entity e, const Transform& t, const SpriteRenderable& s, const ZOrder& zOrder) {
+            renderables.push_back({zOrder.zOrder, e});
+        });
+    world.query_builder<const Transform, const CircleRenderable, const ZOrder>()
+        .with(flecs::Disabled)
+        .optional()
+        .each([&](const flecs::entity e, const Transform& t, const CircleRenderable& c, const ZOrder& zOrder) {
+            renderables.push_back({zOrder.zOrder, e});
+        });
+    world.query_builder<const Transform, const RectangleRenderable, const ZOrder>()
+        .with(flecs::Disabled)
+        .optional()
+        .each([&](const flecs::entity e, const Transform& t, const RectangleRenderable& r, const ZOrder& zOrder) {
+            renderables.push_back({zOrder.zOrder, e});
+        });
+    world.query_builder<const Transform, const TextRenderable, const ZOrder>()
+        .with(flecs::Disabled)
+        .optional()
+        .each([&](const flecs::entity e, const Transform& t, const TextRenderable& text, const ZOrder& zOrder) {
+            renderables.push_back({zOrder.zOrder, e});
+        });
+    world.query_builder<const Transform, const Particle, const ZOrder>()
+        .with(flecs::Disabled)
+        .optional()
+        .each([&](const flecs::entity e, const Transform& t, const Particle& p, const ZOrder& zOrder) {
+            renderables.push_back({zOrder.zOrder, e});
+        });
 
     // Sort the collected renderable entities by their ZOrder value
     std::ranges::sort(renderables, [](const RenderableEntry& a, const RenderableEntry& b) { return a.zOrder < b.zOrder; });

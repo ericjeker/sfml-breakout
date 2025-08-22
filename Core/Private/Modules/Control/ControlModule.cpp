@@ -2,7 +2,7 @@
 
 #include "Core/Modules/Control/ControlModule.h"
 
-#include "Core/Logger.h"
+#include "Core/Utils/Logger.h"
 #include "Core/Modules/Control/Components/CommandQueue.h"
 #include "Core/Modules/Control/Components/PossessedByPlayer.h"
 #include "Core/Modules/Control/Components/Target.h"

@@ -2,12 +2,6 @@
 
 #pragma once
 
-
-
-
-struct ResumeIntent
+struct RestartGameIntent
 {
 };
-
-
-

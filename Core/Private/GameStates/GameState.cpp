@@ -2,7 +2,7 @@
 
 #include "Core/GameStates/GameState.h"
 
-#include "Core/Logger.h"
+#include "Core/Utils/Logger.h"
 
 GameState::GameState(flecs::world& world)
     : _world(world)
@@ -12,18 +12,15 @@ GameState::GameState(flecs::world& world)
 void GameState::Pause()
 {
     LOG_DEBUG("(GameState::Pause)");
-    _paused = true;
 }
 
 void GameState::Resume()
 {
     LOG_DEBUG("(GameState::Resume)");
-    _paused = false;
 }
 
 bool GameState::IsPaused() const
 {
-    return _paused;
 }
 
 void GameState::HandleEvent(const std::optional<sf::Event>& event)

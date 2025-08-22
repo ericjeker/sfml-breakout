@@ -2,7 +2,7 @@
 
 #include "Core/Managers/ResourceManager.h"
 
-#include "Core/Logger.h"
+#include "Core/Utils/Logger.h"
 #include "Core/Managers/FileManager.h"
 
 #include <nlohmann/json.hpp>

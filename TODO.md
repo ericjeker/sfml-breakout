@@ -109,7 +109,7 @@
 - Keyboard Controls:
     - [x] Toggle gravity on/off
     - [ ] Adjust gravity strength
-    - [x] Pause/resume simulation
+    - [x] Pause/ simulation
     - [x] Reset scene
 
 #### Physics Enhancements

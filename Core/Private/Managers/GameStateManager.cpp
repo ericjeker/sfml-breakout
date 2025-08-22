@@ -1,6 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Core/GameStates/GameStateManager.h"
+#include "Core/Managers/GameStateManager.h"
 
 void GameStateManager::PushState(std::unique_ptr<GameState> state)
 {

@@ -2,11 +2,11 @@
 
 #include "MainMenuState.h"
 
-#include "Scenes/MainMenu/MainMenuScene.h"
-#include "Core/GameInstance.h"
-#include "Core/Logger.h"
+#include "Core/GameStates/GameState.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
+#include "Core/Utils/Logger.h"
+#include "Scenes/MainMenu/MainMenuScene.h"
 
 MainMenuState::MainMenuState(flecs::world& world)
     : GameState(world)

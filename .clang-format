@@ -70,12 +70,15 @@ BraceWrapping:
   AfterExternBlock: true
   BeforeCatch: false
   BeforeElse: true
-  BeforeLambdaBody: true
+  BeforeLambdaBody: false
   BeforeWhile: false
   IndentBraces: false
   SplitEmptyFunction: true
   SplitEmptyRecord: true
   SplitEmptyNamespace: true
+
+# Lambdas
+LambdaBodyIndentation: Signature
 
 # Namespaces
 CompactNamespaces: false
@@ -94,9 +97,11 @@ MaxEmptyLinesToKeep: 2
 # Sorting
 IncludeBlocks: Regroup
 IncludeCategories:
+  - Priority: 2
+    Regex: '^\"Core\/(.+)\"$'
   - Priority: 1
     Regex: '^\"(.+)\"$'
-  - Priority: 2
+  - Priority: 8
     Regex: '^<SFML\/(.+)'
   - Priority: 9
     Regex: '^<(glad|gl|X11|jni|android|stb_|GLES2|vorbis|miniaudio|catch2)'

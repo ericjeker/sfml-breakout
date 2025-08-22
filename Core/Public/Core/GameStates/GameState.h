@@ -18,17 +18,16 @@ public:
     virtual void Enter() = 0;
     virtual void Exit() = 0;
 
-    virtual void Pause();
-    virtual void Resume();
-    [[nodiscard]] bool IsPaused() const;
-
     virtual void HandleEvent(const std::optional<sf::Event>& event);
+
+    void Pause();
+    void Resume();
+    bool IsPaused() const;
 
     flecs::world& GetWorld();
     [[nodiscard]] const flecs::world& GetWorld() const;
 
 private:
-    bool _paused = false;
     flecs::world& _world;
 };
 

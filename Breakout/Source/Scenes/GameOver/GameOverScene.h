@@ -5,10 +5,10 @@
 #include "Core/Scenes/Scene.h"
 
 
-class PauseScene final : public Scene
+class GameOverScene final : public Scene
 {
 public:
-    explicit PauseScene(flecs::world& world);
+    explicit GameOverScene(flecs::world& world);
     void Initialize() override;
     void HandleEvent(const std::optional<sf::Event>& event) override;
 };

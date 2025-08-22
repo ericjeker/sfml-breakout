@@ -2,11 +2,11 @@
 
 #include "Scenes/MainMenu/MainMenuScene.h"
 
+#include "Core/Managers/GameStateManager.h"
+#include "Core/Utils/Logger.h"
 #include "Core/Configuration.h"
 #include "Core/Events/DeferredEvent.h"
 #include "Core/GameInstance.h"
-#include "Core/GameStates/GameStateManager.h"
-#include "Core/Logger.h"
 #include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/ResourceManager.h"

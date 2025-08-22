@@ -1,6 +1,6 @@
-// Copyright (c) Eric Jeker. All Rights Reserved.
+// Copyright (c) Eric Jeker 2025.
 
-#include "Core/Logger.h"
+#include "Core/Utils/Logger.h"
 
 #include <iostream>
 #include <ostream>

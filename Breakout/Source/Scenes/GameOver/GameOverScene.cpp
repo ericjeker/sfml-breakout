@@ -1,13 +1,13 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Scenes/Pause/PauseScene.h"
+#include "GameOverScene.h"
 
+#include "../Gameplay/Components/NavigateToMainMenuIntent.h"
+#include "../Gameplay/Components/RestartGameIntent.h"
 #include "Core/Configuration.h"
 #include "Core/Events/DeferredEvent.h"
-#include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
-#include "Core/Modules/Control/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
@@ -18,25 +18,24 @@
 #include "Core/Utils/Logger.h"
 #include "GameStates/Gameplay/GameplayState.h"
 #include "GameStates/MainMenu/MainMenuState.h"
-#include "Scenes/Gameplay/Components/NavigateToMainMenuIntent.h"
-#include "Scenes/Gameplay/Components/ResumeGameIntent.h"
 #include "Scenes/Gameplay/GameplayScene.h"
 
-PauseScene::PauseScene(flecs::world& world)
+GameOverScene::GameOverScene(flecs::world& world)
     : Scene(world)
 {
 }
 
-void PauseScene::Initialize()
+void GameOverScene::Initialize()
 {
     Scene::Initialize();
-    LOG_DEBUG("(PauseScene::Initialize)");
+    LOG_DEBUG("(GameOverScene::Initialize)");
 
     constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
     constexpr float CENTER_Y = Configuration::WINDOW_SIZE.y / 2;
 
-    const auto& world = GetWorld();
+    auto& world = GetWorld();
 
+    // --- Create entities ---
     float zOrder = 0.f;
 
     // --- Overlay ---
@@ -53,10 +52,10 @@ void PauseScene::Initialize()
     )
         .child_of(GetRootEntity());
 
-    // --- Add Pause Text ---
+    // --- Add Game Over Text ---
     Prefabs::Text::Create(
         world,
-        {.text = "Game Paused",
+        {.text = "Game Over",
          .fontAsset = "Orbitron-Bold",
          .fontSize = 60.f,
          .textColor = NordTheme::SnowStorm3,
@@ -66,18 +65,18 @@ void PauseScene::Initialize()
     )
         .child_of(GetRootEntity());
 
-    // --- Add Resume Button ---
+    // --- Add Restart Button ---
     Prefabs::Button::Create(
         world,
         {
-            .text = "Resume",
+            .text = "Restart",
             .fontAsset = "Orbitron-Bold",
             .fontSize = 48.f,
             .textColor = NordTheme::SnowStorm3,
             .backgroundColor = sf::Color::Transparent,
             .position = {CENTER_X, CENTER_Y},
             .zOrder = ++zOrder,
-            .onClick = [](const flecs::world& stage) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<ResumeGameIntent>(); },
+            .onClick = [](const flecs::world& stage) { stage.entity().add<LifetimeOneFrame>().add<RestartGameIntent>(); },
         }
     )
         .child_of(GetRootEntity());
@@ -85,21 +84,19 @@ void PauseScene::Initialize()
     // --- Add Exit Button ---
     Prefabs::Button::Create(
         world,
-        {
-            .text = "Exit",
-            .fontAsset = "Orbitron-Regular",
-            .fontSize = 36.f,
-            .textColor = NordTheme::SnowStorm3,
-            .backgroundColor = sf::Color::Transparent,
-            .position = {CENTER_X, CENTER_Y + 100},
-            .zOrder = ++zOrder,
-            .onClick = [](const flecs::world& stage) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMainMenuIntent>(); },
-        }
-    )
-        .child_of(GetRootEntity());
+        {.text = "Exit",
+         .fontAsset = "Orbitron-Regular",
+         .fontSize = 36.f,
+         .textColor = NordTheme::SnowStorm3,
+         .backgroundColor = sf::Color::Transparent,
+         .position = {CENTER_X, CENTER_Y + 100},
+         .zOrder = ++zOrder,
+         .onClick = [](const flecs::world& stage
+                    ) { stage.entity().add<LifetimeOneFrame>().add<NavigateToMainMenuIntent>(); }}
+    ).child_of(GetRootEntity());
 }
 
-void PauseScene::HandleEvent(const std::optional<sf::Event>& event)
+void GameOverScene::HandleEvent(const std::optional<sf::Event>& event)
 {
     if (!IsLoaded())
     {

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Core/Scenes/Scene.h"
-#include "ResourceManager.h"
+#include "Core/Managers/ResourceManager.h"
 
 #include <memory>
 #include <typeindex>
