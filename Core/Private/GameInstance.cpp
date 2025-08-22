@@ -14,7 +14,7 @@
 
 void GameInstance::Run(sf::RenderWindow& renderWindow) const
 {
-    LOG_DEBUG("(GameInstance::Run): Starting game loop");
+    LOG_DEBUG("GameInstance::Run: Starting game loop");
     auto& world = GetWorld();
 
     sf::Clock clock;
@@ -40,7 +40,7 @@ void GameInstance::Run(sf::RenderWindow& renderWindow) const
         FrameMark;
     }
 
-    LOG_DEBUG("(GameInstance::Run): Game loop ended");
+    LOG_DEBUG("GameInstance::Run: Game loop ended");
     if (renderWindow.isOpen())
     {
         renderWindow.close();

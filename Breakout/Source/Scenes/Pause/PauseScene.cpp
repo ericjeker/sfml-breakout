@@ -30,7 +30,7 @@ PauseScene::PauseScene(flecs::world& world)
 void PauseScene::Initialize()
 {
     Scene::Initialize();
-    LOG_DEBUG("(PauseScene::Initialize)");
+    LOG_DEBUG("PauseScene::Initialize");
 
     constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
     constexpr float CENTER_Y = Configuration::WINDOW_SIZE.y / 2;

@@ -42,6 +42,7 @@
 
 #include <SFML/Graphics.hpp>
 
+#include <iostream>
 #include <optional>
 
 
@@ -53,7 +54,7 @@ GameplayScene::GameplayScene(flecs::world& world)
 void GameplayScene::Initialize()
 {
     Scene::Initialize();
-    LOG_DEBUG("(GameplayScene:Initialize)");
+    LOG_DEBUG("GameplayScene:Initialize");
 
     auto& world = GetWorld();
 
@@ -107,7 +108,9 @@ void GameplayScene::CreateInputBindings(const flecs::world& world)
 
 void GameplayScene::CreateLocalSystems(const flecs::world& world)
 {
+    // Triggered by the Input Bindings and ControlSystem
     world.system<const MoveIntent, const Target>("PaddleMovementSystem")
+        .kind(flecs::PreUpdate)
         .each([](const flecs::entity& cmd, const MoveIntent& i, const Target& t) {
             auto& [acceleration] = t.entity.get_mut<Acceleration>();
             acceleration.y += i.accelerate.y * 1000.f;
@@ -120,12 +123,13 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
 
     // Launch the ball currently on the paddle
     world.system<const LaunchBallIntent>("LaunchBallSystem")
+        .kind(flecs::PreUpdate)
         .each([](const flecs::entity& cmd, const LaunchBallIntent& l) {
             cmd.world().query<const Ball, const PossessedByPlayer>().each(
                 [](const flecs::entity ball, const Ball b, const PossessedByPlayer p) {
                     ball.remove<PossessedByPlayer>();
                     ball.remove<Friction>();
-                    ball.set<Velocity>({{0.f, -500.f}});
+                    ball.set<Velocity>({{0.f, -1000.f}});
                 }
             );
 
@@ -162,6 +166,19 @@ void GameplayScene::CreateUISystem(flecs::world& world)
         })
         .child_of(GetRootEntity());
 
+    // Navigate to the main menu state after quitting the game
+    world.system<const NavigateToMainMenuIntent>()
+        .kind(flecs::PreUpdate)
+        .each([&](const flecs::entity& e, const NavigateToMainMenuIntent i) {
+            // We defer the state change to the end of the frame
+            e.world().entity().set<DeferredEvent>({.callback = [&] {
+                GameService::Get<GameStateManager>().ChangeState(std::make_unique<MainMenuState>(world));
+            }});
+
+            e.destruct();
+        })
+        .child_of(GetRootEntity());
+
     // Game over, load the game over scene
     world.system<const GameOverIntent>("GameOverSystem")
         .kind(flecs::PreUpdate)
@@ -175,22 +192,10 @@ void GameplayScene::CreateUISystem(flecs::world& world)
         })
         .child_of(GetRootEntity());
 
-    world.system<const NavigateToMainMenuIntent>()
-        .each([&](const flecs::entity& e, const NavigateToMainMenuIntent i) {
-            // We defer the state change to the end of the frame
-            e.world().entity().set<DeferredEvent>({.callback = [&] {
-                GameService::Get<GameStateManager>().ChangeState(std::make_unique<MainMenuState>(world));
-            }});
-
-            e.destruct();
-        })
-        .child_of(GetRootEntity());
-
-    world.system<const RestartGameIntent>().each([&](const flecs::entity& e, const RestartGameIntent i) {
+    world.system<const RestartGameIntent>().kind(flecs::PreUpdate).each([&](const flecs::entity& e, const RestartGameIntent i) {
         // We defer the state change to the end of the frame
         e.world().entity().set<DeferredEvent>({.callback = [&] {
             auto& sceneManager = GameService::Get<SceneManager>();
-            sceneManager.UnloadScene<GameOverScene>();
             sceneManager.LoadScene<GameplayScene>(SceneLoadMode::Single);
         }});
 
@@ -347,10 +352,14 @@ void GameplayScene::ProcessScreenBounce(Transform& t, Velocity& v, const CircleC
     }
 }
 
-void GameplayScene::ProcessOutOfBounds(const flecs::iter it, size_t, const Transform& t, const Ball& b)
+void GameplayScene::ProcessOutOfBounds(const flecs::entity ball, const Transform& t, const Ball& b)
 {
     if (t.position.y > Configuration::WINDOW_SIZE.y)
     {
-        it.world().entity().add<LifetimeOneFrame>().add<Command>().add<GameOverIntent>();
+        LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> Destroy ball");
+        ball.destruct();
+
+        LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> Add GameOverIntent");
+        ball.world().entity().add<LifetimeOneFrame>().add<Command>().add<GameOverIntent>();
     }
 }

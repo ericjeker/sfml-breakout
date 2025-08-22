@@ -17,17 +17,17 @@ void MainMenuState::Enter()
 {
     // --- Configure the Scene by updating singletons, enabling/disabling systems ---
 
-    LOG_DEBUG("(MainMenuState::MainMenuState): Adding scenes to the SceneManager");
+    LOG_DEBUG("MainMenuState::MainMenuState: Adding scenes to the SceneManager");
     auto& sceneManager = GameService::Get<SceneManager>();
     sceneManager.AddScene<MainMenuScene>(std::make_unique<MainMenuScene>(GetWorld()));
 
-    LOG_DEBUG("(MainMenuState::Enter): Loading MainMenuScene");
+    LOG_DEBUG("MainMenuState::Enter: Loading MainMenuScene");
     sceneManager.LoadScene<MainMenuScene>(SceneLoadMode::Single);
 }
 
 void MainMenuState::Exit()
 {
-    LOG_DEBUG("(MainMenuState::Exit)");
+    LOG_DEBUG("MainMenuState::Exit");
     auto& sceneManager = GameService::Get<SceneManager>();
     sceneManager.RemoveScene<MainMenuScene>();
 }

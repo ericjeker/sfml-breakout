@@ -1,4 +1,5 @@
 // Copyright (c) Eric Jeker. All Rights Reserved.
+
 #pragma once
 
 #include <SFML/System/Vector2.hpp>

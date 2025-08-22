@@ -20,6 +20,10 @@ add_executable(Breakout)
 target_sources(Breakout PRIVATE ${EXECUTABLE_SOURCE})
 target_link_libraries(Breakout PRIVATE Vendor Core BreakoutLibrary)
 
+# Enable debug mode if we are in the debug build
+target_compile_definitions(BreakoutLibrary PRIVATE $<$<CONFIG:Debug>:DEBUG>)
+target_compile_definitions(Breakout PRIVATE $<$<CONFIG:Debug>:DEBUG>)
+
 # --- Tracy Configuration ---
 if (TRACY_ENABLE)
     target_compile_definitions(Breakout PRIVATE TRACY_ENABLE)

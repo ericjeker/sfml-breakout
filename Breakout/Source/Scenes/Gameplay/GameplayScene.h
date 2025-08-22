@@ -25,7 +25,7 @@ private:
     void CreateBall(const flecs::world& world);
 
     static void ProcessScreenBounce(Transform& t, Velocity& v, const CircleCollider& c, const Ball& b);
-    static void ProcessOutOfBounds(flecs::iter it, size_t, const Transform& t, const Ball& b);
+    static void ProcessOutOfBounds(flecs::entity ball, const Transform& t, const Ball& b);
 };
 
 

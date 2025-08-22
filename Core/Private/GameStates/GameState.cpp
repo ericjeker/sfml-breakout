@@ -11,12 +11,12 @@ GameState::GameState(flecs::world& world)
 
 void GameState::Pause()
 {
-    LOG_DEBUG("(GameState::Pause)");
+    LOG_DEBUG("GameState::Pause");
 }
 
 void GameState::Resume()
 {
-    LOG_DEBUG("(GameState::Resume)");
+    LOG_DEBUG("GameState::Resume");
 }
 
 bool GameState::IsPaused() const

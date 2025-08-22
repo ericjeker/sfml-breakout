@@ -15,7 +15,7 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
 
         if (!manifest.contains("bundles"))
         {
-            LOG_ERROR("(ResourceManager::LoadResourcesFromManifest): Manifest does not contain any bundles");
+            LOG_ERROR("ResourceManager::LoadResourcesFromManifest: Manifest does not contain any bundles");
             return;
         }
 
@@ -23,14 +23,14 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
         {
             if (!bundle.contains("name") || !bundle.contains("assets"))
             {
-                LOG_ERROR("(ResourceManager::LoadResourcesFromManifest): Bundle does not contain a name or assets");
+                LOG_ERROR("ResourceManager::LoadResourcesFromManifest: Bundle does not contain a name or assets");
                 continue;
             }
 
             const std::string bundleName = bundle["name"];
             const json& bundleAssets = bundle["assets"];
 
-            LOG_INFO("(ResourceManager::LoadResourcesFromManifest): Loading bundle: " + bundleName);
+            LOG_INFO("ResourceManager::LoadResourcesFromManifest: Loading bundle: " + bundleName);
 
             // Load Resources
             for (const auto& asset : bundleAssets)
@@ -38,7 +38,7 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
                 if (!asset.contains("name") || !asset.contains("path") || !asset.contains("type"))
                 {
                     LOG_ERROR(
-                        "(ResourceManager::LoadResourcesFromManifest): Asset does not contain a name, path, or type"
+                        "ResourceManager::LoadResourcesFromManifest: Asset does not contain a name, path, or type"
                     );
                     continue;
                 }
@@ -47,12 +47,12 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
                 const std::string assetPath = asset["path"];
                 const std::string assetType = asset["type"];
 
-                LOG_INFO("(ResourceManager::LoadResourcesFromManifest): Loading asset: " + assetName);
+                LOG_INFO("ResourceManager::LoadResourcesFromManifest: Loading asset: " + assetName);
 
                 if (assetType != "music" && assetType != "shader" && assetType != "sound" && assetType != "texture" &&
                     assetType != "font")
                 {
-                    LOG_ERROR("(ResourceManager::LoadResourcesFromManifest): Invalid asset type: " + assetType);
+                    LOG_ERROR("ResourceManager::LoadResourcesFromManifest: Invalid asset type: " + assetType);
                     continue;
                 }
 
@@ -72,7 +72,7 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
                     if (!music->openFromFile(assetPath))
                     {
                         LOG_ERROR(
-                            "(ResourceManager::LoadResourcesFromManifest): Error loading music (" + assetName +
+                            "(ResourceManager::LoadResourcesFromManifest: Error loading music (" + assetName +
                             ") from : " + assetPath
                         );
                     }
@@ -88,11 +88,11 @@ void ResourceManager::LoadResourcesFromManifest(const std::string& manifestPath)
         }
     } catch (const nlohmann::json::parse_error& e)
     {
-        LOG_ERROR("(ResourceManager::LoadResourcesFromManifest): Failed to parse manifest file: " + std::string(e.what()));
+        LOG_ERROR("ResourceManager::LoadResourcesFromManifest: Failed to parse manifest file: " + std::string(e.what()));
     } catch (const std::exception& e)
     {
         LOG_ERROR(
-            "(ResourceManager::LoadResourcesFromManifest): An error occurred while loading the manifest file: " +
+            "(ResourceManager::LoadResourcesFromManifest: An error occurred while loading the manifest file: " +
             std::string(e.what())
         );
     }

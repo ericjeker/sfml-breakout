@@ -89,7 +89,7 @@ void RenderParticle(const Transform& t)
 // {
 //     if (!sf::Shader::isAvailable())
 //     {
-//         LOG_ERROR("(RenderModule::RenderShader): Shaders are not available");
+//         LOG_ERROR("RenderModule::RenderShader: Shaders are not available");
 //         return;
 //     }
 //
@@ -97,7 +97,7 @@ void RenderParticle(const Transform& t)
 //     {
 //         if (std::empty(name))
 //         {
-//             LOG_ERROR("(RenderModule::RenderShader): Shader uniform name is empty");
+//             LOG_ERROR("RenderModule::RenderShader: Shader uniform name is empty");
 //             continue;
 //         }
 //

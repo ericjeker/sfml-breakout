@@ -70,12 +70,12 @@ inline ServiceMap services;
 
 inline void Initialize()
 {
-    LOG_DEBUG("(GameService::Initialize)");
+    LOG_DEBUG("GameService::Initialize");
 }
 
 inline void Shutdown()
 {
-    LOG_DEBUG("(GameService::Shutdown)");
+    LOG_DEBUG("GameService::Shutdown");
     services.clear();
 }
 
@@ -96,7 +96,7 @@ void Register(std::unique_ptr<T> service)
 
     if (GetServices().contains(typeIndex))
     {
-        LOG_ERROR("(GameService): Service " + std::string(typeid(T).name()) + " already exists.");
+        LOG_ERROR("GameService: Service " + std::string(typeid(T).name()) + " already exists.");
         return;
     }
 
@@ -116,7 +116,7 @@ void Register(T& service)
 
     if (GetServices().contains(typeIndex))
     {
-        LOG_ERROR("(GameService): Service " + std::string(typeid(T).name()) + " already exists.");
+        LOG_ERROR("GameService: Service " + std::string(typeid(T).name()) + " already exists.");
         return;
     }
 

@@ -9,9 +9,7 @@
 #include "Core/Modules/Physics/Components/Velocity.h"
 #include "Core/Modules/Physics/Singletons/GravitySettings.h"
 #include "Core/Modules/Render/Components/Transform.h"
-#include "Core/Modules/Scene/Components/ScenePaused.h"
 #include "Core/PhysicsConstants.h"
-#include "Core/Singletons/GamePaused.h"
 
 #include <numbers>
 #include <tracy/Tracy.hpp>

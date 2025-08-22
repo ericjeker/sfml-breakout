@@ -36,7 +36,7 @@ MainMenuScene::MainMenuScene(flecs::world& world)
 void MainMenuScene::Initialize()
 {
     Scene::Initialize();
-    LOG_DEBUG("(MainMenuScene:Initialize)");
+    LOG_DEBUG("MainMenuScene:Initialize");
 
     auto& world = GetWorld();
 

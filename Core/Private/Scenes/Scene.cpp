@@ -2,11 +2,7 @@
 
 #include "Core/Scenes/Scene.h"
 
-#include "Core/Utils/Logger.h"
 #include "Core/Managers/GameService.h"
-#include "Core/Modules/Scene/Components/ScenePaused.h"
-
-#include <tracy/Tracy.hpp>
 
 
 Scene::Scene(flecs::world& world)
@@ -16,9 +12,7 @@ Scene::Scene(flecs::world& world)
 
 void Scene::Initialize()
 {
-    LOG_DEBUG(std::format("({}:Initialize): Create the root entity", typeid(*this).name()));
     _rootEntity = GetWorld().entity();
-    _rootEntity.add<ScenePaused>().disable<ScenePaused>();
 }
 
 void Scene::Shutdown()
@@ -28,9 +22,7 @@ void Scene::Shutdown()
         return;
     }
 
-    LOG_DEBUG(std::format("({}:Shutdown): Deferring root entity destruction", typeid(*this).name()));
     GetWorld().defer([&] {
-        LOG_DEBUG(std::format("({}:Shutdown): Destroying root entity", typeid(*this).name()));
         GetWorld().delete_with(flecs::ChildOf, GetRootEntity());
         GetRootEntity().destruct();
     });

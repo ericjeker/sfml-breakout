@@ -2,23 +2,26 @@
 
 #include "GameOverScene.h"
 
-#include "../Gameplay/Components/NavigateToMainMenuIntent.h"
-#include "../Gameplay/Components/RestartGameIntent.h"
+#include "GameStates/Gameplay/GameplayState.h"
+#include "Scenes/Gameplay/Components/NavigateToMainMenuIntent.h"
+#include "Scenes/Gameplay/Components/RestartGameIntent.h"
+#include "Scenes/Gameplay/GameplayScene.h"
+
 #include "Core/Configuration.h"
 #include "Core/Events/DeferredEvent.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
+#include "Core/Modules/Control/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
+#include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
+#include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
 #include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"
-#include "GameStates/Gameplay/GameplayState.h"
-#include "GameStates/MainMenu/MainMenuState.h"
-#include "Scenes/Gameplay/GameplayScene.h"
 
 GameOverScene::GameOverScene(flecs::world& world)
     : Scene(world)
@@ -28,12 +31,15 @@ GameOverScene::GameOverScene(flecs::world& world)
 void GameOverScene::Initialize()
 {
     Scene::Initialize();
-    LOG_DEBUG("(GameOverScene::Initialize)");
+    LOG_DEBUG("GameOverScene::Initialize");
 
     constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
     constexpr float CENTER_Y = Configuration::WINDOW_SIZE.y / 2;
 
-    auto& world = GetWorld();
+    const auto& world = GetWorld();
+
+
+    CreateUISystems(world);
 
     // --- Create entities ---
     float zOrder = 0.f;
@@ -115,4 +121,36 @@ void GameOverScene::HandleEvent(const std::optional<sf::Event>& event)
             {.position = mouseReleased->position, .button = mouseReleased->button}
         );
     }
+
+    if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+    {
+        // We still filter the scan code as to not populate the ECS with useless entities
+        if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
+        {
+            // Add a KeyPressed event in the world that will be handled later during the update
+            GetWorld().entity().is_a<KeyPressedEvent>().set<KeyPressed>({
+                .code = keyPressed->code,
+                .scancode = keyPressed->scancode,
+                .alt = keyPressed->alt,
+                .control = keyPressed->control,
+                .shift = keyPressed->shift,
+            });
+        }
+    }
+}
+
+void GameOverScene::CreateUISystems(const flecs::world& world)
+{
+    // Query for KeyPressed
+    world.system<const KeyPressed>("ProcessKeyPressed")
+        .kind(flecs::PostLoad)
+        .each([](const flecs::entity& e, const KeyPressed& k) {
+            if (k.scancode == sf::Keyboard::Scancode::Escape)
+            {
+                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMainMenuIntent>();
+            }
+
+            e.destruct();
+        })
+        .child_of(GetRootEntity());
 }

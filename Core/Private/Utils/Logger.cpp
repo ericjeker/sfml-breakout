@@ -13,17 +13,17 @@ std::string SeverityToText(const Logger::LogLevel level)
     switch (level)
     {
         case Logger::LogLevel::Trace:
-            return "TRACE";
+            return "trace";
         case Logger::LogLevel::Debug:
-            return "DEBUG";
+            return "debug";
         case Logger::LogLevel::Info:
-            return "INFO";
+            return "info";
         case Logger::LogLevel::Warning:
-            return "WARN";
+            return "warn";
         case Logger::LogLevel::Error:
-            return "ERROR";
+            return "error";
         case Logger::LogLevel::Fatal:
-            return "FATAL";
+            return "fatal";
     }
 
     return "UNKNOWN";
@@ -33,7 +33,7 @@ void Log(const Logger::LogLevel level, const std::string& message)
 {
     // Use std::cerr when the log level is below or equal Error
     auto& oStream = (level <= Logger::LogLevel::Error) ? std::cerr : std::cout;
-    oStream << " [" << SeverityToText(level) << "] " << message << std::endl;
+    oStream << " (" << SeverityToText(level) << ") " << message << std::endl;
 }
 
 } // namespace

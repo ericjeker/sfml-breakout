@@ -66,7 +66,7 @@ public:
     {
         const std::type_index typeIndex(typeid(T));
 
-        LOG_DEBUG("(EventManager::Emit): Emitting event: " + std::string(typeid(T).name()));
+        LOG_DEBUG("EventManager::Emit: Emitting event: " + std::string(typeid(T).name()));
 
         if (!_listeners.contains(typeIndex))
         {
@@ -84,7 +84,7 @@ public:
     {
         const std::type_index typeIndex(typeid(T));
 
-        LOG_DEBUG("(EventManager::EmitDeferred): Queueing event: " + std::string(typeid(T).name()));
+        LOG_DEBUG("EventManager::EmitDeferred: Queueing event: " + std::string(typeid(T).name()));
 
         // Create a copy of the event and capture it in the lambda
         T eventCopy = event;
@@ -99,7 +99,7 @@ public:
         for (auto& deferredEvent : _deferredEvents)
         {
             LOG_DEBUG(
-                "(EventManager::ProcessDeferredEvents): Processing deferred event: " +
+                "(EventManager::ProcessDeferredEvents: Processing deferred event: " +
                 std::string(deferredEvent.eventType.name())
             );
             deferredEvent.eventExecutor();

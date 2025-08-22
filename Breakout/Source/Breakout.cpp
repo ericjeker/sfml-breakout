@@ -11,23 +11,20 @@
 #include "Core/Modules/Particles/ParticlesModule.h"
 #include "Core/Modules/Physics/PhysicsModule.h"
 #include "Core/Modules/Render/RenderModule.h"
-#include "Core/Modules/Scene/SceneModule.h"
 #include "Core/Modules/UI/UIModule.h"
-#include "Core/Singletons/GamePaused.h"
 #include "Core/Utils/Logger.h"
 #include "GameStates/MainMenu/MainMenuState.h"
 
 void Breakout::Initialize()
 {
     // --- Load all resources from the manifest file
-    LOG_DEBUG("(Breakout::Initialization): Load Resources");
+    LOG_DEBUG("Breakout::Initialization: Load Resources");
     GameService::Get<ResourceManager>().LoadResourcesFromManifest("Assets/Manifest.json");
 
     // --- Initialize the World with global systems and singletons ---
     // clang-format off
     auto& world = GetWorld();
     world.import<Modules::LifetimeModule>();
-    world.import<Modules::SceneModule>();
     world.import<Modules::UIModule>();
     world.import<Modules::ControlModule>();
     world.import<Modules::PhysicsModule>();
@@ -39,7 +36,7 @@ void Breakout::Initialize()
     //world.add<GamePaused>({});
 
     // --- Load the Main Menu State ---
-    LOG_DEBUG("(Breakout::Initialization): Load the Main Menu State");
+    LOG_DEBUG("Breakout::Initialization: Load the Main Menu State");
     GameService::Get<GameStateManager>().ChangeState(std::make_unique<MainMenuState>(world));
 
     // --- Start the main theme ---
@@ -48,6 +45,6 @@ void Breakout::Initialize()
 
 void Breakout::Shutdown()
 {
-    LOG_DEBUG("(Breakout::Shutdown)");
+    LOG_DEBUG("Breakout::Shutdown");
     GameService::Get<AudioManager>().StopMusic();
 }
