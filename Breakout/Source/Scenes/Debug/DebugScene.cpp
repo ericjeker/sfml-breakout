@@ -8,6 +8,7 @@
 #include "Core/Modules/UI/Prefabs/Text.h"
 
 #include <Core/Themes/Nord.h>
+#include <cmath>
 
 namespace
 {

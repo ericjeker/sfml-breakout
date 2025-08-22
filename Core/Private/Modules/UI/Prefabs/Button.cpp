@@ -76,7 +76,7 @@ flecs::entity Button::Create(const flecs::world& world, const ButtonParams& para
         .set<Transform>({.position = params.position})
         .set<TextRenderable>({.text = std::move(buttonText)})
         .set<ButtonText>(
-            {.text = params.text, .fontSize = params.fontSize, .hoverColor = params.textHoverColor, .textColor = params.textColor}
+            {.text = params.text, .fontSize = params.fontSize, .textColor = params.textColor, .hoverColor = params.textHoverColor}
         )
         .set<ZOrder>({params.zOrder + 0.2f}); // Further increment Z-order
 

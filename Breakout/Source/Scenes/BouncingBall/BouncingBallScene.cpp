@@ -70,10 +70,10 @@ void BouncingBallScene::CreateBalls(const flecs::world& world, float zOrder)
             world,
             {
                 .radius = RADIUS,
-                .position = {distX(gen), distY(gen)},
                 .color = NordTheme::Aurora1,
-                .velocity = {velX(gen) * PhysicsConstants::PIXELS_PER_CENTIMETER, velY(gen) * PhysicsConstants::PIXELS_PER_CENTIMETER},
+                .position = {distX(gen), distY(gen)},
                 .zOrder = zOrder++,
+                .velocity = {velX(gen) * PhysicsConstants::PIXELS_PER_CENTIMETER, velY(gen) * PhysicsConstants::PIXELS_PER_CENTIMETER},
                 .gravity = PhysicsConstants::NO_GRAVITY,
                 .friction = 0.f,
             }
