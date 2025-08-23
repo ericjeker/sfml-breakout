@@ -1,23 +1,23 @@
-# SFML Sandbox: Flecs World
+# SFML Breakout
 
-A new SFML Sandbox to try different architectures for a game engine. This time, I integrate with Flecs. The game instance
-creates a unique Flecs world passed down to the scenes.
+This repository started as a SFML sandbox project to learn how to use SFML and Flecs, later I decided to create a
+breakout game to test the engine.
 
 ## Call Hierarchy
 
 ```
 GameInstance -> Flecs World (Systems, Singletons) -> GameStateManager -> GameState
-                                                  -> SceneManager -> Scene -> Systems
-                                                                           -> Entities -> Components
+                -> Global Systems                    -> SceneManager -> Scene -> Local Systems
+                -> Singletons                                                 -> Entities -> Components
 ```
 
-## Game Instance
+## GameInstance
 
-The responsibility of the game instance is to load the base resources. This class also instanciates the Flecs World later
+The responsibility of the game instance is to load the base resources. This class also instantiates the Flecs World later
 passed down to the scenes.
 
-It is also where the game loop is started (`Run()`), and the root of the call hierarchy. The game loop makes the world
-progress by calling the `progress()` function.
+It is also where the game loop is started (`GameInstance::Run()`), and the root of the call hierarchy. The game loop
+makes the world progress by calling the `progress()` function.
 
 ## GameStateManager
 
@@ -26,9 +26,9 @@ be active at the same time using a push/pop system.
 
 ## GameState
 
-Hold the current game mode, encapsulate state-specific behavior and data. The GameState also manages which scene should
-be active given its particular state. There can only be one state active at a time, but multiple scenes can be active at
-the same time.
+Hold the current game state, or game mode, encapsulate state-specific behavior and data. The GameState also manages what
+scene should be active given its particular state. There can only be one state active at a time, but multiple scenes can
+be active at the same time.
 
 The GameState to Scene relationship can be:
 
@@ -42,12 +42,20 @@ Responsible for loading and unloading scenes and keeping track of the current lo
 scenes in two different modes: single or additive. `Single` mode cleans up the previously loaded scenes before loading
 the new scene. `Additive` loads the new scene on top of the previous one as to create an overlay system.
 
-Scenes are initialized in the `SceneManager::LoadScene()` function.
+Scenes are initialized in the `SceneManager::LoadScene()` function and shutdown in the `SceneManager::UnloadScene()`
+function.
 
 ## Scene
 
-A scene is a cohesive set of game objects (entities) add to the Flecs world. Each scene has its own root entity to which
-all other entities are added. When a scene is unloaded, the root entity is destroyed along with all its children.
+A scene is a cohesive set of game objects (entities) added to the Flecs world. Each scene has its own root entity to
+which all other entities are children of. When a scene is unloaded, the root entity is destroyed along with all its
+children.
+
+On initialization, they will instantiate entities and register scene-local systems when necessary. The scene-local
+systems will be unregistered when the scene is unloaded. They operate only on the local entities.
+
+A scene should hold no state. All states should be stored in the Flecs world as Singletons or Entities.
+A scene should be serializable to allow for a future save/load mechanism.
 
 ## Flecs Architecture
 
@@ -58,24 +66,15 @@ game. They are global and are not tied to a specific scene.
 
 These modules are imported during initialization of the game instance.
 
-Examples: Control, Physics, Render, UI, Scene
-
-### Game States
-
-Game states will toggle singletons and systems on and off.
-
-### Scenes
-
-Scenes each hold a root entity. On initialization, they will instantiate entities and prefabs and register scene-local
-systems when necessary. The scene-local systems will be unregistered when the scene is unloaded. They operate only on
-the local entities.
-
-The root entity will be destroyed when the scene is unloaded, cascading to all its children.
+Examples: Control, Physics, Render, UI, ...
 
 ## World Progress
 
 The world progress is the main game loop. It is called by the game instance and progress the world by calling the
 `progress()` function.
+
+Before the world progresses, we will handle the input event from SFML. This is done using a polling mechanism adapted to
+UI elements interaction or single key presses.
 
 ### Phases
 
