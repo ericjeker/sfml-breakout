@@ -81,7 +81,7 @@ void GameplayScene::HandleEvent(const std::optional<sf::Event>& event)
             // Add a KeyPressed event in the world that will be handled later during the update
             GetWorld()
                 .entity()
-                .is_a<KeyPressedEvent>()
+                .is_a<Prefabs::KeyPressedEvent>()
                 .set<KeyPressed>({
                     .code = keyPressed->code,
                     .scancode = keyPressed->scancode,

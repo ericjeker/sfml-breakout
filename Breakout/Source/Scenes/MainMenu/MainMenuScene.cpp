@@ -2,12 +2,17 @@
 
 #include "Scenes/MainMenu/MainMenuScene.h"
 
-#include "Core/Managers/GameStateManager.h"
-#include "Core/Utils/Logger.h"
+#include "GameStates/Gameplay/GameplayState.h"
+#include "Scenes/MainMenu/Components/ExitGameIntent.h"
+#include "Scenes/MainMenu/Components/StartGameIntent.h"
+#include "Scenes/MainMenu/Prefabs/ExitGameIntent.h"
+#include "Scenes/MainMenu/Prefabs/StartGameIntent.h"
+
 #include "Core/Configuration.h"
 #include "Core/Events/DeferredEvent.h"
 #include "Core/GameInstance.h"
 #include "Core/Managers/GameService.h"
+#include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Control/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
@@ -20,11 +25,7 @@
 #include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
-#include "GameStates/Gameplay/GameplayState.h"
-#include "Scenes/MainMenu/Components/ExitGameIntent.h"
-#include "Scenes/MainMenu/Components/StartGameIntent.h"
-#include "Scenes/MainMenu/Prefabs/ExitGameIntent.h"
-#include "Scenes/MainMenu/Prefabs/StartGameIntent.h"
+#include "Core/Utils/Logger.h"
 
 
 MainMenuScene::MainMenuScene(flecs::world& world)
@@ -34,8 +35,8 @@ MainMenuScene::MainMenuScene(flecs::world& world)
 
 void MainMenuScene::Initialize()
 {
-    Scene::Initialize();
     LOG_DEBUG("MainMenuScene:Initialize");
+    Scene::Initialize();
 
     auto& world = GetWorld();
 
@@ -53,7 +54,7 @@ void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
     {
         if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
         {
-            GetWorld().entity().is_a<KeyPressedEvent>().set<KeyPressed>({
+            GetWorld().entity().is_a<Prefabs::KeyPressedEvent>().set<KeyPressed>({
                 .code = keyPressed->code,
                 .scancode = keyPressed->scancode,
                 .alt = keyPressed->alt,
@@ -67,7 +68,7 @@ void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
         if (mouseReleased->button == sf::Mouse::Button::Left)
         {
             // MouseReleasedEvent is treated by the UIInputSystem that will do a hit test on clickable elements
-            GetWorld().entity().is_a<MouseReleasedEvent>().set<MouseReleased>(
+            GetWorld().entity().is_a<Prefabs::MouseReleasedEvent>().set<MouseReleased>(
                 {.position = mouseReleased->position, .button = mouseReleased->button}
             );
         }
@@ -79,41 +80,29 @@ void MainMenuScene::CreateLocalSystems(flecs::world& world)
     // As usual, we process the pressed keys to add the matching intents.
     world.system<const KeyPressed>("ProcessKeyPressed")
         .kind(flecs::PostLoad)
-        .each(
-            [](const flecs::entity& e, const KeyPressed& k)
+        .each([](const flecs::entity& e, const KeyPressed& k) {
+            if (k.scancode == sf::Keyboard::Scancode::Escape)
             {
-                if (k.scancode == sf::Keyboard::Scancode::Escape)
-                {
-                    e.world().entity().is_a<Prefabs::ExitGameIntent>();
-                }
-
-                e.destruct();
+                e.world().entity().is_a<Prefabs::ExitGameIntent>();
             }
-        )
+
+            e.destruct();
+        })
         .child_of(GetRootEntity());
 
     // The created intents are processed here
     world.system<const ExitGameIntent>("ExitGameSystem")
-        .each(
-            [](const flecs::iter& it, size_t, const ExitGameIntent i)
-            {
-                it.world().entity().set<DeferredEvent>(
-                    {.callback = [&] { GameService::Get<GameInstance>().RequestExit(); }}
-                );
-            }
-        )
+        .each([](const flecs::iter& it, size_t, const ExitGameIntent i) {
+            it.world().entity().set<DeferredEvent>({.callback = [&] { GameService::Get<GameInstance>().RequestExit(); }});
+        })
         .child_of(GetRootEntity());
 
     world.system<const StartGameIntent>("StartGameSystem")
-        .each(
-            [&](const flecs::iter& it, size_t, const StartGameIntent i)
-            {
-                it.world().entity().set<DeferredEvent>(
-                    {.callback = [&]
-                     { GameService::Get<GameStateManager>().ChangeState(std::make_unique<GameplayState>(world)); }}
-                );
-            }
-        )
+        .each([&](const flecs::iter& it, size_t, const StartGameIntent i) {
+            it.world().entity().set<DeferredEvent>({.callback = [&] {
+                GameService::Get<GameStateManager>().ChangeState(std::make_unique<GameplayState>(world));
+            }});
+        })
         .child_of(GetRootEntity());
 }
 

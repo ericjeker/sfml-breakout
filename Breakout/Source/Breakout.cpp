@@ -2,6 +2,8 @@
 
 #include "Breakout.h"
 
+#include "GameStates/MainMenu/MainMenuState.h"
+
 #include "Core/Managers/AudioManager.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
@@ -13,11 +15,10 @@
 #include "Core/Modules/Render/RenderModule.h"
 #include "Core/Modules/UI/UIModule.h"
 #include "Core/Utils/Logger.h"
-#include "GameStates/MainMenu/MainMenuState.h"
 
 void Breakout::Initialize()
 {
-    // --- Load all resources from the manifest file
+    // --- Load all resources from the manifest file ---
     LOG_DEBUG("Breakout::Initialization: Load Resources");
     GameService::Get<ResourceManager>().LoadResourcesFromManifest("Assets/Manifest.json");
 
@@ -33,13 +34,15 @@ void Breakout::Initialize()
     // clang-format on
 
     // --- Add the GamePaused singleton ---
+    // TODO: so in the end I haven't managed pause like this, but let's keep a trace of the first iteration
     //world.add<GamePaused>({});
 
-    // --- Load the Main Menu State ---
+    // --- Load the initial state where the initial scene will be loaded ---
     LOG_DEBUG("Breakout::Initialization: Load the Main Menu State");
     GameService::Get<GameStateManager>().ChangeState(std::make_unique<MainMenuState>(world));
 
     // --- Start the main theme ---
+    // TODO: disabled during development as this was driving me insane
     // GameService::Get<AudioManager>().PlayMusic("8mm");
 }
 

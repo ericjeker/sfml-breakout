@@ -30,10 +30,10 @@ namespace Modules
 UIModule::UIModule(const flecs::world& world)
 {
     // --- Declare Prefabs ---
-    world.prefab<MousePressedEvent>().add<LifetimeOneFrame>().add<MousePressed>();
-    world.prefab<MouseReleasedEvent>().add<LifetimeOneFrame>().add<MouseReleased>();
-    world.prefab<KeyPressedEvent>().add<LifetimeOneFrame>().add<KeyPressed>();
-    world.prefab<KeyReleasedEvent>().add<LifetimeOneFrame>().add<KeyReleased>();
+    world.prefab<Prefabs::MousePressedEvent>().add<LifetimeOneFrame>().add<MousePressed>();
+    world.prefab<Prefabs::MouseReleasedEvent>().add<LifetimeOneFrame>().add<MouseReleased>();
+    world.prefab<Prefabs::KeyPressedEvent>().add<LifetimeOneFrame>().add<KeyPressed>();
+    world.prefab<Prefabs::KeyReleasedEvent>().add<LifetimeOneFrame>().add<KeyReleased>();
 
     // --- Declare Components ---
     world.component<ButtonBackground>();

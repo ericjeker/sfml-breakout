@@ -2,14 +2,13 @@
 
 #pragma once
 
-
-
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
 
 #include <flecs.h>
 #include <functional>
 #include <string>
+
 
 // TODO: Move this to Builders/Factories
 namespace Prefabs
@@ -38,6 +37,3 @@ struct Button
 };
 
 } // namespace Prefabs
-
-
-

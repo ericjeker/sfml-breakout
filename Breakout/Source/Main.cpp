@@ -1,11 +1,12 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Core/Managers/GameStateManager.h"
 #include "Breakout.h"
+
 #include "Core/Configuration.h"
 #include "Core/GameInstance.h"
 #include "Core/Managers/AudioManager.h"
 #include "Core/Managers/GameService.h"
+#include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Managers/SceneManager.h"
 
@@ -23,6 +24,7 @@
  */
 int main()
 {
+    // --- Tracy Integration, you are going to see that a lot... ---
     ZoneScoped;
 
     // --- Create the window mode ---
@@ -32,6 +34,7 @@ int main()
     sf::ContextSettings settings;
     settings.antiAliasingLevel = Configuration::ANTI_ALIASING_LEVEL;
 
+    // --- Create the window ---
     auto window = sf::RenderWindow(mode, Configuration::WINDOW_TITLE, Configuration::WINDOW_STYLE, Configuration::WINDOW_STATE, settings);
 
     // --- Configure the window ---
@@ -55,6 +58,7 @@ int main()
     // --- Register the game instance as a service ---
     GameService::Register<GameInstance>(gameInstance);
 
+    // --- Initialize and Run the game ---
     gameInstance.Initialize();
     gameInstance.Run(window);
     gameInstance.Shutdown();

@@ -117,7 +117,7 @@ void GameOverScene::HandleEvent(const std::optional<sf::Event>& event)
         }
 
         // MouseReleasedEvent is treated by the UIInputSystem that will do a hit test on clickable elements
-        GetWorld().entity().is_a<MouseReleasedEvent>().set<MouseReleased>(
+        GetWorld().entity().is_a<Prefabs::MouseReleasedEvent>().set<MouseReleased>(
             {.position = mouseReleased->position, .button = mouseReleased->button}
         );
     }
@@ -128,7 +128,7 @@ void GameOverScene::HandleEvent(const std::optional<sf::Event>& event)
         if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
         {
             // Add a KeyPressed event in the world that will be handled later during the update
-            GetWorld().entity().is_a<KeyPressedEvent>().set<KeyPressed>({
+            GetWorld().entity().is_a<Prefabs::KeyPressedEvent>().set<KeyPressed>({
                 .code = keyPressed->code,
                 .scancode = keyPressed->scancode,
                 .alt = keyPressed->alt,

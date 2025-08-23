@@ -112,7 +112,7 @@ void PauseScene::HandleEvent(const std::optional<sf::Event>& event)
         }
 
         // MouseReleasedEvent is treated by the UIInputSystem that will do a hit test on clickable elements
-        GetWorld().entity().is_a<MouseReleasedEvent>().set<MouseReleased>(
+        GetWorld().entity().is_a<Prefabs::MouseReleasedEvent>().set<MouseReleased>(
             {.position = mouseReleased->position, .button = mouseReleased->button}
         );
     }

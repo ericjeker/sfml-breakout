@@ -3,10 +3,9 @@
 #pragma once
 
 
-
-
+namespace Prefabs
+{
 struct KeyPressedEvent
 {
 };
-
-
+}

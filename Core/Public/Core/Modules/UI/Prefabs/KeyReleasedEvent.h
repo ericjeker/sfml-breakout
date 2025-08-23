@@ -2,10 +2,11 @@
 
 #pragma once
 
-
-
 #include <SFML/Window/Event.hpp>
 
+
+namespace Prefabs
+{
 struct KeyReleasedEvent
 {
     sf::Keyboard::Key code{};
@@ -15,5 +16,4 @@ struct KeyReleasedEvent
     bool shift{};
     bool system{};
 };
-
-
+} // namespace Prefabs

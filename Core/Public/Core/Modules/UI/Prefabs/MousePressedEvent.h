@@ -3,9 +3,9 @@
 #pragma once
 
 
-
+namespace Prefabs
+{
 struct MousePressedEvent
 {
 };
-
-
+} // namespace Prefabs

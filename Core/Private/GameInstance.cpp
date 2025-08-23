@@ -13,9 +13,13 @@
 
 void GameInstance::Run(sf::RenderWindow& renderWindow) const
 {
-    LOG_DEBUG("GameInstance::Run: Starting game loop");
-    auto& world = GetWorld();
+    ZoneScopedN("GameInstance::Run");
 
+    // --- Get the only Flecs World ---
+    const auto world = GetWorld();
+
+    // --- Game loop ---
+    LOG_DEBUG("GameInstance::Run: Starting game loop");
     sf::Clock clock;
     while (renderWindow.isOpen() && !ShouldExit())
     {
@@ -27,7 +31,7 @@ void GameInstance::Run(sf::RenderWindow& renderWindow) const
         // Event-Based Input System
         HandleEvents(renderWindow);
 
-        // Progresses the world
+        // Progressing the world
         renderWindow.clear();
         world.progress(deltaTime);
         renderWindow.display();
@@ -35,10 +39,11 @@ void GameInstance::Run(sf::RenderWindow& renderWindow) const
         // Process deferred events at the end of the frame
         RunDeferredEvents(world);
 
+        // Tracy frame mark so Tracy can properly split each frame
         FrameMark;
     }
 
-    LOG_DEBUG("GameInstance::Run: Game loop ended");
+    // --- Shutdown ---
     if (renderWindow.isOpen())
     {
         renderWindow.close();
@@ -47,7 +52,7 @@ void GameInstance::Run(sf::RenderWindow& renderWindow) const
 
 void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
 {
-    ZoneScoped;
+    ZoneScopedN("GameInstance::HandleEvents");
 
     while (const auto event = renderWindow.pollEvent())
     {
@@ -56,7 +61,7 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
             renderWindow.close();
         }
 
-        // We delegate the event to the game controller
+        // We delegate the event to the game state manager and scene manager
         GameService::Get<GameStateManager>().HandleEvent(event);
         GameService::Get<SceneManager>().HandleEvent(event);
     }
@@ -73,19 +78,19 @@ void GameInstance::RunDeferredEvents(const flecs::world& world)
     callbacks.reserve(32);
     toDelete.reserve(32);
 
-    // Loop the entities
+    // --- Loop the entities ---
     world.each<DeferredEvent>([&](flecs::entity e, const DeferredEvent& ev) {
         callbacks.emplace_back(ev.callback);
         toDelete.emplace_back(e);
     });
 
-    // Run the callbacks
+    // --- Run the callbacks ---
     for (auto& cb : callbacks)
     {
         cb();
     }
 
-    // Destroy the entities
+    // --- Destroy the entities ---
     world.defer_begin();
     for (auto e : toDelete)
     {
