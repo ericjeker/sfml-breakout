@@ -3,7 +3,6 @@
 #include "Core/GameInstance.h"
 
 #include "Core/Events/DeferredEvent.h"
-#include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/SceneManager.h"
@@ -34,7 +33,6 @@ void GameInstance::Run(sf::RenderWindow& renderWindow) const
         renderWindow.display();
 
         // Process deferred events at the end of the frame
-        GameService::Get<EventManager>().ProcessDeferredEvents();
         RunDeferredEvents(world);
 
         FrameMark;

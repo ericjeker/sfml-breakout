@@ -5,7 +5,6 @@
 #include "Core/Configuration.h"
 #include "Core/GameInstance.h"
 #include "Core/Managers/AudioManager.h"
-#include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Managers/SceneManager.h"
@@ -48,8 +47,6 @@ int main()
     GameService::Register<AudioManager>(std::make_unique<AudioManager>(GameService::Get<ResourceManager>()));
     GameService::Register<SceneManager>(std::make_unique<SceneManager>());
     GameService::Register<GameStateManager>(std::make_unique<GameStateManager>());
-    // TODO: I don't think we are using the EventManager anymore
-    GameService::Register<EventManager>(std::make_unique<EventManager>());
     // TODO: NetworkManager
 
     // --- Create the game instance ---

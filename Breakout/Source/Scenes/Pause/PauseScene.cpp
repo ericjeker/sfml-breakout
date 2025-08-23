@@ -4,7 +4,6 @@
 
 #include "Core/Configuration.h"
 #include "Core/Events/DeferredEvent.h"
-#include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Modules/Control/Components/Command.h"
@@ -17,7 +16,6 @@
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"
 #include "GameStates/Gameplay/GameplayState.h"
-#include "GameStates/MainMenu/MainMenuState.h"
 #include "Scenes/Gameplay/Components/NavigateToMainMenuIntent.h"
 #include "Scenes/Gameplay/Components/ResumeGameIntent.h"
 #include "Scenes/Gameplay/GameplayScene.h"

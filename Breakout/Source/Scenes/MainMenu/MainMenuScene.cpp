@@ -7,7 +7,6 @@
 #include "Core/Configuration.h"
 #include "Core/Events/DeferredEvent.h"
 #include "Core/GameInstance.h"
-#include "Core/Managers/EventManager.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Control/Components/Command.h"
