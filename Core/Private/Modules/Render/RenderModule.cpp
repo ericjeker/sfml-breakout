@@ -49,10 +49,10 @@ void RenderRectangleShape(const RectangleRenderable& rect)
     window.draw(rect.shape);
 }
 
-void RenderCircleShape(const CircleRenderable& ball)
+void RenderCircleShape(const CircleRenderable& circle)
 {
     auto& window = GameService::Get<sf::RenderWindow>();
-    window.draw(ball.shape);
+    window.draw(circle.shape);
 }
 
 void RenderText(const TextRenderable& text)

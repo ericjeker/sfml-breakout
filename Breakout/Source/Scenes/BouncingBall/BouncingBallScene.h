@@ -3,8 +3,9 @@
 #pragma once
 
 
-#include "Core/Modules/Physics/Components/CircleCollider.h"
+#include "Core/Modules/Physics/Components/ColliderShape.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
+#include "Core/Modules/Render/Components/Radius.h"
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Scenes/Scene.h"
 
@@ -19,8 +20,5 @@ public:
 
 private:
     void CreateBalls(const flecs::world& world, float zOrder);
-    static void ProcessScreenBounce(Transform& t, Velocity& v, const CircleCollider& c);
+    static void ProcessScreenBounce(Transform& t, Velocity& v, const Radius& r, const ColliderShape& c);
 };
-
-
-

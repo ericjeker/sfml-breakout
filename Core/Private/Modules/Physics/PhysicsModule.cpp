@@ -2,18 +2,30 @@
 
 #include "Core/Modules/Physics/PhysicsModule.h"
 
+#include "Core/Managers/GameService.h"
 #include "Core/Modules/Physics/Components/Acceleration.h"
-#include "Core/Modules/Physics/Components/CircleCollider.h"
+#include "Core/Modules/Physics/Components/ColliderShape.h"
 #include "Core/Modules/Physics/Components/Friction.h"
 #include "Core/Modules/Physics/Components/Gravity.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
 #include "Core/Modules/Physics/Singletons/GravitySettings.h"
+#include "Core/Modules/Render/Components/Origin.h"
+#include "Core/Modules/Render/Components/Radius.h"
+#include "Core/Modules/Render/Components/Size.h"
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/PhysicsConstants.h"
+
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 
 #include <numbers>
 #include <tracy/Tracy.hpp>
 
+namespace sf
+{
+class RenderWindow;
+}
 namespace
 {
 
@@ -42,12 +54,12 @@ void MovementSystem(const flecs::iter& it, size_t, Transform& t, const Velocity&
     t.position += v.velocity * it.delta_time();
 }
 
-void CollisionSystem(const flecs::iter& it, const size_t idx, Transform& t, Velocity& v, const CircleCollider& c)
+void CircleCollisionSystem(const flecs::iter& it, const size_t idx, Transform& t, Velocity& v, const Radius& r, const ColliderShape& c)
 {
     ZoneScoped;
 
-    it.world().query<Transform, Velocity, const CircleCollider>().each(
-        [&](const flecs::entity other, Transform& t2, Velocity& v2, const CircleCollider& c2) {
+    it.world().query<Transform, Velocity, const Radius, const ColliderShape>().each(
+        [&](const flecs::entity other, Transform& t2, Velocity& v2, const Radius& r2, const ColliderShape& c2) {
             if (other == it.entity(idx))
             {
                 return;
@@ -56,7 +68,7 @@ void CollisionSystem(const flecs::iter& it, const size_t idx, Transform& t, Velo
             // TODO: Implement multiple types of colliders (circle, rectangle, etc)
             const sf::Vector2f difference = t2.position - t.position;
             const float distance = difference.length();
-            const float sumOfRadii = c.radius + c2.radius;
+            const float sumOfRadii = r.radius + r2.radius;
             if (distance > sumOfRadii || distance == 0.f)
             {
                 // No collision :(
@@ -83,6 +95,34 @@ void CollisionSystem(const flecs::iter& it, const size_t idx, Transform& t, Velo
     );
 }
 
+void RenderDebugCircleCollider(const Transform& t, const Origin& o, const Radius& r, const ColliderShape& c)
+{
+    sf::CircleShape circle;
+    circle.setPosition(t.position);
+    circle.setRadius(r.radius);
+    circle.setOrigin({r.radius * o.origin.x, r.radius * o.origin.y});
+    circle.setFillColor(sf::Color::Transparent);
+    circle.setOutlineThickness(1.f);
+    circle.setOutlineColor(sf::Color::Magenta);
+
+    auto& window = GameService::Get<sf::RenderWindow>();
+    window.draw(circle);
+}
+
+void RenderDebugRectCollider(const Transform& t, const Origin& o, const Size& s, const ColliderShape& c)
+{
+    sf::RectangleShape rect;
+    rect.setPosition(t.position);
+    rect.setSize(s.size);
+    rect.setOrigin({s.size.x * o.origin.x, s.size.y * o.origin.y});
+    rect.setFillColor(sf::Color::Transparent);
+    rect.setOutlineThickness(1.f);
+    rect.setOutlineColor(sf::Color::Magenta);
+
+    auto& window = GameService::Get<sf::RenderWindow>();
+    window.draw(rect);
+}
+
 } // namespace
 
 
@@ -101,7 +141,9 @@ PhysicsModule::PhysicsModule(const flecs::world& world)
     world.system<const Friction, Velocity>("FrictionSystem").each(FrictionSystem);
     world.system<Acceleration, Velocity>("AccelerationSystem").each(AccelerationSystem);
     world.system<Transform, const Velocity>("MovementSystem").each(MovementSystem);
-    world.system<Transform, Velocity, const CircleCollider>("CollisionSystem").each(CollisionSystem);
+    world.system<Transform, Velocity, const Radius, const ColliderShape>("CircleCollisionSystem").each(CircleCollisionSystem);
+    world.system<const Transform, const Origin, const Radius, const ColliderShape>("RenderDebugCircleCollider").each(RenderDebugCircleCollider);
+    world.system<const Transform, const Origin, const Size, const ColliderShape>("RenderDebugRectCollider").each(RenderDebugRectCollider);
 }
 
 

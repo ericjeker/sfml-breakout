@@ -2,15 +2,15 @@
 
 #include "BouncingBallScene.h"
 
+#include "Scenes/BouncingBall/Prefabs/Ball.h"
+
 #include "Core/Configuration.h"
-#include "Core/Modules/Physics/Components/CircleCollider.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
 #include "Core/Modules/Render/Prefabs/Sprite.h"
 #include "Core/PhysicsConstants.h"
 #include "Core/Themes/Nord.h"
-#include "Scenes/BouncingBall/Prefabs/Ball.h"
 
 #include <random>
 #include <tracy/Tracy.hpp>
@@ -29,8 +29,12 @@ void BouncingBallScene::Initialize()
     const auto& world = GetWorld();
 
     // --- Declare local systems ---
-    world.system<Transform, Velocity, CircleCollider>().kind(flecs::OnStore).each(ProcessScreenBounce).child_of(GetRootEntity());
+    world.system<Transform, Velocity, const Radius, const ColliderShape>()
+        .kind(flecs::OnStore)
+        .each(ProcessScreenBounce)
+        .child_of(GetRootEntity());
 
+    // --- Create the entities ---
     float zOrder = 0.f;
 
     Prefabs::Rectangle::Create(
@@ -83,9 +87,9 @@ void BouncingBallScene::CreateBalls(const flecs::world& world, float zOrder)
 }
 
 
-void BouncingBallScene::ProcessScreenBounce(Transform& t, Velocity& v, const CircleCollider& c)
+void BouncingBallScene::ProcessScreenBounce(Transform& t, Velocity& v, const Radius& r, const ColliderShape& c)
 {
-    const float radius = c.radius;
+    const float radius = r.radius;
 
     if (t.position.x - radius < 0.f)
     {

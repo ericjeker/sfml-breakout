@@ -2,9 +2,7 @@
 
 #pragma once
 
-struct CircleCollider {
-    float radius;
+struct Radius
+{
+    float radius = 1.f;
 };
-
-
-

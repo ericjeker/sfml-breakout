@@ -3,8 +3,10 @@
 #pragma once
 
 #include "Components/Ball.h"
-#include "Core/Modules/Physics/Components/CircleCollider.h"
+
+#include "Core/Modules/Physics/Components/ColliderShape.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
+#include "Core/Modules/Render/Components/Radius.h"
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Scenes/Scene.h"
 
@@ -24,7 +26,7 @@ private:
     void CreateBlocks(const flecs::world& world);
     void CreateBall(const flecs::world& world);
 
-    static void ProcessScreenBounce(Transform& t, Velocity& v, const CircleCollider& c, const Ball& b);
+    static void ProcessScreenBounce(Transform& t, Velocity& v, const ColliderShape& c, const Radius& r, const Ball& b);
     static void ProcessOutOfBounds(flecs::entity ball, const Transform& t, const Ball& b);
 };
 

@@ -30,15 +30,20 @@
 #include "Core/Modules/Control/Singletons/InputBindings.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Physics/Components/Acceleration.h"
-#include "Core/Modules/Physics/Components/CircleCollider.h"
+#include "Core/Modules/Physics/Components/ColliderShape.h"
 #include "Core/Modules/Physics/Components/Friction.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
+#include "Core/Modules/Render/Components/Origin.h"
+#include "Core/Modules/Render/Components/Radius.h"
+#include "Core/Modules/Render/Components/Size.h"
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Modules/Render/Prefabs/Circle.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
+#include "Core/Utils/Collision.h"
 #include "Core/Utils/Logger.h"
+#include "Core/Utils/Vector.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -53,8 +58,8 @@ GameplayScene::GameplayScene(flecs::world& world)
 
 void GameplayScene::Initialize()
 {
-    Scene::Initialize();
     LOG_DEBUG("GameplayScene:Initialize");
+    Scene::Initialize();
 
     auto& world = GetWorld();
 
@@ -139,9 +144,46 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
         .child_of(GetRootEntity());
 
     // Bounce the ball off the walls
-    world.system<Transform, Velocity, const CircleCollider, const Ball>("ScreenBounce")
+    world.system<Transform, Velocity, const ColliderShape, const Radius, const Ball>("ScreenBounce")
         .each(ProcessScreenBounce)
         .child_of(GetRootEntity());
+
+    // Detect a collision with a collider (blocks or paddle)
+    world.system<const Transform, const Size, const Origin, const ColliderShape>().each(
+        [](const flecs::iter& it, size_t, const Transform& transform, const Size& size, const Origin& origin, const ColliderShape& c
+        ) {
+            // Calculate actual collision bounds using transform, size, and origin
+            const sf::Vector2f actualOrigin = size.size.componentWiseMul(origin.origin);
+            const sf::FloatRect colliderBounds(
+                {
+                    transform.position.x - actualOrigin.x,
+                    transform.position.y - actualOrigin.y,
+                },
+                {size.size.x, size.size.y}
+            );
+
+            // We query for the balls
+            it.world().query<Transform, Velocity, const Radius, const Origin, const Ball>().each(
+                [colliderBounds](Transform& ballTransform, Velocity& ballVelocity, const Radius& ballRadius, const Origin& ballOrigin, const Ball& ball) {
+                    const Collision::ContactInformation
+                        contact = Collision::CheckAABBCircleCollision(colliderBounds, ballTransform.position, ballRadius.radius);
+
+                    if (!contact.hasCollision)
+                    {
+                        return;
+                    }
+
+                    // Move circle out of penetration
+                    ballTransform.position = ballTransform.position + contact.normal * contact.penetrationDepth;
+
+                    // Reflect velocity along collision normal
+                    const sf::Vector2f reflected = ballVelocity.velocity -
+                                                   2.f * Vector::Dot(ballVelocity.velocity, contact.normal) * contact.normal;
+                    ballVelocity.velocity = reflected;
+                }
+            );
+        }
+    );
 
     // Check if the ball is out of bounds -> GameOver or LoseOneLife
     world.system<Transform, const Ball>("OutOfBounds").each(ProcessOutOfBounds).child_of(GetRootEntity());
@@ -270,10 +312,10 @@ void GameplayScene::CreatePaddle(const flecs::world& world)
         .child_of(GetRootEntity())
         .add<PossessedByPlayer>()
         .add<Paddle>()
-        .set<CommandQueue>({})
         .set<Acceleration>({})
         .set<Friction>({.friction = 10.f})
-        .set<Velocity>({});
+        .set<Velocity>({})
+        .set<ColliderShape>({Shape::Rectangle});
 }
 
 void GameplayScene::CreateBlocks(const flecs::world& world)
@@ -297,10 +339,10 @@ void GameplayScene::CreateBlocks(const flecs::world& world)
         {
             const float posY = MARGINS + y * (BLOCK_HEIGHT + BLOCK_SPACING);
 
-            Prefabs::Rectangle::Create(
-                world,
-                {.size = {BLOCK_WIDTH, BLOCK_HEIGHT}, .color = sf::Color::Blue, .origin = {0.f, 0.f}, .position = {posX, posY}}
-            ).child_of(GetRootEntity());
+            Prefabs::Rectangle::
+                Create(world, {.size = {BLOCK_WIDTH, BLOCK_HEIGHT}, .color = sf::Color::Blue, .origin = {0.f, 0.f}, .position = {posX, posY}})
+                    .set<ColliderShape>({Shape::Rectangle})
+                    .child_of(GetRootEntity());
         }
     }
 }
@@ -308,7 +350,7 @@ void GameplayScene::CreateBlocks(const flecs::world& world)
 void GameplayScene::CreateBall(const flecs::world& world)
 {
     constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
-    constexpr float RADIUS = 20.f;
+    constexpr float RADIUS = 10.f;
 
     Prefabs::Circle::Create(
         world,
@@ -323,16 +365,15 @@ void GameplayScene::CreateBall(const flecs::world& world)
         .child_of(GetRootEntity())
         .add<PossessedByPlayer>()
         .add<Ball>()
-        .set<CommandQueue>({})
         .set<Acceleration>({})
         .set<Friction>({.friction = 10.f})
         .set<Velocity>({})
-        .set<CircleCollider>({RADIUS});
+        .set<ColliderShape>({Shape::Circle});
 }
 
-void GameplayScene::ProcessScreenBounce(Transform& t, Velocity& v, const CircleCollider& c, const Ball& b)
+void GameplayScene::ProcessScreenBounce(Transform& t, Velocity& v, const ColliderShape& c, const Radius& r, const Ball& b)
 {
-    const float radius = c.radius;
+    const float radius = r.radius;
 
     if (t.position.x - radius < 0.f)
     {

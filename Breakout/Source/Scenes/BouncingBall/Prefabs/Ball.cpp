@@ -3,11 +3,12 @@
 #include "Ball.h"
 
 #include "Core/Modules/Physics/Components/Acceleration.h"
-#include "Core/Modules/Physics/Components/CircleCollider.h"
+#include "Core/Modules/Physics/Components/ColliderShape.h"
 #include "Core/Modules/Physics/Components/Friction.h"
 #include "Core/Modules/Physics/Components/Gravity.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
 #include "Core/Modules/Render/Components/CircleRenderable.h"
+#include "Core/Modules/Render/Components/Radius.h"
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Modules/Render/Components/ZOrder.h"
 
@@ -29,7 +30,8 @@ flecs::entity Ball::Create(const flecs::world& world, const BallParams& params)
         .set<Gravity>({params.gravity})
         .set<Transform>({.position = params.position})
         .set<Velocity>({params.velocity})
-        .set<CircleCollider>({params.radius})
+        .set<Radius>({params.radius})
+        .set<ColliderShape>({Shape::Circle})
         .set<ZOrder>({params.zOrder});
 }
 
