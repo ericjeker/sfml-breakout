@@ -67,7 +67,7 @@ CollisionInfo CheckAABBCircleCollision(const sf::FloatRect& aabb, const sf::Vect
         info.normal = {0.f, 1.f};
     }
 
-    info.contactPoint = circleCenter - info.normal * circleRadius;
+    info.contactPoint = circleCenter + info.normal * circleRadius;
 
     return info;
 }

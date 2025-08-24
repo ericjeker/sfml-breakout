@@ -2,6 +2,7 @@
 
 #include "Scenes/Gameplay/GameplayScene.h"
 
+#include "Components/AttachedToPaddle.h"
 #include "Components/Ball.h"
 #include "Components/GameOverIntent.h"
 #include "Components/LaunchBallIntent.h"
@@ -143,11 +144,10 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
         .kind(flecs::PreUpdate)
         .each([](const flecs::entity& cmd, const LaunchBallIntent& l) {
             // Get the ball entity
-            cmd.world().query<const Ball, const PossessedByPlayer>().each(
-                [](const flecs::entity ball, const Ball b, const PossessedByPlayer p) {
-                    ball.remove<PossessedByPlayer>();
-                    ball.remove<Friction>();
-                    ball.set<Velocity>({{0.f, -1000.f}});
+            cmd.world().query<const Ball, const AttachedToPaddle>().each(
+                [](const flecs::entity ball, const Ball b, const AttachedToPaddle ap) {
+                    ball.remove<AttachedToPaddle>();
+                    ball.set<Velocity>({{0.f, -500.f}});
                     ball.set<ColliderShape>({Shape::Circle});
                 }
             );
@@ -163,57 +163,20 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
         .child_of(GetRootEntity());
 
     // Detect a collision with a collider (blocks or paddle)
-    world.system<const Transform, const Size, const Origin, const ColliderShape>("CollisionDetectionSystem").each(
-        [](const flecs::iter& it, size_t, const Transform& transform, const Size& size, const Origin& origin, const ColliderShape& c
-        ) {
-            ZoneScopedN("GameplayScene::CollisionDetectionSystem");
+    world.system<const Transform, const Size, const Origin, const ColliderShape>("CollisionDetectionSystem")
+        .each(ProcessCollisionDetection)
+        .child_of(GetRootEntity());
 
-            // Calculate actual collision bounds using transform, size, and origin
-            const sf::Vector2f actualOrigin = size.size.componentWiseMul(origin.origin);
-            const sf::FloatRect colliderBounds(
-                {
-                    transform.position.x - actualOrigin.x,
-                    transform.position.y - actualOrigin.y,
-                },
-                {size.size.x, size.size.y}
-            );
-
-            // We query for all the balls
-            it.world().query<Transform, Velocity, const Radius, const ColliderShape, const Ball>().each(
-                [colliderBounds](
-                    const flecs::entity& e,
-                    Transform& ballTransform,
-                    Velocity& ballVelocity,
-                    const Radius& ballRadius,
-                    const ColliderShape& c,
-                    const Ball& b
-                ) {
-                    const CollisionInfo collisionInfo = Collision::
-                        CheckAABBCircleCollision(colliderBounds, ballTransform.position, ballRadius.radius);
-
-                    if (!collisionInfo.hasCollision)
-                    {
-                        return;
-                    }
-
-                    // Add the debug information
-                    e.world().entity().set<Lifetime>({.5f}).set<CollisionInfo>(collisionInfo);
-
-                    // Move circle out of penetration
-                    ballTransform.position = ballTransform.position + collisionInfo.normal * collisionInfo.penetrationDepth;
-
-                    // Reflect velocity along collision normal
-                    const sf::Vector2f reflected = ballVelocity.velocity -
-                                                   2.f * Vector::Dot(ballVelocity.velocity, collisionInfo.normal) *
-                                                       collisionInfo.normal;
-                    ballVelocity.velocity = reflected;
-                }
-            );
-        }
-    );
+    // Constrain paddle to the screen
+    world.system<Transform, const Size, const Paddle>("ConstrainPaddleToScreen")
+        .each(ConstrainPaddleToScreen)
+        .child_of(GetRootEntity());
 
     // Check if the ball is out of bounds -> GameOver or LoseOneLife
     world.system<Transform, const Ball>("OutOfBounds").each(ProcessOutOfBounds).child_of(GetRootEntity());
+
+    // When the ball is attached to the paddle, move it with the paddle
+    world.system<Transform, const AttachedToPaddle, const Ball>("ApplyPaddlePositionToBall").each(ApplyPaddlePositionToBall).child_of(GetRootEntity());
 }
 
 void GameplayScene::CreateUISystem(flecs::world& world)
@@ -377,10 +340,8 @@ void GameplayScene::CreateBall(const flecs::world& world)
         }
     )
         .child_of(GetRootEntity())
-        .add<PossessedByPlayer>()
+        .add<AttachedToPaddle>()
         .add<Ball>()
-        .set<Acceleration>({})
-        .set<Friction>({.friction = 10.f})
         .set<Velocity>({});
 }
 
@@ -445,4 +406,108 @@ void GameplayScene::ProcessOutOfBounds(const flecs::entity ball, const Transform
         LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> Add GameOverIntent");
         ball.world().entity().add<LifetimeOneFrame>().add<Command>().add<GameOverIntent>();
     }
+}
+
+void GameplayScene::ProcessCollisionDetection(
+    const flecs::entity& e,
+    const Transform& transform,
+    const Size& size,
+    const Origin& origin,
+    const ColliderShape& c
+)
+{
+    ZoneScopedN("GameplayScene::CollisionDetectionSystem");
+
+    // Calculate actual collision bounds using transform, size, and origin
+    const sf::Vector2f actualOrigin = size.size.componentWiseMul(origin.origin);
+    const sf::FloatRect colliderBounds(
+        {
+            transform.position.x - actualOrigin.x,
+            transform.position.y - actualOrigin.y,
+        },
+        {size.size.x, size.size.y}
+    );
+
+    // Check if this is a paddle collision
+    bool isPaddle = e.has<Paddle>();
+
+    // We query for all the balls
+    e.world().query<Transform, Velocity, const Radius, const ColliderShape, const Ball>().each(
+        [colliderBounds, isPaddle](
+            const flecs::entity& e,
+            Transform& ballTransform,
+            Velocity& ballVelocity,
+            const Radius& ballRadius,
+            const ColliderShape& c,
+            const Ball& b
+        ) {
+            const CollisionInfo
+                collisionInfo = Collision::CheckAABBCircleCollision(colliderBounds, ballTransform.position, ballRadius.radius);
+
+            if (!collisionInfo.hasCollision)
+            {
+                return;
+            }
+
+            // Add the debug information
+            e.world().entity().set<Lifetime>({.5f}).set<CollisionInfo>(collisionInfo);
+
+            // Move circle out of penetration
+            ballTransform.position = ballTransform.position + collisionInfo.normal * collisionInfo.penetrationDepth;
+
+            if (isPaddle)
+            {
+                // Calculate where on the paddle the ball hit relative to the paddle center
+                const float paddleHalfWidth = colliderBounds.size.x * 0.5f;
+                const float paddleCenter = colliderBounds.position.x + paddleHalfWidth;
+                const float hitOffset = collisionInfo.contactPoint.x - paddleCenter;
+
+                // Normalize to range [-1, 1]
+                const float normalizedHit = std::clamp(hitOffset / paddleHalfWidth, -1.0f, 1.0f);
+
+                // Create deflection based on hit position
+                constexpr float DEFLECTION_STRENGTH = 0.5f;
+
+                // Modify the normal to add horizontal deflection
+                sf::Vector2f modifiedNormal = collisionInfo.normal;
+                modifiedNormal.x += normalizedHit * DEFLECTION_STRENGTH;
+                modifiedNormal = modifiedNormal.normalized();
+
+                // Reflect with modified normal
+                const sf::Vector2f reflected = ballVelocity.velocity -
+                                               2.f * Vector::Dot(ballVelocity.velocity, modifiedNormal) * modifiedNormal;
+                ballVelocity.velocity = reflected;
+            }
+            else
+            {
+                // Reflect velocity along collision normal
+                const sf::Vector2f reflected = ballVelocity.velocity -
+                                               2.f * Vector::Dot(ballVelocity.velocity, collisionInfo.normal) *
+                                                   collisionInfo.normal;
+                ballVelocity.velocity = reflected;
+            }
+        }
+    );
+}
+
+void GameplayScene::ConstrainPaddleToScreen(Transform& t, const Size& s, const Paddle& p)
+{
+    const float halfSize = s.size.x / 2;
+
+    if (t.position.x - halfSize < 0.f)
+    {
+        t.position.x = halfSize;
+    }
+    else if (t.position.x + halfSize > Configuration::WINDOW_SIZE.x)
+    {
+        t.position.x = Configuration::WINDOW_SIZE.x - halfSize;
+    }
+}
+
+void GameplayScene::ApplyPaddlePositionToBall(const flecs::entity& e, Transform& t, const AttachedToPaddle& ap, const Ball& b)
+{
+    // Get the paddle
+    e.world().query<const Transform, const Paddle>().each([&ballTransform = t](const Transform& paddleTransform, const Paddle& p) {
+        ballTransform.position.x = paddleTransform.position.x;
+    });
 }
