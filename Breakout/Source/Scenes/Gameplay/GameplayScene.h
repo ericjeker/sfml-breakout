@@ -5,6 +5,7 @@
 #include "Components/AttachedToPaddle.h"
 #include "Components/Ball.h"
 #include "Components/Paddle.h"
+#include "Components/PauseGameIntent.h"
 
 #include "Core/Modules/Physics/Components/ColliderShape.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
@@ -41,6 +42,7 @@ private:
     );
     static void ConstrainPaddleToScreen(Transform& t, const Size& s, const Paddle& p);
     static void ApplyPaddlePositionToBall(const flecs::entity& e, Transform& t, const AttachedToPaddle& ap, const Ball& b);
+    void ProcessPauseGameIntent(const flecs::entity& e, const PauseGameIntent& p);
 };
 
 

@@ -5,6 +5,7 @@
 #include "Components/AttachedToPaddle.h"
 #include "Components/Ball.h"
 #include "Components/GameOverIntent.h"
+#include "Components/Health.h"
 #include "Components/LaunchBallIntent.h"
 #include "Components/MoveIntent.h"
 #include "Components/NavigateToMainMenuIntent.h"
@@ -51,6 +52,7 @@
 #include <SFML/Graphics.hpp>
 
 #include <iostream>
+#include <numbers>
 #include <optional>
 #include <string>
 #include <tracy/Tracy.hpp>
@@ -176,7 +178,9 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
     world.system<Transform, const Ball>("OutOfBounds").each(ProcessOutOfBounds).child_of(GetRootEntity());
 
     // When the ball is attached to the paddle, move it with the paddle
-    world.system<Transform, const AttachedToPaddle, const Ball>("ApplyPaddlePositionToBall").each(ApplyPaddlePositionToBall).child_of(GetRootEntity());
+    world.system<Transform, const AttachedToPaddle, const Ball>("ApplyPaddlePositionToBall")
+        .each(ApplyPaddlePositionToBall)
+        .child_of(GetRootEntity());
 }
 
 void GameplayScene::CreateUISystem(flecs::world& world)
@@ -202,7 +206,7 @@ void GameplayScene::CreateUISystem(flecs::world& world)
         .child_of(GetRootEntity());
 
     // Navigate to the main menu state after quitting the game
-    world.system<const NavigateToMainMenuIntent>()
+    world.system<const NavigateToMainMenuIntent>("ProcessNavigateToMainMenuIntent")
         .kind(flecs::PreUpdate)
         .each([&](const flecs::entity& e, const NavigateToMainMenuIntent i) {
             // We defer the state change to the end of the frame
@@ -215,7 +219,7 @@ void GameplayScene::CreateUISystem(flecs::world& world)
         .child_of(GetRootEntity());
 
     // Game over, load the game over scene
-    world.system<const GameOverIntent>("GameOverSystem")
+    world.system<const GameOverIntent>("ProcessGameOverIntent")
         .kind(flecs::PreUpdate)
         .each([](const flecs::entity& e, const GameOverIntent& g) {
             e.world().entity().set<DeferredEvent>({[] {
@@ -227,18 +231,20 @@ void GameplayScene::CreateUISystem(flecs::world& world)
         })
         .child_of(GetRootEntity());
 
-    world.system<const RestartGameIntent>().kind(flecs::PreUpdate).each([&](const flecs::entity& e, const RestartGameIntent i) {
-        // We defer the state change to the end of the frame
-        e.world().entity().set<DeferredEvent>({.callback = [&] {
-            auto& sceneManager = GameService::Get<SceneManager>();
-            sceneManager.LoadScene<GameplayScene>(SceneLoadMode::Single);
-        }});
+    world.system<const RestartGameIntent>("ProcessRestartGameIntent")
+        .kind(flecs::PreUpdate)
+        .each([&](const flecs::entity& e, const RestartGameIntent i) {
+            // We defer the state change to the end of the frame
+            e.world().entity().set<DeferredEvent>({.callback = [&] {
+                auto& sceneManager = GameService::Get<SceneManager>();
+                sceneManager.LoadScene<GameplayScene>(SceneLoadMode::Single);
+            }});
 
-        e.destruct();
-    });
+            e.destruct();
+        });
 
     // Resume the game, enable the entities again
-    world.system<const ResumeGameIntent>("ResumeGameSystem")
+    world.system<const ResumeGameIntent>("ProcessResumeGameIntent")
         .kind(flecs::PreUpdate)
         .each([rootEntity = GetRootEntity()](const flecs::entity& e, const ResumeGameIntent& r) {
             LOG_DEBUG("GameplayScene::ResumeGameSystem");
@@ -270,34 +276,9 @@ void GameplayScene::CreateUISystem(flecs::world& world)
         .child_of(GetRootEntity());
 
     // Pause the game, disable the entities
-    world.system<const PauseGameIntent>("PauseGameSystem")
+    world.system<const PauseGameIntent>("ProcessPauseGameIntent")
         .kind(flecs::PreUpdate)
-        .each([rootEntity = GetRootEntity()](const flecs::entity& e, const PauseGameIntent& p) {
-            LOG_DEBUG("GameplayScene::PauseGameSystem");
-
-            e.world().entity().set<DeferredEvent>({[] {
-                LOG_DEBUG("GameplayScene::PauseGameSystem -> Load Pause Scene");
-                auto& sceneManager = GameService::Get<SceneManager>();
-                sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
-            }});
-
-            rootEntity.add<ScenePaused>();
-
-            // Query for the Paddle and Ball to disable them
-            e.world()
-                .query_builder<>()
-                .scope_open()
-                .with<Ball>()
-                .oper(flecs::Or)
-                .with<Paddle>()
-                .scope_close()
-                .with(flecs::ChildOf, rootEntity)
-                .each([](const flecs::entity& entity) { entity.disable(); });
-
-            // Destroy the command entity
-            LOG_DEBUG("GameplayScene::PauseGameSystem -> Destroy PauseGameIntent");
-            e.destruct();
-        })
+        .each([this](const flecs::entity& e, const PauseGameIntent& p) { ProcessPauseGameIntent(e, p); })
         .child_of(GetRootEntity());
 }
 
@@ -324,27 +305,6 @@ void GameplayScene::CreatePaddle(const flecs::world& world)
         .set<ColliderShape>({Shape::Rectangle});
 }
 
-void GameplayScene::CreateBall(const flecs::world& world)
-{
-    constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
-    constexpr float RADIUS = 10.f;
-
-    Prefabs::Circle::Create(
-        world,
-        {
-            .radius = RADIUS,
-            .color = sf::Color::Red,
-            .origin = {0.5f, 0.5f},
-            .position = {CENTER_X, Configuration::WINDOW_SIZE.y - 125.f},
-            .zOrder = 0.f,
-        }
-    )
-        .child_of(GetRootEntity())
-        .add<AttachedToPaddle>()
-        .add<Ball>()
-        .set<Velocity>({});
-}
-
 void GameplayScene::CreateBlocks(const flecs::world& world)
 {
     constexpr float COLUMNS = 10;
@@ -368,10 +328,33 @@ void GameplayScene::CreateBlocks(const flecs::world& world)
 
             Prefabs::Rectangle::
                 Create(world, {.size = {BLOCK_WIDTH, BLOCK_HEIGHT}, .color = sf::Color::Blue, .origin = {0.f, 0.f}, .position = {posX, posY}})
+                    .set<Health>({1})
                     .set<ColliderShape>({Shape::Rectangle})
                     .child_of(GetRootEntity());
         }
     }
+}
+
+void GameplayScene::CreateBall(const flecs::world& world)
+{
+    constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
+    constexpr float RADIUS = 10.f;
+
+    Prefabs::Circle::Create(
+        world,
+        {
+            .radius = RADIUS,
+            .color = sf::Color::Red,
+            .origin = {0.5f, 0.5f},
+            .position = {CENTER_X, Configuration::WINDOW_SIZE.y - 125.f},
+            .zOrder = 0.f,
+        }
+    )
+        .child_of(GetRootEntity())
+        // TODO: maybe just AttachedTo and add a socket information
+        .add<AttachedToPaddle>()
+        .add<Ball>()
+        .set<Velocity>({});
 }
 
 void GameplayScene::ProcessScreenBounce(Transform& t, Velocity& v, const ColliderShape& c, const Radius& r, const Ball& b)
@@ -429,7 +412,7 @@ void GameplayScene::ProcessCollisionDetection(
     );
 
     // Check if this is a paddle collision
-    bool isPaddle = e.has<Paddle>();
+    const bool isPaddle = e.has<Paddle>();
 
     // We query for all the balls
     e.world().query<Transform, Velocity, const Radius, const ColliderShape, const Ball>().each(
@@ -504,10 +487,40 @@ void GameplayScene::ConstrainPaddleToScreen(Transform& t, const Size& s, const P
     }
 }
 
+void GameplayScene::ProcessPauseGameIntent(const flecs::entity& e, const PauseGameIntent& p)
+{
+    LOG_DEBUG("GameplayScene::PauseGameSystem");
+
+    e.world().entity().set<DeferredEvent>({[] {
+        LOG_DEBUG("GameplayScene::PauseGameSystem -> Load Pause Scene");
+        auto& sceneManager = GameService::Get<SceneManager>();
+        sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
+    }});
+
+    GetRootEntity().add<ScenePaused>();
+
+    // Query for the Paddle and Ball to disable them
+    e.world()
+        .query_builder<>()
+        .scope_open()
+        .with<Ball>()
+        .oper(flecs::Or)
+        .with<Paddle>()
+        .scope_close()
+        .with(flecs::ChildOf, GetRootEntity())
+        .each([](const flecs::entity& entity) { entity.disable(); });
+
+    // Destroy the command entity
+    LOG_DEBUG("GameplayScene::PauseGameSystem -> Destroy PauseGameIntent");
+    e.destruct();
+}
+
 void GameplayScene::ApplyPaddlePositionToBall(const flecs::entity& e, Transform& t, const AttachedToPaddle& ap, const Ball& b)
 {
     // Get the paddle
-    e.world().query<const Transform, const Paddle>().each([&ballTransform = t](const Transform& paddleTransform, const Paddle& p) {
-        ballTransform.position.x = paddleTransform.position.x;
-    });
+    e.world().query<const Transform, const Paddle>().each(
+        [&ballTransform = t](const Transform& paddleTransform, const Paddle& p) {
+            ballTransform.position.x = paddleTransform.position.x;
+        }
+    );
 }
