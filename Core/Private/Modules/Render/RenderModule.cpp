@@ -22,6 +22,8 @@
 namespace
 {
 
+constexpr bool DEBUG_ORIGIN = false;
+
 void ApplyTransformToCircle(const Transform& t, CircleRenderable& c)
 {
     c.shape.setPosition(t.position);
@@ -47,12 +49,40 @@ void RenderRectangleShape(const RectangleRenderable& rect)
 {
     auto& window = GameService::Get<sf::RenderWindow>();
     window.draw(rect.shape);
+
+    if constexpr (!DEBUG_ORIGIN)
+    {
+        return;
+    }
+
+    // Debug Center Point
+    sf::CircleShape circleCenter(1.f);
+    circleCenter.setFillColor(sf::Color::White);
+    circleCenter.setPosition(rect.shape.getPosition() + rect.shape.getOrigin());
+    circleCenter.setOrigin({0.5f, 0.5f});
+
+    window.draw(circleCenter);
 }
 
 void RenderCircleShape(const CircleRenderable& circle)
 {
+    const auto drawable = circle.shape;
+
     auto& window = GameService::Get<sf::RenderWindow>();
-    window.draw(circle.shape);
+    window.draw(drawable);
+
+    if constexpr (!DEBUG_ORIGIN)
+    {
+        return;
+    }
+
+    // Debug Center Point
+    sf::CircleShape circleCenter(1.f);
+    circleCenter.setFillColor(sf::Color::White);
+    circleCenter.setPosition(drawable.getPosition());
+    circleCenter.setOrigin({0.5f, 0.5f});
+
+    window.draw(circleCenter);
 }
 
 void RenderText(const TextRenderable& text)

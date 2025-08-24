@@ -3,13 +3,16 @@
 #include "Core/Utils/Collision.h"
 
 #include <algorithm>
+#include <tracy/Tracy.hpp>
 
 namespace Collision
 {
 
-ContactInformation CheckAABBCircleCollision(const sf::FloatRect& aabb, const sf::Vector2f& circleCenter, const float circleRadius)
+CollisionInfo CheckAABBCircleCollision(const sf::FloatRect& aabb, const sf::Vector2f& circleCenter, const float circleRadius)
 {
-    ContactInformation contactInfo;
+    ZoneScopedN("CheckAABBCircleCollision");
+
+    CollisionInfo info;
 
     // Find the closest point on the rectangle to the circle center
     sf::Vector2f closestPoint;
@@ -24,18 +27,18 @@ ContactInformation CheckAABBCircleCollision(const sf::FloatRect& aabb, const sf:
     if (distanceLength > circleRadius)
     {
         // No contact, we return early
-        return contactInfo;
+        return info;
     }
 
-    contactInfo.hasCollision = true;
-    contactInfo.penetrationDepth = circleRadius - distanceLength;
+    info.hasCollision = true;
+    info.penetrationDepth = circleRadius - distanceLength;
 
     if (distanceLength > 0.f)
     {
-        contactInfo.normal = distance.normalized();
-        contactInfo.contactPoint = circleCenter - contactInfo.normal * circleRadius;
+        info.normal = distance.normalized();
+        info.contactPoint = closestPoint;
 
-        return contactInfo;
+        return info;
     }
 
     // Special case if the distance is zero
@@ -49,24 +52,24 @@ ContactInformation CheckAABBCircleCollision(const sf::FloatRect& aabb, const sf:
 
     if (minDist == leftDist)
     {
-        contactInfo.normal = {-1.f, 0.f};
+        info.normal = {-1.f, 0.f};
     }
     else if (minDist == rightDist)
     {
-        contactInfo.normal = {1.f, 0.f};
+        info.normal = {1.f, 0.f};
     }
     else if (minDist == topDist)
     {
-        contactInfo.normal = {0.f, -1.f};
+        info.normal = {0.f, -1.f};
     }
     else
     {
-        contactInfo.normal = {0.f, 1.f};
+        info.normal = {0.f, 1.f};
     }
 
-    contactInfo.contactPoint = circleCenter - contactInfo.normal * circleRadius;
+    info.contactPoint = circleCenter - info.normal * circleRadius;
 
-    return contactInfo;
+    return info;
 }
 
 

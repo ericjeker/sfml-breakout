@@ -16,7 +16,7 @@ flecs::entity Circle::Create(const flecs::world& world, const CircleParams& para
     sf::CircleShape circleShape(params.radius);
     circleShape.setPosition(params.position);
     circleShape.setFillColor(params.color);
-    circleShape.setOrigin({params.radius * params.origin.x, params.radius * params.origin.y});
+    circleShape.setOrigin({2 * params.radius * params.origin.x, 2 * params.radius * params.origin.y});
 
     const auto entity = world.entity()
                             .set<CircleRenderable>({std::move(circleShape)})

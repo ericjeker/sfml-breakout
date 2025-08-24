@@ -20,5 +20,4 @@ constexpr unsigned int ANTI_ALIASING_LEVEL = 4;
 
 constexpr bool ENABLE_KEY_REPEAT = false;
 
-
 } // namespace Configuration

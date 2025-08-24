@@ -2,6 +2,11 @@
 
 #include "Scenes/Pause/PauseScene.h"
 
+#include "GameStates/Gameplay/GameplayState.h"
+#include "Scenes/Gameplay/Components/NavigateToMainMenuIntent.h"
+#include "Scenes/Gameplay/Components/ResumeGameIntent.h"
+#include "Scenes/Gameplay/GameplayScene.h"
+
 #include "Core/Configuration.h"
 #include "Core/Events/DeferredEvent.h"
 #include "Core/Managers/GameService.h"
@@ -9,16 +14,14 @@
 #include "Core/Modules/Control/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
+#include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
+#include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
 #include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"
-#include "GameStates/Gameplay/GameplayState.h"
-#include "Scenes/Gameplay/Components/NavigateToMainMenuIntent.h"
-#include "Scenes/Gameplay/Components/ResumeGameIntent.h"
-#include "Scenes/Gameplay/GameplayScene.h"
 
 PauseScene::PauseScene(flecs::world& world)
     : Scene(world)
@@ -27,14 +30,18 @@ PauseScene::PauseScene(flecs::world& world)
 
 void PauseScene::Initialize()
 {
-    Scene::Initialize();
     LOG_DEBUG("PauseScene::Initialize");
+    Scene::Initialize();
 
     constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
     constexpr float CENTER_Y = Configuration::WINDOW_SIZE.y / 2;
 
     const auto& world = GetWorld();
 
+    // --- Create Local Systems ---
+    CreateUISystems(world);
+
+    // --- Create entities ---
     float zOrder = 0.f;
 
     // --- Overlay ---
@@ -75,7 +82,8 @@ void PauseScene::Initialize()
             .backgroundColor = sf::Color::Transparent,
             .position = {CENTER_X, CENTER_Y},
             .zOrder = ++zOrder,
-            .onClick = [](const flecs::world& stage) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<ResumeGameIntent>(); },
+            .onClick = [](const flecs::world& stage
+                       ) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<ResumeGameIntent>(); },
         }
     )
         .child_of(GetRootEntity());
@@ -91,7 +99,8 @@ void PauseScene::Initialize()
             .backgroundColor = sf::Color::Transparent,
             .position = {CENTER_X, CENTER_Y + 100},
             .zOrder = ++zOrder,
-            .onClick = [](const flecs::world& stage) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMainMenuIntent>(); },
+            .onClick = [](const flecs::world& stage
+                       ) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMainMenuIntent>(); },
         }
     )
         .child_of(GetRootEntity());
@@ -116,4 +125,39 @@ void PauseScene::HandleEvent(const std::optional<sf::Event>& event)
             {.position = mouseReleased->position, .button = mouseReleased->button}
         );
     }
+    else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+    {
+        if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
+        {
+            GetWorld()
+                .entity()
+                .is_a<Prefabs::KeyPressedEvent>()
+                .set<KeyPressed>({
+                    .code = keyPressed->code,
+                    .scancode = keyPressed->scancode,
+                    .alt = keyPressed->alt,
+                    .control = keyPressed->control,
+                    .shift = keyPressed->shift,
+                })
+                .child_of(GetRootEntity());
+        }
+    }
+}
+
+void PauseScene::CreateUISystems(const flecs::world& world)
+{
+    // Query for KeyPressed
+    world.system<const KeyPressed>("ProcessKeyPressed")
+        .kind(flecs::PostLoad)
+        .with(flecs::ChildOf, GetRootEntity())
+        .each([](const flecs::entity& e, const KeyPressed& k) {
+            if (k.scancode == sf::Keyboard::Scancode::Escape)
+            {
+                LOG_DEBUG("PauseScene::ProcessKeyPressed: Escape -> Add ResumeGameIntent");
+                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<ResumeGameIntent>();
+            }
+
+            e.destruct();
+        })
+        .child_of(GetRootEntity());
 }

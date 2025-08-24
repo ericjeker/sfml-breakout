@@ -28,6 +28,7 @@
 #include "Core/Modules/Control/Components/PossessedByPlayer.h"
 #include "Core/Modules/Control/Components/Target.h"
 #include "Core/Modules/Control/Singletons/InputBindings.h"
+#include "Core/Modules/Lifetime/Components/Lifetime.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Physics/Components/Acceleration.h"
 #include "Core/Modules/Physics/Components/ColliderShape.h"
@@ -41,6 +42,7 @@
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
+#include "Core/Tags/ScenePaused.h"
 #include "Core/Utils/Collision.h"
 #include "Core/Utils/Logger.h"
 #include "Core/Utils/Vector.h"
@@ -49,6 +51,8 @@
 
 #include <iostream>
 #include <optional>
+#include <string>
+#include <tracy/Tracy.hpp>
 
 
 GameplayScene::GameplayScene(flecs::world& world)
@@ -78,12 +82,20 @@ void GameplayScene::Initialize()
 
 void GameplayScene::HandleEvent(const std::optional<sf::Event>& event)
 {
+    // Only process when active
+    if (GetRootEntity().has<ScenePaused>())
+    {
+        return;
+    }
+
     if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
     {
         // We still filter the scan code as to not populate the ECS with useless entities
         if (keyPressed->scancode == sf::Keyboard::Scancode::Escape || keyPressed->scancode == sf::Keyboard::Scancode::Space)
         {
-            // Add a KeyPressed event in the world that will be handled later during the update
+            LOG_DEBUG("GameplayScene::HandleEvent: KeyPressed");
+
+            // Add a KeyPressed event to this scene, that will later be handled during the update
             GetWorld()
                 .entity()
                 .is_a<Prefabs::KeyPressedEvent>()
@@ -130,11 +142,13 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
     world.system<const LaunchBallIntent>("LaunchBallSystem")
         .kind(flecs::PreUpdate)
         .each([](const flecs::entity& cmd, const LaunchBallIntent& l) {
+            // Get the ball entity
             cmd.world().query<const Ball, const PossessedByPlayer>().each(
                 [](const flecs::entity ball, const Ball b, const PossessedByPlayer p) {
                     ball.remove<PossessedByPlayer>();
                     ball.remove<Friction>();
                     ball.set<Velocity>({{0.f, -1000.f}});
+                    ball.set<ColliderShape>({Shape::Circle});
                 }
             );
 
@@ -149,9 +163,11 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
         .child_of(GetRootEntity());
 
     // Detect a collision with a collider (blocks or paddle)
-    world.system<const Transform, const Size, const Origin, const ColliderShape>().each(
+    world.system<const Transform, const Size, const Origin, const ColliderShape>("CollisionDetectionSystem").each(
         [](const flecs::iter& it, size_t, const Transform& transform, const Size& size, const Origin& origin, const ColliderShape& c
         ) {
+            ZoneScopedN("GameplayScene::CollisionDetectionSystem");
+
             // Calculate actual collision bounds using transform, size, and origin
             const sf::Vector2f actualOrigin = size.size.componentWiseMul(origin.origin);
             const sf::FloatRect colliderBounds(
@@ -162,23 +178,34 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
                 {size.size.x, size.size.y}
             );
 
-            // We query for the balls
-            it.world().query<Transform, Velocity, const Radius, const Origin, const Ball>().each(
-                [colliderBounds](Transform& ballTransform, Velocity& ballVelocity, const Radius& ballRadius, const Origin& ballOrigin, const Ball& ball) {
-                    const Collision::ContactInformation
-                        contact = Collision::CheckAABBCircleCollision(colliderBounds, ballTransform.position, ballRadius.radius);
+            // We query for all the balls
+            it.world().query<Transform, Velocity, const Radius, const ColliderShape, const Ball>().each(
+                [colliderBounds](
+                    const flecs::entity& e,
+                    Transform& ballTransform,
+                    Velocity& ballVelocity,
+                    const Radius& ballRadius,
+                    const ColliderShape& c,
+                    const Ball& b
+                ) {
+                    const CollisionInfo collisionInfo = Collision::
+                        CheckAABBCircleCollision(colliderBounds, ballTransform.position, ballRadius.radius);
 
-                    if (!contact.hasCollision)
+                    if (!collisionInfo.hasCollision)
                     {
                         return;
                     }
 
+                    // Add the debug information
+                    e.world().entity().set<Lifetime>({.5f}).set<CollisionInfo>(collisionInfo);
+
                     // Move circle out of penetration
-                    ballTransform.position = ballTransform.position + contact.normal * contact.penetrationDepth;
+                    ballTransform.position = ballTransform.position + collisionInfo.normal * collisionInfo.penetrationDepth;
 
                     // Reflect velocity along collision normal
                     const sf::Vector2f reflected = ballVelocity.velocity -
-                                                   2.f * Vector::Dot(ballVelocity.velocity, contact.normal) * contact.normal;
+                                                   2.f * Vector::Dot(ballVelocity.velocity, collisionInfo.normal) *
+                                                       collisionInfo.normal;
                     ballVelocity.velocity = reflected;
                 }
             );
@@ -194,9 +221,12 @@ void GameplayScene::CreateUISystem(flecs::world& world)
     // Query for KeyPressed and pause the Scene
     world.system<const KeyPressed>("ProcessKeyPressed")
         .kind(flecs::PostLoad)
+        // Make sure we process only the KeyPressed events from this scene
+        .with(flecs::ChildOf, GetRootEntity())
         .each([](const flecs::entity& e, const KeyPressed& k) {
             if (k.scancode == sf::Keyboard::Scancode::Escape)
             {
+                LOG_DEBUG("GameplayScene::ProcessKeyPressed: Escape -> Add PauseGameIntent");
                 e.world().entity().add<LifetimeOneFrame>().add<Command>().add<PauseGameIntent>();
             }
             else if (k.scancode == sf::Keyboard::Scancode::Space)
@@ -248,11 +278,17 @@ void GameplayScene::CreateUISystem(flecs::world& world)
     world.system<const ResumeGameIntent>("ResumeGameSystem")
         .kind(flecs::PreUpdate)
         .each([rootEntity = GetRootEntity()](const flecs::entity& e, const ResumeGameIntent& r) {
+            LOG_DEBUG("GameplayScene::ResumeGameSystem");
+
             e.world().entity().set<DeferredEvent>({[] {
+                LOG_DEBUG("GameplayScene::ResumeGameSystem -> Unload Pause Scene");
                 auto& sceneManager = GameService::Get<SceneManager>();
                 sceneManager.UnloadScene<PauseScene>();
             }});
 
+            rootEntity.remove<ScenePaused>();
+
+            // Query for the Paddle and Ball to enable them
             e.world()
                 .query_builder<>()
                 .scope_open()
@@ -265,6 +301,7 @@ void GameplayScene::CreateUISystem(flecs::world& world)
                 .with(flecs::ChildOf, rootEntity)
                 .each([](const flecs::entity& entity) { entity.enable(); });
 
+            LOG_DEBUG("GameplayScene::ResumeGameSystem -> Destroy ResumeGameIntent");
             e.destruct();
         })
         .child_of(GetRootEntity());
@@ -273,12 +310,17 @@ void GameplayScene::CreateUISystem(flecs::world& world)
     world.system<const PauseGameIntent>("PauseGameSystem")
         .kind(flecs::PreUpdate)
         .each([rootEntity = GetRootEntity()](const flecs::entity& e, const PauseGameIntent& p) {
+            LOG_DEBUG("GameplayScene::PauseGameSystem");
+
             e.world().entity().set<DeferredEvent>({[] {
-                // Add the pause scene
+                LOG_DEBUG("GameplayScene::PauseGameSystem -> Load Pause Scene");
                 auto& sceneManager = GameService::Get<SceneManager>();
                 sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
             }});
 
+            rootEntity.add<ScenePaused>();
+
+            // Query for the Paddle and Ball to disable them
             e.world()
                 .query_builder<>()
                 .scope_open()
@@ -290,6 +332,7 @@ void GameplayScene::CreateUISystem(flecs::world& world)
                 .each([](const flecs::entity& entity) { entity.disable(); });
 
             // Destroy the command entity
+            LOG_DEBUG("GameplayScene::PauseGameSystem -> Destroy PauseGameIntent");
             e.destruct();
         })
         .child_of(GetRootEntity());
@@ -316,6 +359,29 @@ void GameplayScene::CreatePaddle(const flecs::world& world)
         .set<Friction>({.friction = 10.f})
         .set<Velocity>({})
         .set<ColliderShape>({Shape::Rectangle});
+}
+
+void GameplayScene::CreateBall(const flecs::world& world)
+{
+    constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
+    constexpr float RADIUS = 10.f;
+
+    Prefabs::Circle::Create(
+        world,
+        {
+            .radius = RADIUS,
+            .color = sf::Color::Red,
+            .origin = {0.5f, 0.5f},
+            .position = {CENTER_X, Configuration::WINDOW_SIZE.y - 125.f},
+            .zOrder = 0.f,
+        }
+    )
+        .child_of(GetRootEntity())
+        .add<PossessedByPlayer>()
+        .add<Ball>()
+        .set<Acceleration>({})
+        .set<Friction>({.friction = 10.f})
+        .set<Velocity>({});
 }
 
 void GameplayScene::CreateBlocks(const flecs::world& world)
@@ -345,30 +411,6 @@ void GameplayScene::CreateBlocks(const flecs::world& world)
                     .child_of(GetRootEntity());
         }
     }
-}
-
-void GameplayScene::CreateBall(const flecs::world& world)
-{
-    constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
-    constexpr float RADIUS = 10.f;
-
-    Prefabs::Circle::Create(
-        world,
-        {
-            .radius = RADIUS,
-            .color = sf::Color::Red,
-            .origin = {0.5f, 0.5f},
-            .position = {CENTER_X, Configuration::WINDOW_SIZE.y - 120.f},
-            .zOrder = 0.f,
-        }
-    )
-        .child_of(GetRootEntity())
-        .add<PossessedByPlayer>()
-        .add<Ball>()
-        .set<Acceleration>({})
-        .set<Friction>({.friction = 10.f})
-        .set<Velocity>({})
-        .set<ColliderShape>({Shape::Circle});
 }
 
 void GameplayScene::ProcessScreenBounce(Transform& t, Velocity& v, const ColliderShape& c, const Radius& r, const Ball& b)

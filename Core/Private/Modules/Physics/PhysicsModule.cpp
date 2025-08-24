@@ -5,14 +5,18 @@
 #include "Core/Managers/GameService.h"
 #include "Core/Modules/Physics/Components/Acceleration.h"
 #include "Core/Modules/Physics/Components/ColliderShape.h"
+#include "Core/Modules/Physics/Components/CollisionInfo.h"
 #include "Core/Modules/Physics/Components/Friction.h"
 #include "Core/Modules/Physics/Components/Gravity.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
 #include "Core/Modules/Physics/Singletons/GravitySettings.h"
+#include "Core/Modules/Render/Components/CircleRenderable.h"
 #include "Core/Modules/Render/Components/Origin.h"
 #include "Core/Modules/Render/Components/Radius.h"
+#include "Core/Modules/Render/Components/RectangleRenderable.h"
 #include "Core/Modules/Render/Components/Size.h"
 #include "Core/Modules/Render/Components/Transform.h"
+#include "Core/Modules/Render/Components/ZOrder.h"
 #include "Core/PhysicsConstants.h"
 
 #include <SFML/Graphics/CircleShape.hpp>
@@ -95,21 +99,20 @@ void CircleCollisionSystem(const flecs::iter& it, const size_t idx, Transform& t
     );
 }
 
-void RenderDebugCircleCollider(const Transform& t, const Origin& o, const Radius& r, const ColliderShape& c)
+void AddDebugCircleCollider(const flecs::entity& e, const Transform& t, const Origin& o, const Radius& r, const ColliderShape& c)
 {
     sf::CircleShape circle;
     circle.setPosition(t.position);
     circle.setRadius(r.radius);
-    circle.setOrigin({r.radius * o.origin.x, r.radius * o.origin.y});
+    circle.setOrigin({2 * r.radius * o.origin.x, 2 * r.radius * o.origin.y});
     circle.setFillColor(sf::Color::Transparent);
     circle.setOutlineThickness(1.f);
     circle.setOutlineColor(sf::Color::Magenta);
 
-    auto& window = GameService::Get<sf::RenderWindow>();
-    window.draw(circle);
+    e.set<CircleRenderable>({circle}).set<ZOrder>({ZOrderLayer::Debug});
 }
 
-void RenderDebugRectCollider(const Transform& t, const Origin& o, const Size& s, const ColliderShape& c)
+void AddDebugRectCollider(const flecs::entity& e, const Transform& t, const Origin& o, const Size& s, const ColliderShape& c)
 {
     sf::RectangleShape rect;
     rect.setPosition(t.position);
@@ -119,8 +122,20 @@ void RenderDebugRectCollider(const Transform& t, const Origin& o, const Size& s,
     rect.setOutlineThickness(1.f);
     rect.setOutlineColor(sf::Color::Magenta);
 
-    auto& window = GameService::Get<sf::RenderWindow>();
-    window.draw(rect);
+    e.set<RectangleRenderable>({rect}).set<ZOrder>({ZOrderLayer::Debug});
+}
+
+void AddDebugCollisionInfo(const flecs::entity& e, const CollisionInfo& c)
+{
+    constexpr float SIZE = 5.f;
+
+    sf::RectangleShape rect;
+    rect.setPosition(c.contactPoint);
+    rect.setSize({SIZE, SIZE});
+    rect.setOrigin({SIZE * 0.5f, SIZE * 0.5f});
+    rect.setFillColor(sf::Color::White);
+
+    e.set<Transform>({.position = c.contactPoint}).set<RectangleRenderable>({rect}).set<ZOrder>({ZOrderLayer::Debug});
 }
 
 } // namespace
@@ -142,8 +157,11 @@ PhysicsModule::PhysicsModule(const flecs::world& world)
     world.system<Acceleration, Velocity>("AccelerationSystem").each(AccelerationSystem);
     world.system<Transform, const Velocity>("MovementSystem").each(MovementSystem);
     world.system<Transform, Velocity, const Radius, const ColliderShape>("CircleCollisionSystem").each(CircleCollisionSystem);
-    world.system<const Transform, const Origin, const Radius, const ColliderShape>("RenderDebugCircleCollider").each(RenderDebugCircleCollider);
-    world.system<const Transform, const Origin, const Size, const ColliderShape>("RenderDebugRectCollider").each(RenderDebugRectCollider);
+
+    // Debug rendering
+    //world.system<const Transform, const Origin, const Radius, const ColliderShape>("AddDebugCircleCollider").each(AddDebugCircleCollider);
+    //world.system<const Transform, const Origin, const Size, const ColliderShape>("AddDebugRectCollider").each(AddDebugRectCollider);
+    world.system<const CollisionInfo>("AddDebugCollisionInfo").each(AddDebugCollisionInfo);
 }
 
 
