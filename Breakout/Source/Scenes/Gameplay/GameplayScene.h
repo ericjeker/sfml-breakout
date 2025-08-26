@@ -34,7 +34,7 @@ private:
     static void ProcessScreenBounce(Transform& t, Velocity& v, const ColliderShape& c, const Radius& r, const Ball& b);
     static void ProcessOutOfBounds(flecs::entity ball, const Transform& t, const Ball& b);
     static void ProcessCollisionDetection(
-        const flecs::entity& e,
+        const flecs::entity& blockEntity,
         const Transform& transform,
         const Size& size,
         const Origin& origin,
@@ -43,6 +43,7 @@ private:
     static void ConstrainPaddleToScreen(Transform& t, const Size& s, const Paddle& p);
     static void ApplyPaddlePositionToBall(const flecs::entity& e, Transform& t, const AttachedToPaddle& ap, const Ball& b);
     void ProcessPauseGameIntent(const flecs::entity& e, const PauseGameIntent& p);
+    void PauseGame(const flecs::world& w);
 };
 
 

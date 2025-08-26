@@ -2,13 +2,15 @@
 
 #include "GameplayState.h"
 
+#include "Scenes/Debug/DebugScene.h"
+#include "Scenes/GameOver/GameOverScene.h"
+#include "Scenes/GameWon/GameWonScene.h"
+#include "Scenes/Gameplay/GameplayScene.h"
+#include "Scenes/Pause/PauseScene.h"
+
 #include "Core/GameStates/GameState.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
-#include "Scenes/Debug/DebugScene.h"
-#include "Scenes/GameOver/GameOverScene.h"
-#include "Scenes/Gameplay/GameplayScene.h"
-#include "Scenes/Pause/PauseScene.h"
 
 GameplayState::GameplayState(flecs::world& world)
     : GameState(world)
@@ -23,6 +25,7 @@ void GameplayState::Enter()
     sceneManager.AddScene<DebugScene>(std::make_unique<DebugScene>(GetWorld()));
     sceneManager.AddScene<GameplayScene>(std::make_unique<GameplayScene>(GetWorld()));
     sceneManager.AddScene<GameOverScene>(std::make_unique<GameOverScene>(GetWorld()));
+    sceneManager.AddScene<GameWonScene>(std::make_unique<GameWonScene>(GetWorld()));
     sceneManager.AddScene<PauseScene>(std::make_unique<PauseScene>(GetWorld()));
 
     // --- Load the default scene ---

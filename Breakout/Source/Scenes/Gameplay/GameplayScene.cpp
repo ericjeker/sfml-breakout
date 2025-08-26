@@ -4,7 +4,9 @@
 
 #include "Components/AttachedToPaddle.h"
 #include "Components/Ball.h"
+#include "Components/Block.h"
 #include "Components/GameOverIntent.h"
+#include "Components/GameWonIntent.h"
 #include "Components/Health.h"
 #include "Components/LaunchBallIntent.h"
 #include "Components/MoveIntent.h"
@@ -17,6 +19,7 @@
 #include "Prefabs/MoveLeftCommand.h"
 #include "Prefabs/MoveRightCommand.h"
 #include "Scenes/GameOver/GameOverScene.h"
+#include "Scenes/GameWon/GameWonScene.h"
 #include "Scenes/Pause/PauseScene.h"
 
 #include "Core/Configuration.h"
@@ -128,6 +131,8 @@ void GameplayScene::CreateInputBindings(const flecs::world& world)
 
 void GameplayScene::CreateLocalSystems(const flecs::world& world)
 {
+    // --- Paddle Movement System ---
+
     // Triggered by the Input Bindings and ControlSystem
     world.system<const MoveIntent, const Target>("PaddleMovementSystem")
         .kind(flecs::PreUpdate)
@@ -140,6 +145,9 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
             cmd.destruct();
         })
         .child_of(GetRootEntity());
+
+
+    // --- Launching the Ball ---
 
     // Launch the ball currently on the paddle
     world.system<const LaunchBallIntent>("LaunchBallSystem")
@@ -159,6 +167,14 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
         })
         .child_of(GetRootEntity());
 
+    // When the ball is attached to the paddle, move it with the paddle
+    world.system<Transform, const AttachedToPaddle, const Ball>("ApplyPaddlePositionToBall")
+        .each(ApplyPaddlePositionToBall)
+        .child_of(GetRootEntity());
+
+
+    // --- Physics, Collision, Constraints ---
+
     // Bounce the ball off the walls
     world.system<Transform, Velocity, const ColliderShape, const Radius, const Ball>("ScreenBounce")
         .each(ProcessScreenBounce)
@@ -174,12 +190,22 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
         .each(ConstrainPaddleToScreen)
         .child_of(GetRootEntity());
 
+
+    // --- Game Over / Game Won ---
+
     // Check if the ball is out of bounds -> GameOver or LoseOneLife
+    // TODO: instead, check if there are no more ball on the screen = GAME OVER or LOSE ONE LIFE
     world.system<Transform, const Ball>("OutOfBounds").each(ProcessOutOfBounds).child_of(GetRootEntity());
 
-    // When the ball is attached to the paddle, move it with the paddle
-    world.system<Transform, const AttachedToPaddle, const Ball>("ApplyPaddlePositionToBall")
-        .each(ApplyPaddlePositionToBall)
+    // Check if there are no more blocks on the screen = WIN
+    world.system("CheckIfAllBlocksDestroyed")
+        .run([&](const flecs::iter& it) {
+            if (it.world().count<const Block>() == 0)
+            {
+                LOG_DEBUG("GameplayScene::CheckIfAllBlocksDestroyed -> Add GameWonIntent");
+                it.world().entity().add<LifetimeOneFrame>().add<Command>().add<GameWonIntent>().child_of(GetRootEntity());
+            }
+        })
         .child_of(GetRootEntity());
 }
 
@@ -190,15 +216,15 @@ void GameplayScene::CreateUISystem(flecs::world& world)
         .kind(flecs::PostLoad)
         // Make sure we process only the KeyPressed events from this scene
         .with(flecs::ChildOf, GetRootEntity())
-        .each([](const flecs::entity& e, const KeyPressed& k) {
+        .each([&](const flecs::entity& e, const KeyPressed& k) {
             if (k.scancode == sf::Keyboard::Scancode::Escape)
             {
                 LOG_DEBUG("GameplayScene::ProcessKeyPressed: Escape -> Add PauseGameIntent");
-                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<PauseGameIntent>();
+                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<PauseGameIntent>().child_of(GetRootEntity());
             }
             else if (k.scancode == sf::Keyboard::Scancode::Space)
             {
-                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<LaunchBallIntent>();
+                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<LaunchBallIntent>().child_of(GetRootEntity());
             }
 
             e.destruct();
@@ -226,6 +252,28 @@ void GameplayScene::CreateUISystem(flecs::world& world)
                 auto& sceneManager = GameService::Get<SceneManager>();
                 sceneManager.LoadScene<GameOverScene>(SceneLoadMode::Additive);
             }});
+
+            e.destruct();
+        })
+        .child_of(GetRootEntity());
+
+    // Game won, load the game over scene
+    world.system<const GameWonIntent>("ProcessGameWonIntent")
+        .kind(flecs::PreUpdate)
+        .each([&](const flecs::entity& e, const GameWonIntent& g) {
+            e.world().entity().set<DeferredEvent>({[] {
+                auto& sceneManager = GameService::Get<SceneManager>();
+                sceneManager.LoadScene<GameWonScene>(SceneLoadMode::Additive);
+            }});
+
+            // Get CheckIfAllBlocksDestroyed and disable it
+            if (const auto system = GetRootEntity().lookup("CheckIfAllBlocksDestroyed"); system.is_valid())
+            {
+                LOG_DEBUG("GameplayScene::ProcessGameWonIntent -> Disable CheckIfAllBlocksDestroyed");
+                system.disable();
+            }
+
+            PauseGame(e.world());
 
             e.destruct();
         })
@@ -328,6 +376,7 @@ void GameplayScene::CreateBlocks(const flecs::world& world)
 
             Prefabs::Rectangle::
                 Create(world, {.size = {BLOCK_WIDTH, BLOCK_HEIGHT}, .color = sf::Color::Blue, .origin = {0.f, 0.f}, .position = {posX, posY}})
+                    .add<Block>()
                     .set<Health>({1})
                     .set<ColliderShape>({Shape::Rectangle})
                     .child_of(GetRootEntity());
@@ -392,7 +441,7 @@ void GameplayScene::ProcessOutOfBounds(const flecs::entity ball, const Transform
 }
 
 void GameplayScene::ProcessCollisionDetection(
-    const flecs::entity& e,
+    const flecs::entity& blockEntity,
     const Transform& transform,
     const Size& size,
     const Origin& origin,
@@ -412,12 +461,12 @@ void GameplayScene::ProcessCollisionDetection(
     );
 
     // Check if this is a paddle collision
-    const bool isPaddle = e.has<Paddle>();
+    const bool isPaddle = blockEntity.has<Paddle>();
 
     // We query for all the balls
-    e.world().query<Transform, Velocity, const Radius, const ColliderShape, const Ball>().each(
-        [colliderBounds, isPaddle](
-            const flecs::entity& e,
+    blockEntity.world().query<Transform, Velocity, const Radius, const ColliderShape, const Ball>().each(
+        [blockEntity, colliderBounds, isPaddle](
+            const flecs::entity& ballEntity,
             Transform& ballTransform,
             Velocity& ballVelocity,
             const Radius& ballRadius,
@@ -433,7 +482,7 @@ void GameplayScene::ProcessCollisionDetection(
             }
 
             // Add the debug information
-            e.world().entity().set<Lifetime>({.5f}).set<CollisionInfo>(collisionInfo);
+            ballEntity.world().entity().set<Lifetime>({.5f}).set<CollisionInfo>(collisionInfo);
 
             // Move circle out of penetration
             ballTransform.position = ballTransform.position + collisionInfo.normal * collisionInfo.penetrationDepth;
@@ -468,6 +517,16 @@ void GameplayScene::ProcessCollisionDetection(
                                                2.f * Vector::Dot(ballVelocity.velocity, collisionInfo.normal) *
                                                    collisionInfo.normal;
                 ballVelocity.velocity = reflected;
+
+                // Remove one health from the block
+                auto [health] = blockEntity.get_mut<Health>();
+                health -= 1;
+
+                if (health <= 0)
+                {
+                    // Destroy the block
+                    blockEntity.destruct();
+                }
             }
         }
     );
@@ -497,11 +556,19 @@ void GameplayScene::ProcessPauseGameIntent(const flecs::entity& e, const PauseGa
         sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
     }});
 
+    PauseGame(e.world());
+
+    // Destroy the command entity
+    LOG_DEBUG("GameplayScene::PauseGameSystem -> Destroy PauseGameIntent");
+    e.destruct();
+}
+
+void GameplayScene::PauseGame(const flecs::world& w)
+{
     GetRootEntity().add<ScenePaused>();
 
     // Query for the Paddle and Ball to disable them
-    e.world()
-        .query_builder<>()
+    w.query_builder<>()
         .scope_open()
         .with<Ball>()
         .oper(flecs::Or)
@@ -509,10 +576,6 @@ void GameplayScene::ProcessPauseGameIntent(const flecs::entity& e, const PauseGa
         .scope_close()
         .with(flecs::ChildOf, GetRootEntity())
         .each([](const flecs::entity& entity) { entity.disable(); });
-
-    // Destroy the command entity
-    LOG_DEBUG("GameplayScene::PauseGameSystem -> Destroy PauseGameIntent");
-    e.destruct();
 }
 
 void GameplayScene::ApplyPaddlePositionToBall(const flecs::entity& e, Transform& t, const AttachedToPaddle& ap, const Ball& b)
