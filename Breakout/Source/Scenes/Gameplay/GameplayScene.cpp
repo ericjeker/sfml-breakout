@@ -15,6 +15,8 @@
 #include "Components/PauseGameIntent.h"
 #include "Components/RestartGameIntent.h"
 #include "Components/ResumeGameIntent.h"
+#include "GameStates/Gameplay/Components/GameSession.h"
+#include "GameStates/Gameplay/Components/Score.h"
 #include "GameStates/MainMenu/MainMenuState.h"
 #include "Prefabs/MoveLeftCommand.h"
 #include "Prefabs/MoveRightCommand.h"
@@ -48,6 +50,7 @@
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
 #include "Core/Tags/ScenePaused.h"
+#include "Core/Themes/Nord.h"
 #include "Core/Utils/Collision.h"
 #include "Core/Utils/Logger.h"
 #include "Core/Utils/Vector.h"
@@ -77,9 +80,12 @@ void GameplayScene::Initialize()
 
     // --- Create entities ---
     CreateInputBindings(world);
-    CreatePaddle(world);
-    CreateBlocks(world);
-    CreateBall(world);
+
+    float zOrder = 0.f;
+    CreateBackground(world, zOrder);
+    CreatePaddle(world, zOrder);
+    CreateBlocks(world, zOrder);
+    CreateBall(world, zOrder);
 
     // --- Add local systems ---
     CreateLocalSystems(world);
@@ -330,7 +336,7 @@ void GameplayScene::CreateUISystem(flecs::world& world)
         .child_of(GetRootEntity());
 }
 
-void GameplayScene::CreatePaddle(const flecs::world& world)
+void GameplayScene::CreatePaddle(const flecs::world& world, float& zOrder)
 {
     constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
 
@@ -338,7 +344,7 @@ void GameplayScene::CreatePaddle(const flecs::world& world)
         world,
         {
             .size = {100.f, 20.f},
-            .color = sf::Color::Red,
+            .color = NordTheme::Aurora1,
             .origin = {0.5f, 0.5f},
             .position = {CENTER_X, Configuration::WINDOW_SIZE.y - 100.f},
             .zOrder = 0.f,
@@ -353,7 +359,7 @@ void GameplayScene::CreatePaddle(const flecs::world& world)
         .set<ColliderShape>({Shape::Rectangle});
 }
 
-void GameplayScene::CreateBlocks(const flecs::world& world)
+void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
 {
     constexpr float COLUMNS = 10;
     constexpr float ROWS = 6;
@@ -375,7 +381,7 @@ void GameplayScene::CreateBlocks(const flecs::world& world)
             const float posY = MARGINS + y * (BLOCK_HEIGHT + BLOCK_SPACING);
 
             Prefabs::Rectangle::
-                Create(world, {.size = {BLOCK_WIDTH, BLOCK_HEIGHT}, .color = sf::Color::Blue, .origin = {0.f, 0.f}, .position = {posX, posY}})
+                Create(world, {.size = {BLOCK_WIDTH, BLOCK_HEIGHT}, .color = NordTheme::Aurora2, .origin = {0.f, 0.f}, .position = {posX, posY}})
                     .add<Block>()
                     .set<Health>({1})
                     .set<ColliderShape>({Shape::Rectangle})
@@ -384,7 +390,7 @@ void GameplayScene::CreateBlocks(const flecs::world& world)
     }
 }
 
-void GameplayScene::CreateBall(const flecs::world& world)
+void GameplayScene::CreateBall(const flecs::world& world, float& zOrder)
 {
     constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
     constexpr float RADIUS = 10.f;
@@ -393,10 +399,10 @@ void GameplayScene::CreateBall(const flecs::world& world)
         world,
         {
             .radius = RADIUS,
-            .color = sf::Color::Red,
+            .color = sf::Color::White,
             .origin = {0.5f, 0.5f},
             .position = {CENTER_X, Configuration::WINDOW_SIZE.y - 125.f},
-            .zOrder = 0.f,
+            .zOrder = ++zOrder,
         }
     )
         .child_of(GetRootEntity())
@@ -404,6 +410,20 @@ void GameplayScene::CreateBall(const flecs::world& world)
         .add<AttachedToPaddle>()
         .add<Ball>()
         .set<Velocity>({});
+}
+void GameplayScene::CreateBackground(const flecs::world& world, float& zOrder)
+{
+    // --- Create Background ---
+    Prefabs::Rectangle::Create(
+        world,
+        {
+            .size = sf::Vector2f{Configuration::WINDOW_SIZE},
+            .color = NordTheme::PolarNight4,
+            .position = {0.f, 0.f},
+            .zOrder = zOrder++,
+        }
+    )
+        .child_of(GetRootEntity());
 }
 
 void GameplayScene::ProcessScreenBounce(Transform& t, Velocity& v, const ColliderShape& c, const Radius& r, const Ball& b)
@@ -526,6 +546,13 @@ void GameplayScene::ProcessCollisionDetection(
                 {
                     // Destroy the block
                     blockEntity.destruct();
+
+                    // Get the score singleton and update the score
+                    blockEntity.world().query<const GameSession, Score>().each([](const GameSession& gs, Score& score) {
+                        LOG_DEBUG("GameplayScene::ProcessCollisionDetection -> Current score: " + std::to_string(score.score));
+                        score.score += 100;
+                        score.blocksDestroyed += 1;
+                    });
                 }
             }
         }

@@ -27,9 +27,10 @@ private:
     void CreateInputBindings(const flecs::world& world);
     void CreateLocalSystems(const flecs::world& world);
     void CreateUISystem(flecs::world& world);
-    void CreatePaddle(const flecs::world& world);
-    void CreateBlocks(const flecs::world& world);
-    void CreateBall(const flecs::world& world);
+    void CreatePaddle(const flecs::world& world, float& zOrder);
+    void CreateBlocks(const flecs::world& world, float& zOrder);
+    void CreateBall(const flecs::world& world, float& zOrder);
+    void CreateBackground(const flecs::world& world, float& zOrder);
 
     static void ProcessScreenBounce(Transform& t, Velocity& v, const ColliderShape& c, const Radius& r, const Ball& b);
     static void ProcessOutOfBounds(flecs::entity ball, const Transform& t, const Ball& b);

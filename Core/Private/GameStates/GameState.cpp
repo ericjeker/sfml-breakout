@@ -8,6 +8,32 @@ GameState::GameState(flecs::world& world)
     : _world(world)
 {
 }
+void GameState::Enter()
+{
+    LOG_DEBUG("GameState::Enter");
+
+    _rootEntity = GetWorld().entity();
+}
+
+void GameState::Exit()
+{
+    LOG_DEBUG("GameState::Exit");
+
+    if (GetRootEntity() == flecs::entity::null() || !GetWorld().exists(GetRootEntity()))
+    {
+        return;
+    }
+
+    GetWorld().defer([&] {
+        GetWorld().delete_with(flecs::ChildOf, GetRootEntity());
+        GetRootEntity().destruct();
+    });
+}
+
+flecs::entity GameState::GetRootEntity() const
+{
+    return _rootEntity;
+}
 
 void GameState::Pause()
 {
