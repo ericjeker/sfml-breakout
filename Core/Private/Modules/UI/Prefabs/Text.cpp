@@ -4,6 +4,7 @@
 
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/ResourceManager.h"
+#include "Core/Modules/Render/Components/Origin.h"
 #include "Core/Modules/Render/Components/TextRenderable.h"
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Modules/Render/Components/ZOrder.h"
@@ -31,6 +32,7 @@ flecs::entity Text::Create(const flecs::world& world, const TextParams& params)
 
     const auto entity = world.entity()
                             .set<TextRenderable>({.text = std::move(text)})
+                            .set<Origin>({params.origin})
                             .set<ZOrder>({params.zOrder})
                             .set<Transform>({.position = params.position, .scale = params.scale, .rotation = params.rotation});
 

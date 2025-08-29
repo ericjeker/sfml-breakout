@@ -5,6 +5,7 @@
 #include "Components/AttachedToPaddle.h"
 #include "Components/Ball.h"
 #include "Components/Block.h"
+#include "Components/ContinueGameIntent.h"
 #include "Components/GameOverIntent.h"
 #include "Components/GameWonIntent.h"
 #include "Components/Health.h"
@@ -16,12 +17,16 @@
 #include "Components/RestartGameIntent.h"
 #include "Components/ResumeGameIntent.h"
 #include "GameStates/Gameplay/Components/GameSession.h"
+#include "GameStates/Gameplay/Components/Lives.h"
+#include "GameStates/Gameplay/Components/Multiplier.h"
 #include "GameStates/Gameplay/Components/Score.h"
 #include "GameStates/MainMenu/MainMenuState.h"
 #include "Prefabs/MoveLeftCommand.h"
 #include "Prefabs/MoveRightCommand.h"
+#include "Scenes/Debug/DebugScene.h"
 #include "Scenes/GameOver/GameOverScene.h"
 #include "Scenes/GameWon/GameWonScene.h"
+#include "Scenes/Hud/HudScene.h"
 #include "Scenes/Pause/PauseScene.h"
 
 #include "Core/Configuration.h"
@@ -84,8 +89,8 @@ void GameplayScene::Initialize()
     float zOrder = 0.f;
     CreateBackground(world, zOrder);
     CreatePaddle(world, zOrder);
-    CreateBlocks(world, zOrder);
     CreateBall(world, zOrder);
+    CreateBlocks(world, zOrder);
 
     // --- Add local systems ---
     CreateLocalSystems(world);
@@ -259,6 +264,16 @@ void GameplayScene::CreateUISystem(flecs::world& world)
                 sceneManager.LoadScene<GameOverScene>(SceneLoadMode::Additive);
             }});
 
+            // Reset the score and lives
+            e.world().query<const GameSession, Score, Lives, Multiplier>().each(
+                [](const GameSession& gs, Score& score, Lives& lives, Multiplier& multiplier) {
+                    score.score = 0;
+                    score.blocksDestroyed = 0;
+                    lives.lives = 3;
+                    multiplier.multiplier = 1;
+                }
+            );
+
             e.destruct();
         })
         .child_of(GetRootEntity());
@@ -287,14 +302,28 @@ void GameplayScene::CreateUISystem(flecs::world& world)
 
     world.system<const RestartGameIntent>("ProcessRestartGameIntent")
         .kind(flecs::PreUpdate)
-        .each([&](const flecs::entity& e, const RestartGameIntent i) {
+        .each([&](const flecs::entity& e, const RestartGameIntent& i) {
             // We defer the state change to the end of the frame
             e.world().entity().set<DeferredEvent>({.callback = [&] {
                 auto& sceneManager = GameService::Get<SceneManager>();
                 sceneManager.LoadScene<GameplayScene>(SceneLoadMode::Single);
+                sceneManager.LoadScene<DebugScene>(SceneLoadMode::Additive);
+                sceneManager.LoadScene<HudScene>(SceneLoadMode::Additive);
             }});
 
             e.destruct();
+        });
+
+    world.system<const ContinueGameIntent>("ProcessContinueGameIntent")
+        .kind(flecs::PreUpdate)
+        .each([&](const flecs::entity& e, const ContinueGameIntent& i) {
+            // Create a ball and place it on the paddle
+            float zOrder = 1.f;
+            CreateBall(world, ++zOrder);
+            // Center the paddle again on the screen
+            e.world().query<const Paddle>().each([](const flecs::entity& paddle, const Paddle& p) {
+                paddle.set<Transform>({{Configuration::WINDOW_SIZE.x / 2, Configuration::WINDOW_SIZE.y - 100.f}});
+            });
         });
 
     // Resume the game, enable the entities again
@@ -380,12 +409,14 @@ void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
         {
             const float posY = MARGINS + y * (BLOCK_HEIGHT + BLOCK_SPACING);
 
-            Prefabs::Rectangle::
-                Create(world, {.size = {BLOCK_WIDTH, BLOCK_HEIGHT}, .color = NordTheme::Aurora2, .origin = {0.f, 0.f}, .position = {posX, posY}})
-                    .add<Block>()
-                    .set<Health>({1})
-                    .set<ColliderShape>({Shape::Rectangle})
-                    .child_of(GetRootEntity());
+            Prefabs::Rectangle::Create(
+                world,
+                {.size = {BLOCK_WIDTH, BLOCK_HEIGHT}, .color = NordTheme::Aurora2, .origin = {0.f, 0.f}, .position = {posX, posY}}
+            )
+                .add<Block>()
+                .set<Health>({1})
+                .set<ColliderShape>({Shape::Rectangle})
+                .child_of(GetRootEntity());
         }
     }
 }
@@ -455,8 +486,27 @@ void GameplayScene::ProcessOutOfBounds(const flecs::entity ball, const Transform
         LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> Destroy ball");
         ball.destruct();
 
-        LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> Add GameOverIntent");
-        ball.world().entity().add<LifetimeOneFrame>().add<Command>().add<GameOverIntent>();
+        // Lose one life
+        LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> LoseOneLife");
+        ball.world().query<const GameSession, Lives>().each([](const flecs::entity& e, const GameSession& gs, Lives& lives) {
+            lives.lives -= 1;
+
+            if (lives.lives <= 0)
+            {
+                // Game over
+                LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> Add GameOverIntent");
+                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<GameOverIntent>();
+            }
+            else
+            {
+                // Continue player...
+                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<ContinueGameIntent>();
+            }
+        });
+
+        ball.world().query<const GameSession, Multiplier>().each(
+            [](const flecs::entity& e, const GameSession& gs, Multiplier& multiplier) { multiplier.multiplier = 1; }
+        );
     }
 }
 
@@ -526,17 +576,17 @@ void GameplayScene::ProcessCollisionDetection(
                 modifiedNormal = modifiedNormal.normalized();
 
                 // Reflect with modified normal
-                const sf::Vector2f reflected = ballVelocity.velocity -
-                                               2.f * Vector::Dot(ballVelocity.velocity, modifiedNormal) * modifiedNormal;
-                ballVelocity.velocity = reflected;
+                ballVelocity.velocity = CalculateReflection(ballVelocity.velocity, modifiedNormal);
+
+                // Get the game session and reset the multiplier
+                blockEntity.world().query<const GameSession, Multiplier>().each(
+                    [](const GameSession& gs, Multiplier& multiplier) { multiplier.multiplier = 1; }
+                );
             }
             else
             {
                 // Reflect velocity along collision normal
-                const sf::Vector2f reflected = ballVelocity.velocity -
-                                               2.f * Vector::Dot(ballVelocity.velocity, collisionInfo.normal) *
-                                                   collisionInfo.normal;
-                ballVelocity.velocity = reflected;
+                ballVelocity.velocity = CalculateReflection(ballVelocity.velocity, collisionInfo.normal);
 
                 // Remove one health from the block
                 auto [health] = blockEntity.get_mut<Health>();
@@ -547,12 +597,17 @@ void GameplayScene::ProcessCollisionDetection(
                     // Destroy the block
                     blockEntity.destruct();
 
-                    // Get the score singleton and update the score
-                    blockEntity.world().query<const GameSession, Score>().each([](const GameSession& gs, Score& score) {
-                        LOG_DEBUG("GameplayScene::ProcessCollisionDetection -> Current score: " + std::to_string(score.score));
-                        score.score += 100;
-                        score.blocksDestroyed += 1;
-                    });
+                    // Get the game session and update the score
+                    blockEntity.world().query<const GameSession, Score, Multiplier>().each(
+                        [](const GameSession& gs, Score& score, Multiplier& multiplier) {
+                            LOG_DEBUG(
+                                "GameplayScene::ProcessCollisionDetection -> Current score: " + std::to_string(score.score)
+                            );
+                            score.score += 100 * multiplier.multiplier;
+                            score.blocksDestroyed += 1;
+                            multiplier.multiplier += 1;
+                        }
+                    );
                 }
             }
         }
@@ -613,4 +668,34 @@ void GameplayScene::ApplyPaddlePositionToBall(const flecs::entity& e, Transform&
             ballTransform.position.x = paddleTransform.position.x;
         }
     );
+}
+
+sf::Vector2f GameplayScene::CalculateReflection(const sf::Vector2f& velocity, const sf::Vector2f& normal)
+{
+    // Reflect velocity along collision normal
+    sf::Vector2f reflected = velocity - 2.f * Vector::Dot(velocity, normal) * normal;
+
+    // Preserve the current speed
+    const float currentSpeed = velocity.length();
+
+    // Define the minimum vertical velocity required
+    constexpr float MIN_VERTICAL_VELOCITY = 150.f;
+
+    if (std::abs(reflected.y) < MIN_VERTICAL_VELOCITY)
+    {
+        reflected.y = std::copysign(MIN_VERTICAL_VELOCITY, reflected.y);
+    }
+
+    // Scale the velocity to maintain the same speed
+    if (reflected.length() > 0.f)
+    {
+        reflected *= currentSpeed / reflected.length();
+    }
+    else
+    {
+        // Fallback in case of zero velocity
+        reflected = sf::Vector2f{0.f, MIN_VERTICAL_VELOCITY};
+    }
+
+    return reflected;
 }

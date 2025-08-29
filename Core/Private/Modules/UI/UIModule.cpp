@@ -46,12 +46,16 @@ UIModule::UIModule(const flecs::world& world)
     // --- Declare Singletons ---
     world.singleton<MousePosition>();
 
+    // --- Declare Systems ---
+
+    // Update the mouse position every frame
     world.system("UIInputSystem").kind(flecs::PostLoad).run([](const flecs::iter& it) {
         const auto& renderWindow = GameService::Get<sf::RenderWindow>();
         const auto pos = sf::Mouse::getPosition(renderWindow);
         it.world().set<MousePosition>({.position = pos});
     });
 
+    // Handle mouse-released events and hit test on all the UI components
     world.system<const MouseReleased>("UIHitTest")
         .kind(flecs::PreUpdate)
         .each([&](const flecs::iter& it, size_t index, const MouseReleased& mouseReleased) {

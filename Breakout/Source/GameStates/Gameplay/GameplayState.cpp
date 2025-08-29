@@ -3,6 +3,8 @@
 #include "GameplayState.h"
 
 #include "Components/GameSession.h"
+#include "Components/Lives.h"
+#include "Components/Multiplier.h"
 #include "Components/Score.h"
 #include "Scenes/Debug/DebugScene.h"
 #include "Scenes/GameOver/GameOverScene.h"
@@ -27,7 +29,7 @@ void GameplayState::Enter()
 
     // --- Create the game session ---
     const auto& world = GetWorld();
-    world.entity().add<GameSession>().set<Score>({}).child_of(GetRootEntity());
+    world.entity().add<GameSession>().set<Score>({}).set<Lives>({}).set<Multiplier>({}).child_of(GetRootEntity());
 
     auto& sceneManager = GameService::Get<SceneManager>();
 

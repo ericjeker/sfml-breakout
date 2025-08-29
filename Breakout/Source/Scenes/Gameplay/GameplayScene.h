@@ -43,6 +43,7 @@ private:
     );
     static void ConstrainPaddleToScreen(Transform& t, const Size& s, const Paddle& p);
     static void ApplyPaddlePositionToBall(const flecs::entity& e, Transform& t, const AttachedToPaddle& ap, const Ball& b);
+    static sf::Vector2f CalculateReflection(const sf::Vector2f& velocity, const sf::Vector2f& normal);
     void ProcessPauseGameIntent(const flecs::entity& e, const PauseGameIntent& p);
     void PauseGame(const flecs::world& w);
 };
