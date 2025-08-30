@@ -390,8 +390,8 @@ void GameplayScene::CreatePaddle(const flecs::world& world, float& zOrder)
 
 void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
 {
-    constexpr float COLUMNS = 10;
-    constexpr float ROWS = 6;
+    constexpr float COLUMNS = 1;
+    constexpr float ROWS = 1;
     constexpr float BLOCK_SPACING = 10.f;
     constexpr float MARGINS = 100.f;
 

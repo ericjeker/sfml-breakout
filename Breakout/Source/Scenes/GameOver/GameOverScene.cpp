@@ -38,7 +38,6 @@ void GameOverScene::Initialize()
 
     const auto& world = GetWorld();
 
-
     CreateUISystems(world);
 
     // --- Create entities ---
