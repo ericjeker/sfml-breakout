@@ -9,13 +9,14 @@ namespace Configuration
 {
 
 constexpr auto WINDOW_TITLE = "Game Engine Using Flecs ECS";
-constexpr sf::Vector2u WINDOW_SIZE = {1920, 1080};
-constexpr auto WINDOW_STYLE = sf::Style::Close;
+constexpr auto WINDOW_STYLE = sf::Style::Default;
 constexpr auto WINDOW_STATE = sf::State::Windowed;
-constexpr bool IS_FULL_SCREEN = false;
 
-constexpr unsigned int FRAMES_PER_SECOND = 60;
-constexpr bool IS_VSYNC = true;
+constexpr sf::Vector2u WINDOW_SIZE = {1920, 1080};
+constexpr sf::Vector2u RESOLUTION = {1920, 1080};
+
+constexpr unsigned int FRAMERATE_LIMIT = 60;
+constexpr bool IS_VSYNC = false;
 constexpr unsigned int ANTI_ALIASING_LEVEL = 4;
 
 constexpr bool ENABLE_KEY_REPEAT = false;

@@ -2,21 +2,35 @@
 
 #include "Core/GameInstance.h"
 
-#include "Core/Events/DeferredEvent.h"
+#include "Core/Components/DeferredEvent.h"
+#include "Core/Components/WindowResizeIntent.h"
+#include "Core/Configuration.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/SceneManager.h"
+#include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
+#include "Core/Singletons/FrameCount.h"
+#include "Core/Singletons/WindowSize.h"
 #include "Core/Utils/Logger.h"
 
 #include <tracy/Tracy.hpp>
 
+void GameInstance::Initialize()
+{
+    ZoneScopedN("GameInstance::Initialize");
+
+    // --- Set the initial window size ---
+    LOG_DEBUG("GameInstance::Run: Setting initial window size");
+    const auto& window = GameService::Get<sf::RenderWindow>();
+    GetWorld().set<WindowSize>({.currentSize = window.getSize(), .refSize = Configuration::RESOLUTION});
+}
 
 void GameInstance::Run(sf::RenderWindow& renderWindow) const
 {
     ZoneScopedN("GameInstance::Run");
 
     // --- Get the only Flecs World ---
-    const auto world = GetWorld();
+    const auto& world = GetWorld();
 
     // --- Game loop ---
     LOG_DEBUG("GameInstance::Run: Starting game loop");
@@ -24,22 +38,22 @@ void GameInstance::Run(sf::RenderWindow& renderWindow) const
     while (renderWindow.isOpen() && !ShouldExit())
     {
         static int frameCount = 0;
-        frameCount++;
+        world.set<FrameCount>({frameCount++});
 
         const float deltaTime = clock.restart().asSeconds();
 
-        // Event-Based Input System
+        // --- Event-Based Input System---
         HandleEvents(renderWindow);
 
-        // Progressing the world
+        // --- Progressing the world ---
         renderWindow.clear();
         world.progress(deltaTime);
         renderWindow.display();
 
-        // Process deferred events at the end of the frame
+        // --- Process deferred events at the end of the frame ---
         RunDeferredEvents(world);
 
-        // Tracy frame mark so Tracy can properly split each frame
+        // --- Tracy frame mark so Tracy can properly split each frame ---
         FrameMark;
     }
 
@@ -50,7 +64,7 @@ void GameInstance::Run(sf::RenderWindow& renderWindow) const
     }
 }
 
-void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
+void GameInstance::HandleEvents(sf::RenderWindow& renderWindow) const
 {
     ZoneScopedN("GameInstance::HandleEvents");
 
@@ -59,6 +73,48 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow)
         if (event->is<sf::Event::Closed>())
         {
             renderWindow.close();
+        }
+        else if (const auto* resized = event->getIf<sf::Event::Resized>())
+        {
+            const auto& world = GetWorld();
+
+            assert(world.has<WindowSize>() && "WindowSize singleton does not exist.");
+            auto& [size, refSize] = world.get_mut<WindowSize>();
+
+            // Calculate the scale of the new window size
+            assert(refSize.x > 0 && refSize.y > 0 && "Reference size must be greater than 0.");
+            const sf::Vector2f scale =
+                {static_cast<float>(resized->size.x) / static_cast<float>(refSize.x),
+                 static_cast<float>(resized->size.y) / static_cast<float>(refSize.y)};
+            const float scaleRatio = std::min(scale.x, scale.y);
+
+            // Calculate transformation to center (letterboxing or pillarboxing)
+            const sf::Vector2f transformRatio =
+                {(static_cast<float>(resized->size.x) - static_cast<float>(refSize.x) * scaleRatio) / 2.f,
+                 (static_cast<float>(resized->size.y) - static_cast<float>(refSize.y) * scaleRatio) / 2.f};
+
+            world.entity().add<LifetimeOneFrame>().set<WindowResizeIntent>({
+                .newSize = resized->size,
+                .oldSize = size,
+                .scaleRatio = scaleRatio,
+                .transformRatio = transformRatio,
+            });
+
+            LOG_DEBUG(
+                std::format(
+                    "GameInstance::HandleEvents: Window resized from {}x{} to {}x{}, scale: {:.3f}, transform: "
+                    "{:.3f}x{:.3f}",
+                    size.x,
+                    size.y,
+                    resized->size.x,
+                    resized->size.y,
+                    scaleRatio,
+                    transformRatio.x,
+                    transformRatio.y
+                )
+            );
+
+            size = resized->size;
         }
 
         // We delegate the event to the game state manager and scene manager
@@ -97,6 +153,11 @@ void GameInstance::RunDeferredEvents(const flecs::world& world)
         e.destruct();
     }
     world.defer_end();
+}
+
+void GameInstance::Shutdown()
+{
+    ZoneScopedN("GameInstance::Shutdown");
 }
 
 void GameInstance::RequestExit()

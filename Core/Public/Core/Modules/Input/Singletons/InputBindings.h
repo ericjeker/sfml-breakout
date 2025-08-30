@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Core/Modules/Control/InputKey.h"
+#include "Core/Modules/Input/InputKey.h"
 
 #include <unordered_map>
 

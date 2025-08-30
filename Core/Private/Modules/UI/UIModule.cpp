@@ -2,7 +2,8 @@
 
 #include "Core/Modules/UI/UIModule.h"
 
-#include "Core/Events/Event.h"
+#include "../../../Public/Core/Components/Event.h"
+
 #include "Core/Managers/GameService.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Components/Size.h"
@@ -72,7 +73,11 @@ UIModule::UIModule(const flecs::world& world)
                     bounds.size = s.size;
                     bounds.position = t.position;
 
-                    if (bounds.contains(sf::Vector2f(mouseReleased.position)))
+                    // Map the mouse position to world coordinates
+                    const auto& window = GameService::Get<sf::RenderWindow>();
+                    const auto worldPosition = window.mapPixelToCoords(mouseReleased.position, window.getView());
+
+                    if (bounds.contains(sf::Vector2f(worldPosition)))
                     {
                         // The mouse press hit this clickable entity
                         eventTrigger.callback(it.world());

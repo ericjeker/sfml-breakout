@@ -40,7 +40,7 @@ void BouncingBallScene::Initialize()
     Prefabs::Rectangle::Create(
         world,
         {
-            .size = sf::Vector2f{Configuration::WINDOW_SIZE},
+            .size = sf::Vector2f{Configuration::RESOLUTION},
             .color = NordTheme::PolarNight4,
             .position = {0.f, 0.f},
             .zOrder = zOrder++,
@@ -61,8 +61,8 @@ void BouncingBallScene::CreateBalls(const flecs::world& world, float zOrder)
     // Create balls
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> distX(0.f, Configuration::WINDOW_SIZE.x);
-    std::uniform_real_distribution<float> distY(0.f, Configuration::WINDOW_SIZE.y);
+    std::uniform_real_distribution<float> distX(0.f, Configuration::RESOLUTION.x);
+    std::uniform_real_distribution<float> distY(0.f, Configuration::RESOLUTION.y);
     std::uniform_real_distribution velX(-50.f, 50.f);
     std::uniform_real_distribution velY(-50.f, 50.f);
 
@@ -96,10 +96,10 @@ void BouncingBallScene::ProcessScreenBounce(Transform& t, Velocity& v, const Rad
         v.velocity.x *= -1.f;
         t.position.x = radius;
     }
-    else if (t.position.x + radius > Configuration::WINDOW_SIZE.x)
+    else if (t.position.x + radius > Configuration::RESOLUTION.x)
     {
         v.velocity.x *= -1.f;
-        t.position.x = Configuration::WINDOW_SIZE.x - radius;
+        t.position.x = Configuration::RESOLUTION.x - radius;
     }
 
     if (t.position.y - radius < 0.f)
@@ -107,9 +107,9 @@ void BouncingBallScene::ProcessScreenBounce(Transform& t, Velocity& v, const Rad
         v.velocity.y *= -1.f;
         t.position.y = radius;
     }
-    else if (t.position.y + radius > Configuration::WINDOW_SIZE.y)
+    else if (t.position.y + radius > Configuration::RESOLUTION.y)
     {
         v.velocity.y *= -1.f;
-        t.position.y = Configuration::WINDOW_SIZE.y - radius;
+        t.position.y = Configuration::RESOLUTION.y - radius;
     }
 }

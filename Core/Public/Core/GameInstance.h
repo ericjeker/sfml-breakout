@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Singletons/WindowSize.h"
+
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include <flecs.h>
@@ -13,15 +15,15 @@ public:
     GameInstance() = default;
     virtual ~GameInstance() = default;
 
-    virtual void Initialize() = 0;
-    virtual void Shutdown() = 0;
+    virtual void Initialize();
+    virtual void Shutdown();
 
     /**
      * This is the big RUN function that stats everything
      * @param renderWindow
      */
     void Run(sf::RenderWindow& renderWindow) const;
-    static void HandleEvents(sf::RenderWindow& renderWindow);
+    void HandleEvents(sf::RenderWindow& renderWindow) const;
     static void RunDeferredEvents(const flecs::world& world);
 
     void RequestExit();
@@ -36,5 +38,3 @@ private:
     // The Only World
     flecs::world _world;
 };
-
-

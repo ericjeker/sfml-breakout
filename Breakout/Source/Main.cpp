@@ -28,7 +28,7 @@ int main()
     ZoneScoped;
 
     // --- Create the window mode ---
-    const sf::VideoMode mode(Configuration::WINDOW_SIZE);
+    const sf::VideoMode mode(Configuration::RESOLUTION);
 
     // --- Enable anti-aliasing ---
     sf::ContextSettings settings;
@@ -38,7 +38,7 @@ int main()
     auto window = sf::RenderWindow(mode, Configuration::WINDOW_TITLE, Configuration::WINDOW_STYLE, Configuration::WINDOW_STATE, settings);
 
     // --- Configure the window ---
-    window.setFramerateLimit(Configuration::FRAMES_PER_SECOND);
+    window.setFramerateLimit(Configuration::FRAMERATE_LIMIT);
     window.setVerticalSyncEnabled(Configuration::IS_VSYNC);
     window.setKeyRepeatEnabled(Configuration::ENABLE_KEY_REPEAT);
 

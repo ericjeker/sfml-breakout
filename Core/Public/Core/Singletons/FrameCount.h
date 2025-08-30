@@ -2,8 +2,7 @@
 
 #pragma once
 
-
-struct GamePaused
+struct FrameCount
 {
-    bool isPaused = false;
+    int frameCount = 0;
 };

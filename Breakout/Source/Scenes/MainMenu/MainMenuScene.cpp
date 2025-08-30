@@ -8,14 +8,18 @@
 #include "Scenes/MainMenu/Prefabs/ExitGameIntent.h"
 #include "Scenes/MainMenu/Prefabs/StartGameIntent.h"
 
+#include "Core/Components/DeferredEvent.h"
+#include "Core/Components/WindowResizeIntent.h"
 #include "Core/Configuration.h"
-#include "Core/Events/DeferredEvent.h"
 #include "Core/GameInstance.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/ResourceManager.h"
-#include "Core/Modules/Control/Components/Command.h"
+#include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
+#include "Core/Modules/Render/Components/RectangleRenderable.h"
+#include "Core/Modules/Render/Components/Size.h"
+#include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MousePressed.h"
@@ -27,6 +31,7 @@
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"
 
+#include <format>
 
 MainMenuScene::MainMenuScene(flecs::world& world)
     : Scene(world)
@@ -44,8 +49,9 @@ void MainMenuScene::Initialize()
     world.prefab<Prefabs::ExitGameIntent>().add<LifetimeOneFrame>().add<Command>().add<ExitGameIntent>();
     world.prefab<Prefabs::StartGameIntent>().add<LifetimeOneFrame>().add<Command>().add<StartGameIntent>();
 
-    CreateLocalSystems(world);
+    // --- Declare local systems ---
     CreateUIEntities(world);
+    CreateLocalSystems(world);
 }
 
 void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
@@ -108,8 +114,8 @@ void MainMenuScene::CreateLocalSystems(flecs::world& world)
 
 void MainMenuScene::CreateUIEntities(const flecs::world& world)
 {
-    constexpr float centerX = Configuration::WINDOW_SIZE.x / 2;
-    constexpr float centerY = Configuration::WINDOW_SIZE.y / 2;
+    const float centerX = Configuration::RESOLUTION.x / 2.f;
+    const float centerY = Configuration::RESOLUTION.y / 2.f;
 
     float zOrder = 0;
 
@@ -117,7 +123,7 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
     Prefabs::Rectangle::Create(
         world,
         {
-            .size = sf::Vector2f{Configuration::WINDOW_SIZE},
+            .size = sf::Vector2f{Configuration::RESOLUTION},
             .color = NordTheme::PolarNight4,
             .position = {0.f, 0.f},
             .zOrder = zOrder++,
@@ -125,7 +131,20 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
     )
         .child_of(GetRootEntity());
 
+    // --- Reference Rectangles
+    Prefabs::Rectangle::Create(world, {.size = {10.f, 10.f}, .color = NordTheme::SnowStorm3, .position = {20.f, 20.f}, .zOrder = zOrder++})
+        .child_of(GetRootEntity());
+    Prefabs::Rectangle::Create(
+        world,
+        {.size = {10.f, 10.f},
+         .color = NordTheme::SnowStorm3,
+         .position = {Configuration::RESOLUTION.x - 30.f, Configuration::RESOLUTION.y - 30.f},
+         .zOrder = zOrder++}
+    )
+        .child_of(GetRootEntity());
+
     // --- Add Title ---
+
     Prefabs::Text::Create(
         world,
         {.text = "Main Menu",

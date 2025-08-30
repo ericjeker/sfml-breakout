@@ -8,9 +8,9 @@
 namespace Modules
 {
 
-struct ControlModule
+struct InputModule
 {
-    explicit ControlModule(const flecs::world& world);
+    explicit InputModule(const flecs::world& world);
 };
 
 } // namespace Modules

@@ -46,7 +46,7 @@ void HudScene::Initialize()
                                   .fontSize = 40.f,
                                   .textColor = NordTheme::SnowStorm3,
                                   .origin = sf::Vector2f{.5f, 0.f},
-                                  .position = {Configuration::WINDOW_SIZE.x / 2, 20.f},
+                                  .position = {Configuration::RESOLUTION.x / 2, 20.f},
                                   .zOrder = ++zOrder}
     )
                                  .child_of(GetRootEntity());
@@ -58,7 +58,7 @@ void HudScene::Initialize()
                                   .fontSize = 40.f,
                                   .textColor = NordTheme::SnowStorm3,
                                   .origin = sf::Vector2f{1.f, 0.f},
-                                  .position = {Configuration::WINDOW_SIZE.x - 20.f, 20.f},
+                                  .position = {Configuration::RESOLUTION.x - 20.f, 20.f},
                                   .zOrder = ++zOrder}
     )
                                  .child_of(GetRootEntity());

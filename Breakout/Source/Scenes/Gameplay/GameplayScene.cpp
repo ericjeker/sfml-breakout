@@ -29,17 +29,18 @@
 #include "Scenes/Hud/HudScene.h"
 #include "Scenes/Pause/PauseScene.h"
 
+#include "Core/Components/DeferredEvent.h"
 #include "Core/Configuration.h"
-#include "Core/Events/DeferredEvent.h"
 #include "Core/GameInstance.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/SceneManager.h"
-#include "Core/Modules/Control/Components/Command.h"
-#include "Core/Modules/Control/Components/CommandQueue.h"
-#include "Core/Modules/Control/Components/PossessedByPlayer.h"
-#include "Core/Modules/Control/Components/Target.h"
-#include "Core/Modules/Control/Singletons/InputBindings.h"
+#include "Core/Modules/Camera/Components/CameraShakeIntent.h"
+#include "Core/Modules/Input/Components/Command.h"
+#include "Core/Modules/Input/Components/CommandQueue.h"
+#include "Core/Modules/Input/Components/PossessedByPlayer.h"
+#include "Core/Modules/Input/Components/Target.h"
+#include "Core/Modules/Input/Singletons/InputBindings.h"
 #include "Core/Modules/Lifetime/Components/Lifetime.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Physics/Components/Acceleration.h"
@@ -322,7 +323,7 @@ void GameplayScene::CreateUISystem(flecs::world& world)
             CreateBall(world, ++zOrder);
             // Center the paddle again on the screen
             e.world().query<const Paddle>().each([](const flecs::entity& paddle, const Paddle& p) {
-                paddle.set<Transform>({{Configuration::WINDOW_SIZE.x / 2, Configuration::WINDOW_SIZE.y - 100.f}});
+                paddle.set<Transform>({{Configuration::RESOLUTION.x / 2, Configuration::RESOLUTION.y - 100.f}});
             });
         });
 
@@ -367,7 +368,7 @@ void GameplayScene::CreateUISystem(flecs::world& world)
 
 void GameplayScene::CreatePaddle(const flecs::world& world, float& zOrder)
 {
-    constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
+    constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
 
     Prefabs::Rectangle::Create(
         world,
@@ -375,7 +376,7 @@ void GameplayScene::CreatePaddle(const flecs::world& world, float& zOrder)
             .size = {100.f, 20.f},
             .color = NordTheme::Aurora1,
             .origin = {0.5f, 0.5f},
-            .position = {CENTER_X, Configuration::WINDOW_SIZE.y - 100.f},
+            .position = {CENTER_X, Configuration::RESOLUTION.y - 100.f},
             .zOrder = 0.f,
         }
     )
@@ -390,14 +391,14 @@ void GameplayScene::CreatePaddle(const flecs::world& world, float& zOrder)
 
 void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
 {
-    constexpr float COLUMNS = 1;
-    constexpr float ROWS = 1;
+    constexpr float COLUMNS = 10;
+    constexpr float ROWS = 6;
     constexpr float BLOCK_SPACING = 10.f;
     constexpr float MARGINS = 100.f;
 
     constexpr sf::Vector2f PLAYGROUND =
-        {Configuration::WINDOW_SIZE.x - (COLUMNS - 1) * BLOCK_SPACING - MARGINS * 2,
-         Configuration::WINDOW_SIZE.y / 3 - (ROWS - 1) * BLOCK_SPACING - MARGINS};
+        {Configuration::RESOLUTION.x - (COLUMNS - 1) * BLOCK_SPACING - MARGINS * 2,
+         Configuration::RESOLUTION.y / 3 - (ROWS - 1) * BLOCK_SPACING - MARGINS};
     constexpr float BLOCK_WIDTH = PLAYGROUND.x / COLUMNS;
     constexpr float BLOCK_HEIGHT = PLAYGROUND.y / ROWS;
 
@@ -423,7 +424,7 @@ void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
 
 void GameplayScene::CreateBall(const flecs::world& world, float& zOrder)
 {
-    constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
+    constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
     constexpr float RADIUS = 10.f;
 
     Prefabs::Circle::Create(
@@ -432,7 +433,7 @@ void GameplayScene::CreateBall(const flecs::world& world, float& zOrder)
             .radius = RADIUS,
             .color = sf::Color::White,
             .origin = {0.5f, 0.5f},
-            .position = {CENTER_X, Configuration::WINDOW_SIZE.y - 125.f},
+            .position = {CENTER_X, Configuration::RESOLUTION.y - 125.f},
             .zOrder = ++zOrder,
         }
     )
@@ -448,7 +449,7 @@ void GameplayScene::CreateBackground(const flecs::world& world, float& zOrder)
     Prefabs::Rectangle::Create(
         world,
         {
-            .size = sf::Vector2f{Configuration::WINDOW_SIZE},
+            .size = sf::Vector2f{Configuration::RESOLUTION},
             .color = NordTheme::PolarNight4,
             .position = {0.f, 0.f},
             .zOrder = zOrder++,
@@ -466,10 +467,10 @@ void GameplayScene::ProcessScreenBounce(Transform& t, Velocity& v, const Collide
         v.velocity.x *= -1.f;
         t.position.x = radius;
     }
-    else if (t.position.x + radius > Configuration::WINDOW_SIZE.x)
+    else if (t.position.x + radius > Configuration::RESOLUTION.x)
     {
         v.velocity.x *= -1.f;
-        t.position.x = Configuration::WINDOW_SIZE.x - radius;
+        t.position.x = Configuration::RESOLUTION.x - radius;
     }
 
     if (t.position.y - radius < 0.f)
@@ -481,7 +482,7 @@ void GameplayScene::ProcessScreenBounce(Transform& t, Velocity& v, const Collide
 
 void GameplayScene::ProcessOutOfBounds(const flecs::entity ball, const Transform& t, const Ball& b)
 {
-    if (t.position.y > Configuration::WINDOW_SIZE.y)
+    if (t.position.y > Configuration::RESOLUTION.y)
     {
         LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> Destroy ball");
         ball.destruct();
@@ -608,6 +609,12 @@ void GameplayScene::ProcessCollisionDetection(
                             multiplier.multiplier += 1;
                         }
                     );
+
+                    // Trigger a shake (e.g., when something explodes)
+                    blockEntity.world().entity().set<CameraShakeIntent>({
+                        .intensity = 3.0f, // Shake strength
+                        .duration = 0.3f   // Half a second
+                    });
                 }
             }
         }
@@ -622,9 +629,9 @@ void GameplayScene::ConstrainPaddleToScreen(Transform& t, const Size& s, const P
     {
         t.position.x = halfSize;
     }
-    else if (t.position.x + halfSize > Configuration::WINDOW_SIZE.x)
+    else if (t.position.x + halfSize > Configuration::RESOLUTION.x)
     {
-        t.position.x = Configuration::WINDOW_SIZE.x - halfSize;
+        t.position.x = Configuration::RESOLUTION.x - halfSize;
     }
 }
 

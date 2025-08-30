@@ -255,22 +255,24 @@ namespace Modules
 
 RenderModule::RenderModule(const flecs::world& world)
 {
-    world.component<ZOrder>();
-    world.component<RectangleRenderable>();
+    // --- Declare Components ---
     world.component<CircleRenderable>();
-    world.component<TextRenderable>();
-    world.component<SpriteRenderable>();
+    world.component<RectangleRenderable>();
     // world.component<ShaderRenderable>();
     world.component<ShaderUniform>();
     world.component<ShaderUniforms>();
+    world.component<SpriteRenderable>();
+    world.component<TextRenderable>();
+    world.component<ZOrder>();
 
+    // --- We apply all the Transform to the Renderables ---
     world.system<const Transform, CircleRenderable>("ApplyTransformToCircle").kind(flecs::PreStore).each(ApplyTransformToCircle);
     world.system<const Transform, RectangleRenderable>("ApplyTransformToRectangle")
         .kind(flecs::PreStore)
         .each(ApplyTransformToRectangle);
     world.system<const Transform, SpriteRenderable>("ApplyTransformToSprite").kind(flecs::PreStore).each(ApplyTransformToSprite);
 
-    // Render all the Renderable Components
+    // --- Render all the Renderable Components ---
     world.system().kind(flecs::OnStore).run(Render);
     world.system().kind(flecs::OnStore).run(RenderAllParticles);
 }

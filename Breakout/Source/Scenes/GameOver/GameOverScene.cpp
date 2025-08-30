@@ -7,11 +7,11 @@
 #include "Scenes/Gameplay/Components/RestartGameIntent.h"
 #include "Scenes/Gameplay/GameplayScene.h"
 
+#include "Core/Components/DeferredEvent.h"
 #include "Core/Configuration.h"
-#include "Core/Events/DeferredEvent.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
-#include "Core/Modules/Control/Components/Command.h"
+#include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Prefabs/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
@@ -33,8 +33,8 @@ void GameOverScene::Initialize()
     Scene::Initialize();
     LOG_DEBUG("GameOverScene::Initialize");
 
-    constexpr float CENTER_X = Configuration::WINDOW_SIZE.x / 2;
-    constexpr float CENTER_Y = Configuration::WINDOW_SIZE.y / 2;
+    constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
+    constexpr float CENTER_Y = Configuration::RESOLUTION.y / 2;
 
     const auto& world = GetWorld();
 
@@ -49,7 +49,7 @@ void GameOverScene::Initialize()
 
     Prefabs::Rectangle::Create(
         world,
-        {.size = sf::Vector2f{Configuration::WINDOW_SIZE},
+        {.size = sf::Vector2f{Configuration::RESOLUTION},
          .color = backgroundColor,
          .position = {0.f, 0.f},
          .scale = {1.f, 1.f},

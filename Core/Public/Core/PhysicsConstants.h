@@ -19,7 +19,7 @@ constexpr float DEFAULT_DAMPING = 0.98f;
 constexpr float NO_DAMPING = 1.f;
 
 // Consider that the height of the screen is 2 meters (200 cm) high
-constexpr float PIXELS_PER_CENTIMETER = Configuration::WINDOW_SIZE.y / 200.f;
+constexpr float PIXELS_PER_CENTIMETER = Configuration::RESOLUTION.y / 200.f;
 
 constexpr float NO_FRICTION = 0.f;
 } // namespace PhysicsConstants

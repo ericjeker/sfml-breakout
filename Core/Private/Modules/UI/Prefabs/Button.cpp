@@ -2,7 +2,8 @@
 
 #include "Core/Modules/UI/Prefabs/Button.h"
 
-#include "Core/Events/Event.h"
+#include "../../../../Public/Core/Components/Event.h"
+
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Render/Components/RectangleRenderable.h"

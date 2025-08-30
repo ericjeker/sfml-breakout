@@ -8,7 +8,8 @@
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/ResourceManager.h"
-#include "Core/Modules/Control/ControlModule.h"
+#include "Core/Modules/Camera/CameraModule.h"
+#include "Core/Modules/Input/InputModule.h"
 #include "Core/Modules/Lifetime/LifetimeModule.h"
 #include "Core/Modules/Particles/ParticlesModule.h"
 #include "Core/Modules/Physics/PhysicsModule.h"
@@ -16,8 +17,11 @@
 #include "Core/Modules/UI/UIModule.h"
 #include "Core/Utils/Logger.h"
 
+
 void Breakout::Initialize()
 {
+    GameInstance::Initialize();
+
     // --- Load all resources from the manifest file ---
     LOG_DEBUG("Breakout::Initialization: Load Resources");
     GameService::Get<ResourceManager>().LoadResourcesFromManifest("Assets/Manifest.json");
@@ -25,17 +29,14 @@ void Breakout::Initialize()
     // --- Initialize the World with global systems and singletons ---
     // clang-format off
     auto& world = GetWorld();
+    world.import<Modules::CameraModule>();
+    world.import<Modules::InputModule>();
     world.import<Modules::LifetimeModule>();
-    world.import<Modules::UIModule>();
-    world.import<Modules::ControlModule>();
     world.import<Modules::PhysicsModule>();
-    world.import<Modules::RenderModule>();
     world.import<Modules::ParticlesModule>();
+    world.import<Modules::RenderModule>();
+    world.import<Modules::UIModule>();
     // clang-format on
-
-    // --- Add the GamePaused singleton ---
-    // TODO: so in the end I haven't managed pause like this, but let's keep a trace of the first iteration
-    //world.add<GamePaused>({});
 
     // --- Load the initial state where the initial scene will be loaded ---
     LOG_DEBUG("Breakout::Initialization: Load the Main Menu State");
@@ -48,6 +49,8 @@ void Breakout::Initialize()
 
 void Breakout::Shutdown()
 {
+    GameInstance::Shutdown();
+
     LOG_DEBUG("Breakout::Shutdown");
     GameService::Get<AudioManager>().StopMusic();
 }
