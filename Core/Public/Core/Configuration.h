@@ -9,7 +9,7 @@ namespace Configuration
 {
 
 constexpr auto WINDOW_TITLE = "Game Engine Using Flecs ECS";
-constexpr auto WINDOW_STYLE = sf::Style::Default;
+constexpr auto WINDOW_STYLE = sf::Style::None;
 constexpr auto WINDOW_STATE = sf::State::Windowed;
 
 constexpr sf::Vector2u WINDOW_SIZE = {1920, 1080};

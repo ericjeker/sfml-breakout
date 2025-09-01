@@ -1,6 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Core/Modules/Render/Prefabs/Sprite.h"
+#include "Core/Modules/Render/Factories/Sprite.h"
 
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/ResourceManager.h"
@@ -9,7 +9,7 @@
 #include "Core/Modules/Render/Components/ZOrder.h"
 
 
-namespace Prefabs
+namespace Factories
 {
 
 flecs::entity Sprite::Create(const flecs::world& world, const SpriteParams& params)
@@ -33,4 +33,4 @@ flecs::entity Sprite::Create(const flecs::world& world, const SpriteParams& para
 }
 
 
-} // namespace Prefabs
+} // namespace Factories

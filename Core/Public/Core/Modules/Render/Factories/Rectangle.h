@@ -2,15 +2,13 @@
 
 #pragma once
 
-
-
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
 
 #include <flecs.h>
 
 
-namespace Prefabs
+namespace Factories
 {
 
 struct RectangleParams
@@ -29,7 +27,4 @@ struct Rectangle
     static flecs::entity Create(const flecs::world& world, const RectangleParams& params);
 };
 
-} // namespace Prefabs
-
-
-
+} // namespace Factories

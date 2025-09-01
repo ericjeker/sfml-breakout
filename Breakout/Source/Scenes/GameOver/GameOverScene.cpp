@@ -13,7 +13,7 @@
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
-#include "Core/Modules/Render/Prefabs/Rectangle.h"
+#include "Core/Modules/Render/Factories/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
@@ -47,7 +47,7 @@ void GameOverScene::Initialize()
     auto backgroundColor = NordTheme::PolarNight1;
     backgroundColor.a = 127;
 
-    Prefabs::Rectangle::Create(
+    Factories::Rectangle::Create(
         world,
         {.size = sf::Vector2f{Configuration::RESOLUTION},
          .color = backgroundColor,

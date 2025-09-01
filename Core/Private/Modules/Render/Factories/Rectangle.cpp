@@ -1,6 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Core/Modules/Render/Prefabs/Rectangle.h"
+#include "Core/Modules/Render/Factories/Rectangle.h"
 
 #include "Core/Modules/Render/Components/Origin.h"
 #include "Core/Modules/Render/Components/RectangleRenderable.h"
@@ -8,7 +8,7 @@
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Modules/Render/Components/ZOrder.h"
 
-namespace Prefabs
+namespace Factories
 {
 
 flecs::entity Rectangle::Create(const flecs::world& world, const RectangleParams& params)
@@ -29,4 +29,4 @@ flecs::entity Rectangle::Create(const flecs::world& world, const RectangleParams
     return entity;
 }
 
-} // namespace Prefabs
+} // namespace Factories

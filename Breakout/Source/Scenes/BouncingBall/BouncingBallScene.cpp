@@ -7,8 +7,7 @@
 #include "Core/Configuration.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
 #include "Core/Modules/Render/Components/Transform.h"
-#include "Core/Modules/Render/Prefabs/Rectangle.h"
-#include "Core/Modules/Render/Prefabs/Sprite.h"
+#include "Core/Modules/Render/Factories/Rectangle.h"
 #include "Core/PhysicsConstants.h"
 #include "Core/Themes/Nord.h"
 
@@ -37,7 +36,7 @@ void BouncingBallScene::Initialize()
     // --- Create the entities ---
     float zOrder = 0.f;
 
-    Prefabs::Rectangle::Create(
+    Factories::Rectangle::Create(
         world,
         {
             .size = sf::Vector2f{Configuration::RESOLUTION},

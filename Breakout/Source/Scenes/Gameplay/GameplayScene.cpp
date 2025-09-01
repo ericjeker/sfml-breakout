@@ -6,9 +6,11 @@
 #include "Components/Ball.h"
 #include "Components/Block.h"
 #include "Components/ContinueGameIntent.h"
+#include "Components/CurrentLevel.h"
 #include "Components/GameOverIntent.h"
 #include "Components/GameWonIntent.h"
 #include "Components/Health.h"
+#include "Components/Indestructible.h"
 #include "Components/LaunchBallIntent.h"
 #include "Components/MoveIntent.h"
 #include "Components/NavigateToMainMenuIntent.h"
@@ -16,6 +18,7 @@
 #include "Components/PauseGameIntent.h"
 #include "Components/RestartGameIntent.h"
 #include "Components/ResumeGameIntent.h"
+#include "Factories/Block.h"
 #include "GameStates/Gameplay/Components/GameSession.h"
 #include "GameStates/Gameplay/Components/Lives.h"
 #include "GameStates/Gameplay/Components/Multiplier.h"
@@ -31,7 +34,7 @@
 
 #include "Core/Components/DeferredEvent.h"
 #include "Core/Configuration.h"
-#include "Core/GameInstance.h"
+#include "Core/Managers/FileManager.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/SceneManager.h"
@@ -51,8 +54,8 @@
 #include "Core/Modules/Render/Components/Radius.h"
 #include "Core/Modules/Render/Components/Size.h"
 #include "Core/Modules/Render/Components/Transform.h"
-#include "Core/Modules/Render/Prefabs/Circle.h"
-#include "Core/Modules/Render/Prefabs/Rectangle.h"
+#include "Core/Modules/Render/Factories/Circle.h"
+#include "Core/Modules/Render/Factories/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
 #include "Core/Tags/ScenePaused.h"
@@ -61,9 +64,10 @@
 #include "Core/Utils/Logger.h"
 #include "Core/Utils/Vector.h"
 
-#include <SFML/Graphics.hpp>
-
+#include <fstream>
 #include <iostream>
+#include <map>
+#include <nlohmann/json.hpp>
 #include <numbers>
 #include <optional>
 #include <string>
@@ -91,6 +95,7 @@ void GameplayScene::Initialize()
     CreateBackground(world, zOrder);
     CreatePaddle(world, zOrder);
     CreateBall(world, zOrder);
+
     CreateBlocks(world, zOrder);
 
     // --- Add local systems ---
@@ -370,7 +375,7 @@ void GameplayScene::CreatePaddle(const flecs::world& world, float& zOrder)
 {
     constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
 
-    Prefabs::Rectangle::Create(
+    Factories::Rectangle::Create(
         world,
         {
             .size = {100.f, 20.f},
@@ -389,36 +394,81 @@ void GameplayScene::CreatePaddle(const flecs::world& world, float& zOrder)
         .set<ColliderShape>({Shape::Rectangle});
 }
 
+std::map<char, GameplayScene::BlockDefinition> GameplayScene::LoadBlockDefinitions(const std::string& filename)
+{
+    std::map<char, BlockDefinition> blockDefinitions;
+
+    const auto data = FileManager::LoadJSON(filename);
+
+    for (const auto& [key, value] : data["definitions"].items())
+    {
+        char symbol = key[0];
+        BlockDefinition def;
+
+        if (blockDefinitions.contains(symbol))
+        {
+            LOG_ERROR(std::format("GameplayScene::LoadBlockDefinitions -> Duplicate symbol: {}", symbol));
+            continue;
+        }
+
+        if (value.contains("color"))
+        {
+            auto colorArray = value["color"];
+            def.color = {colorArray[0], colorArray[1], colorArray[2]};
+        }
+
+        def.health = value.value("health", 1);
+        def.isIndestructible = value.value("indestructible", false);
+
+        blockDefinitions[symbol] = def;
+    }
+
+    return blockDefinitions;
+}
+
 void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
 {
-    constexpr float COLUMNS = 10;
-    constexpr float ROWS = 6;
-    constexpr float BLOCK_SPACING = 10.f;
-    constexpr float MARGINS = 100.f;
+    // Load the block definition file (json)
+    const auto blockDefinitions = LoadBlockDefinitions("Content/Levels/Definitions.json");
 
-    constexpr sf::Vector2f PLAYGROUND =
-        {Configuration::RESOLUTION.x - (COLUMNS - 1) * BLOCK_SPACING - MARGINS * 2,
-         Configuration::RESOLUTION.y / 3 - (ROWS - 1) * BLOCK_SPACING - MARGINS};
-    constexpr float BLOCK_WIDTH = PLAYGROUND.x / COLUMNS;
-    constexpr float BLOCK_HEIGHT = PLAYGROUND.y / ROWS;
+    // Which level are we playing?
+    int currentLevel{1};
+    world.query<const CurrentLevel>().each([&currentLevel](const CurrentLevel& c) { currentLevel = c.level; });
 
-    for (int x = 0; x < COLUMNS; ++x)
+    // Load the level definition file (txt)
+    std::ifstream f(std::format("Content/Levels/Level_{}.txt", currentLevel));
+    std::string line;
+    int row = 0;
+
+    while (std::getline(f, line))
     {
-        const float posX = MARGINS + x * (BLOCK_WIDTH + BLOCK_SPACING);
+        constexpr float BLOCK_SPACING = 10.f;
+        constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
+        constexpr sf::Vector2f BLOCK_SIZE = {120.f, 30.f};
 
-        for (int y = 0; y < ROWS; ++y)
+        // Calculate the left margin
+        const float leftMargin = CENTER_X - (line.size() / 2 * BLOCK_SIZE.x) - (line.size() - 1) / 2 * BLOCK_SPACING;
+
+        for (int col = 0; col < line.size(); ++col)
         {
-            const float posY = MARGINS + y * (BLOCK_HEIGHT + BLOCK_SPACING);
+            constexpr float TOP_MARGIN = 200.f;
 
-            Prefabs::Rectangle::Create(
-                world,
-                {.size = {BLOCK_WIDTH, BLOCK_HEIGHT}, .color = NordTheme::Aurora2, .origin = {0.f, 0.f}, .position = {posX, posY}}
-            )
-                .add<Block>()
-                .set<Health>({1})
-                .set<ColliderShape>({Shape::Rectangle})
-                .child_of(GetRootEntity());
+            const char symbol = line[col];
+            if (symbol == '.' || !blockDefinitions.contains(symbol))
+            {
+                continue;
+            }
+
+            const auto& def = blockDefinitions.at(symbol);
+
+            // Calculate the position (block's origin is {0, 0})
+            float x = leftMargin + col * (BLOCK_SIZE.x + BLOCK_SPACING);
+            float y = TOP_MARGIN + row * (BLOCK_SIZE.y + BLOCK_SPACING);
+
+            Factories::CreateBlock(world, {.position = {x, y}, .color = def.color, .size = BLOCK_SIZE, .health = def.health, .isIndestructible = def.isIndestructible});
         }
+
+        ++row;
     }
 }
 
@@ -427,7 +477,7 @@ void GameplayScene::CreateBall(const flecs::world& world, float& zOrder)
     constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
     constexpr float RADIUS = 10.f;
 
-    Prefabs::Circle::Create(
+    Factories::Circle::Create(
         world,
         {
             .radius = RADIUS,
@@ -446,7 +496,7 @@ void GameplayScene::CreateBall(const flecs::world& world, float& zOrder)
 void GameplayScene::CreateBackground(const flecs::world& world, float& zOrder)
 {
     // --- Create Background ---
-    Prefabs::Rectangle::Create(
+    Factories::Rectangle::Create(
         world,
         {
             .size = sf::Vector2f{Configuration::RESOLUTION},
@@ -589,8 +639,13 @@ void GameplayScene::ProcessCollisionDetection(
                 // Reflect velocity along collision normal
                 ballVelocity.velocity = CalculateReflection(ballVelocity.velocity, collisionInfo.normal);
 
+                if (blockEntity.has<Indestructible>())
+                {
+                    return;
+                }
+
                 // Remove one health from the block
-                auto [health] = blockEntity.get_mut<Health>();
+                auto& [health] = blockEntity.get_mut<Health>();
                 health -= 1;
 
                 if (health <= 0)

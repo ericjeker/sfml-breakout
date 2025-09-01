@@ -10,7 +10,7 @@
 #include <flecs.h>
 #include <string>
 
-namespace Prefabs
+namespace Factories
 {
 
 struct SpriteParams
@@ -28,7 +28,7 @@ struct Sprite
     static flecs::entity Create(const flecs::world& world, const SpriteParams& params);
 };
 
-} // namespace Prefabs
+} // namespace Factories
 
 
 

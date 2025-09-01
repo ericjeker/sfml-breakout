@@ -1,6 +1,6 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Core/Modules/Render/Prefabs/Circle.h"
+#include "Core/Modules/Render/Factories/Circle.h"
 
 #include "Core/Modules/Render/Components/CircleRenderable.h"
 #include "Core/Modules/Render/Components/Origin.h"
@@ -8,7 +8,7 @@
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Modules/Render/Components/ZOrder.h"
 
-namespace Prefabs
+namespace Factories
 {
 
 flecs::entity Circle::Create(const flecs::world& world, const CircleParams& params)
@@ -29,4 +29,4 @@ flecs::entity Circle::Create(const flecs::world& world, const CircleParams& para
 }
 
 
-} // namespace Prefabs
+} // namespace Factories

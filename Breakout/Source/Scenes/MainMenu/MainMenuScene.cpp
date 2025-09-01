@@ -17,10 +17,7 @@
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
-#include "Core/Modules/Render/Components/RectangleRenderable.h"
-#include "Core/Modules/Render/Components/Size.h"
-#include "Core/Modules/Render/Components/Transform.h"
-#include "Core/Modules/Render/Prefabs/Rectangle.h"
+#include "Core/Modules/Render/Factories/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MousePressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
@@ -120,7 +117,7 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
     float zOrder = 0;
 
     // --- Create Background ---
-    Prefabs::Rectangle::Create(
+    Factories::Rectangle::Create(
         world,
         {
             .size = sf::Vector2f{Configuration::RESOLUTION},
@@ -132,9 +129,9 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
         .child_of(GetRootEntity());
 
     // --- Reference Rectangles
-    Prefabs::Rectangle::Create(world, {.size = {10.f, 10.f}, .color = NordTheme::SnowStorm3, .position = {20.f, 20.f}, .zOrder = zOrder++})
+    Factories::Rectangle::Create(world, {.size = {10.f, 10.f}, .color = NordTheme::SnowStorm3, .position = {20.f, 20.f}, .zOrder = zOrder++})
         .child_of(GetRootEntity());
-    Prefabs::Rectangle::Create(
+    Factories::Rectangle::Create(
         world,
         {.size = {10.f, 10.f},
          .color = NordTheme::SnowStorm3,

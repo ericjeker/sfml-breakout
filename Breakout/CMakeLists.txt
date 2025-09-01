@@ -42,6 +42,13 @@ add_custom_command(TARGET Breakout POST_BUILD
   COMMENT "Copying assets to build directory"
 )
 
+add_custom_command(TARGET Breakout POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_CURRENT_SOURCE_DIR}/Content
+          $<TARGET_FILE_DIR:Breakout>/Content
+  COMMENT "Copying content to build directory"
+)
+
 # --- Testing toggle integrates with top-level CTest ---
 option(BUILD_TESTS "Build the tests" OFF)
 if (BUILD_TESTS AND BUILD_TESTING)

@@ -7,7 +7,7 @@
 #include <flecs.h>
 
 
-namespace Prefabs
+namespace Factories
 {
 
 struct CircleParams
@@ -25,4 +25,4 @@ struct Circle
     static flecs::entity Create(const flecs::world& world, const CircleParams& params);
 };
 
-} // namespace Prefabs
+} // namespace Factories

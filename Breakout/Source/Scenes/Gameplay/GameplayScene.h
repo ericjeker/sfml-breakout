@@ -15,6 +15,8 @@
 #include "Core/Modules/Render/Components/Transform.h"
 #include "Core/Scenes/Scene.h"
 
+#include <map>
+
 
 class GameplayScene final : public Scene
 {
@@ -24,10 +26,18 @@ public:
     void HandleEvent(const std::optional<sf::Event>& event) override;
 
 private:
+    struct BlockDefinition
+    {
+        sf::Color color = sf::Color::White;
+        int health{};
+        bool isIndestructible{};
+    };
+
     void CreateInputBindings(const flecs::world& world);
     void CreateLocalSystems(const flecs::world& world);
     void CreateUISystem(flecs::world& world);
     void CreatePaddle(const flecs::world& world, float& zOrder);
+    static std::map<char, BlockDefinition> LoadBlockDefinitions(const std::string& filename);
     void CreateBlocks(const flecs::world& world, float& zOrder);
     void CreateBall(const flecs::world& world, float& zOrder);
     void CreateBackground(const flecs::world& world, float& zOrder);
