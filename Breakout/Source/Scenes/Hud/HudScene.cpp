@@ -2,7 +2,6 @@
 
 #include "HudScene.h"
 
-#include "GameStates/Gameplay/Components/GameSession.h"
 #include "GameStates/Gameplay/Components/Lives.h"
 #include "GameStates/Gameplay/Components/Multiplier.h"
 #include "GameStates/Gameplay/Components/Score.h"
@@ -65,9 +64,9 @@ void HudScene::Initialize()
 
 
     // --- Create local systems ---
-    world.system<const GameSession, const Score>("DisplayScoreSystem")
+    world.system<const Score>("DisplayScoreSystem")
         .kind(flecs::PostUpdate)
-        .each([scoreEntity](const GameSession& gs, const Score& score) {
+        .each([scoreEntity](const Score& score) {
             const auto& [text] = scoreEntity.get<TextRenderable>();
             const auto& [origin] = scoreEntity.get<Origin>();
             text->setString("SCORE " + std::to_string(score.score));
@@ -81,9 +80,9 @@ void HudScene::Initialize()
         })
         .child_of(GetRootEntity());
 
-    world.system<const GameSession, const Lives>("DisplayLivesSystem")
+    world.system<const Lives>("DisplayLivesSystem")
         .kind(flecs::PostUpdate)
-        .each([livesEntity](const GameSession& gs, const Lives& lives) {
+        .each([livesEntity](const Lives& lives) {
             const auto& [text] = livesEntity.get<TextRenderable>();
             const auto& [origin] = livesEntity.get<Origin>();
             text->setString("LIVES " + std::to_string(lives.lives));
@@ -97,9 +96,9 @@ void HudScene::Initialize()
         })
         .child_of(GetRootEntity());
 
-    world.system<const GameSession, const Multiplier>("DisplayMultiplierSystem")
+    world.system<const Multiplier>("DisplayMultiplierSystem")
         .kind(flecs::PostUpdate)
-        .each([multEntity](const GameSession& gs, const Multiplier& multiplier) {
+        .each([multEntity](const Multiplier& multiplier) {
             const auto& [text] = multEntity.get<TextRenderable>();
             const auto& [origin] = multEntity.get<Origin>();
             text->setString("MULT " + std::to_string(multiplier.multiplier) + "x");

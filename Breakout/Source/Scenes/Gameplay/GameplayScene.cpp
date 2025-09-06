@@ -6,7 +6,6 @@
 #include "Components/Ball.h"
 #include "Components/Block.h"
 #include "Components/ContinueGameIntent.h"
-#include "Components/CurrentLevel.h"
 #include "Components/GameOverIntent.h"
 #include "Components/GameWonIntent.h"
 #include "Components/Health.h"
@@ -14,13 +13,15 @@
 #include "Components/LaunchBallIntent.h"
 #include "Components/MoveIntent.h"
 #include "Components/NavigateToMainMenuIntent.h"
+#include "Components/NextLevelIntent.h"
 #include "Components/Paddle.h"
 #include "Components/PauseGameIntent.h"
 #include "Components/RestartGameIntent.h"
 #include "Components/ResumeGameIntent.h"
 #include "Factories/Block.h"
-#include "GameStates/Gameplay/Components/GameSession.h"
+#include "GameStates/Gameplay/Components/CurrentLevel.h"
 #include "GameStates/Gameplay/Components/Lives.h"
+#include "GameStates/Gameplay/Components/MaxLevel.h"
 #include "GameStates/Gameplay/Components/Multiplier.h"
 #include "GameStates/Gameplay/Components/Score.h"
 #include "GameStates/MainMenu/MainMenuState.h"
@@ -93,10 +94,9 @@ void GameplayScene::Initialize()
 
     float zOrder = 0.f;
     CreateBackground(world, zOrder);
+    CreateBlocks(world, zOrder);
     CreatePaddle(world, zOrder);
     CreateBall(world, zOrder);
-
-    CreateBlocks(world, zOrder);
 
     // --- Add local systems ---
     CreateLocalSystems(world);
@@ -217,7 +217,18 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
     // Check if there are no more blocks on the screen = WIN
     world.system("CheckIfAllBlocksDestroyed")
         .run([&](const flecs::iter& it) {
-            if (it.world().count<const Block>() == 0)
+            if (it.world().query_builder<const Block>().without<Indestructible>().build().count() > 0)
+            {
+                return;
+            }
+
+            const int currentLevel = it.world().get<CurrentLevel>().level;
+            if (const int& maxLevel = it.world().get<MaxLevel>().level; currentLevel < maxLevel)
+            {
+                LOG_DEBUG("GameplayScene::CheckIfAllBlocksDestroyed -> Add NextLevelIntent");
+                it.world().entity().add<LifetimeOneFrame>().add<Command>().add<NextLevelIntent>().child_of(GetRootEntity());
+            }
+            else
             {
                 LOG_DEBUG("GameplayScene::CheckIfAllBlocksDestroyed -> Add GameWonIntent");
                 it.world().entity().add<LifetimeOneFrame>().add<Command>().add<GameWonIntent>().child_of(GetRootEntity());
@@ -228,6 +239,7 @@ void GameplayScene::CreateLocalSystems(const flecs::world& world)
 
 void GameplayScene::CreateUISystem(flecs::world& world)
 {
+    // --- Create the UI ---
     // Query for KeyPressed and pause the Scene
     world.system<const KeyPressed>("ProcessKeyPressed")
         .kind(flecs::PostLoad)
@@ -270,21 +282,11 @@ void GameplayScene::CreateUISystem(flecs::world& world)
                 sceneManager.LoadScene<GameOverScene>(SceneLoadMode::Additive);
             }});
 
-            // Reset the score and lives
-            e.world().query<const GameSession, Score, Lives, Multiplier>().each(
-                [](const GameSession& gs, Score& score, Lives& lives, Multiplier& multiplier) {
-                    score.score = 0;
-                    score.blocksDestroyed = 0;
-                    lives.lives = 3;
-                    multiplier.multiplier = 1;
-                }
-            );
-
             e.destruct();
         })
         .child_of(GetRootEntity());
 
-    // Game won, load the game over scene
+    // Game won, load the game won scene
     world.system<const GameWonIntent>("ProcessGameWonIntent")
         .kind(flecs::PreUpdate)
         .each([&](const flecs::entity& e, const GameWonIntent& g) {
@@ -306,6 +308,27 @@ void GameplayScene::CreateUISystem(flecs::world& world)
         })
         .child_of(GetRootEntity());
 
+    // Next level
+    world.system<const NextLevelIntent>("ProcessNextLevelIntent")
+        .kind(flecs::PreUpdate)
+        .each([&](const flecs::entity& e, const NextLevelIntent& i) {
+            // We defer the state change to the end of the frame
+            e.world().entity().set<DeferredEvent>({.callback = [&] {
+                auto& sceneManager = GameService::Get<SceneManager>();
+                sceneManager.LoadScene<GameplayScene>(SceneLoadMode::Single);
+                sceneManager.LoadScene<DebugScene>(SceneLoadMode::Additive);
+                sceneManager.LoadScene<HudScene>(SceneLoadMode::Additive);
+            }});
+
+            // Move to the next level and reset the multiplier
+            e.world().get_mut<CurrentLevel>().level++;
+            e.world().get_mut<Multiplier>().multiplier = 1;
+
+            e.destruct();
+        })
+        .child_of(GetRootEntity());
+
+    // Restart the game, reset the score, lives and multiplier
     world.system<const RestartGameIntent>("ProcessRestartGameIntent")
         .kind(flecs::PreUpdate)
         .each([&](const flecs::entity& e, const RestartGameIntent& i) {
@@ -317,9 +340,16 @@ void GameplayScene::CreateUISystem(flecs::world& world)
                 sceneManager.LoadScene<HudScene>(SceneLoadMode::Additive);
             }});
 
+            e.world().get_mut<CurrentLevel>().level = 1;
+            e.world().get_mut<Score>().score = 0;
+            e.world().get_mut<Score>().blocksDestroyed = 0;
+            e.world().get_mut<Lives>().lives = 3;
+            e.world().get_mut<Multiplier>().multiplier = 1;
+
             e.destruct();
         });
 
+    // After losing one life, continue playing
     world.system<const ContinueGameIntent>("ProcessContinueGameIntent")
         .kind(flecs::PreUpdate)
         .each([&](const flecs::entity& e, const ContinueGameIntent& i) {
@@ -336,10 +366,7 @@ void GameplayScene::CreateUISystem(flecs::world& world)
     world.system<const ResumeGameIntent>("ProcessResumeGameIntent")
         .kind(flecs::PreUpdate)
         .each([rootEntity = GetRootEntity()](const flecs::entity& e, const ResumeGameIntent& r) {
-            LOG_DEBUG("GameplayScene::ResumeGameSystem");
-
             e.world().entity().set<DeferredEvent>({[] {
-                LOG_DEBUG("GameplayScene::ResumeGameSystem -> Unload Pause Scene");
                 auto& sceneManager = GameService::Get<SceneManager>();
                 sceneManager.UnloadScene<PauseScene>();
             }});
@@ -359,7 +386,6 @@ void GameplayScene::CreateUISystem(flecs::world& world)
                 .with(flecs::ChildOf, rootEntity)
                 .each([](const flecs::entity& entity) { entity.enable(); });
 
-            LOG_DEBUG("GameplayScene::ResumeGameSystem -> Destroy ResumeGameIntent");
             e.destruct();
         })
         .child_of(GetRootEntity());
@@ -428,15 +454,21 @@ std::map<char, GameplayScene::BlockDefinition> GameplayScene::LoadBlockDefinitio
 
 void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
 {
+    // Which level are we playing?
+    int& currentLevel = world.get_mut<CurrentLevel>().level;
+    LOG_DEBUG("GameplayScene::CreateBlocks -> currentLevel: {}", currentLevel);
+
     // Load the block definition file (json)
     const auto blockDefinitions = LoadBlockDefinitions("Content/Levels/Definitions.json");
 
-    // Which level are we playing?
-    int currentLevel{1};
-    world.query<const CurrentLevel>().each([&currentLevel](const CurrentLevel& c) { currentLevel = c.level; });
-
     // Load the level definition file (txt)
     std::ifstream f(std::format("Content/Levels/Level_{}.txt", currentLevel));
+    if (!f.is_open())
+    {
+        LOG_ERROR("GameplayScene::CreateBlocks -> Failed to open level file: Content/Levels/Level_{}.txt", currentLevel);
+        return;
+    }
+
     std::string line;
     int row = 0;
 
@@ -451,6 +483,8 @@ void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
 
         for (int col = 0; col < line.size(); ++col)
         {
+            LOG_DEBUG("GameplayScene::CreateBlocks -> line: {}, col: {}", row, col);
+
             constexpr float TOP_MARGIN = 200.f;
 
             const char symbol = line[col];
@@ -459,17 +493,20 @@ void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
                 continue;
             }
 
-            const auto& def = blockDefinitions.at(symbol);
+            const auto& [color, health, isIndestructible] = blockDefinitions.at(symbol);
 
             // Calculate the position (block's origin is {0, 0})
             float x = leftMargin + col * (BLOCK_SIZE.x + BLOCK_SPACING);
             float y = TOP_MARGIN + row * (BLOCK_SIZE.y + BLOCK_SPACING);
 
-            Factories::CreateBlock(world, {.position = {x, y}, .color = def.color, .size = BLOCK_SIZE, .health = def.health, .isIndestructible = def.isIndestructible});
+            Factories::CreateBlock(world, {.position = {x, y}, .color = color, .size = BLOCK_SIZE, .zOrder = zOrder, .health = health, .isIndestructible = isIndestructible})
+                .child_of(GetRootEntity());
         }
 
         ++row;
     }
+
+    zOrder += 1.f;
 }
 
 void GameplayScene::CreateBall(const flecs::world& world, float& zOrder)
@@ -539,25 +576,20 @@ void GameplayScene::ProcessOutOfBounds(const flecs::entity ball, const Transform
 
         // Lose one life
         LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> LoseOneLife");
-        ball.world().query<const GameSession, Lives>().each([](const flecs::entity& e, const GameSession& gs, Lives& lives) {
-            lives.lives -= 1;
+        ball.world().get_mut<Lives>().lives -= 1;
+        if (ball.world().get_mut<Lives>().lives <= 0)
+        {
+            // Game over
+            LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> Add GameOverIntent");
+            ball.world().entity().add<LifetimeOneFrame>().add<Command>().add<GameOverIntent>();
+        }
+        else
+        {
+            // Continue playing...
+            ball.world().entity().add<LifetimeOneFrame>().add<Command>().add<ContinueGameIntent>();
+        }
 
-            if (lives.lives <= 0)
-            {
-                // Game over
-                LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> Add GameOverIntent");
-                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<GameOverIntent>();
-            }
-            else
-            {
-                // Continue player...
-                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<ContinueGameIntent>();
-            }
-        });
-
-        ball.world().query<const GameSession, Multiplier>().each(
-            [](const flecs::entity& e, const GameSession& gs, Multiplier& multiplier) { multiplier.multiplier = 1; }
-        );
+        ball.world().get_mut<Multiplier>().multiplier = 1;
     }
 }
 
@@ -630,9 +662,7 @@ void GameplayScene::ProcessCollisionDetection(
                 ballVelocity.velocity = CalculateReflection(ballVelocity.velocity, modifiedNormal);
 
                 // Get the game session and reset the multiplier
-                blockEntity.world().query<const GameSession, Multiplier>().each(
-                    [](const GameSession& gs, Multiplier& multiplier) { multiplier.multiplier = 1; }
-                );
+                blockEntity.world().get_mut<Multiplier>().multiplier = 1;
             }
             else
             {
@@ -653,17 +683,12 @@ void GameplayScene::ProcessCollisionDetection(
                     // Destroy the block
                     blockEntity.destruct();
 
-                    // Get the game session and update the score
-                    blockEntity.world().query<const GameSession, Score, Multiplier>().each(
-                        [](const GameSession& gs, Score& score, Multiplier& multiplier) {
-                            LOG_DEBUG(
-                                "GameplayScene::ProcessCollisionDetection -> Current score: " + std::to_string(score.score)
-                            );
-                            score.score += 100 * multiplier.multiplier;
-                            score.blocksDestroyed += 1;
-                            multiplier.multiplier += 1;
-                        }
-                    );
+                    // Update the score
+                    int& multiplier = blockEntity.world().get_mut<Multiplier>().multiplier;
+                    auto& score = blockEntity.world().get_mut<Score>();
+                    score.score += 100 * multiplier;
+                    score.blocksDestroyed += 1;
+                    multiplier += 1;
 
                     // Trigger a shake (e.g., when something explodes)
                     blockEntity.world().entity().set<CameraShakeIntent>({

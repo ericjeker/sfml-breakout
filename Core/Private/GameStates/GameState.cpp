@@ -2,7 +2,6 @@
 
 #include "Core/GameStates/GameState.h"
 
-#include "Core/Utils/Logger.h"
 
 GameState::GameState(flecs::world& world)
     : _world(world)
@@ -10,15 +9,11 @@ GameState::GameState(flecs::world& world)
 }
 void GameState::Enter()
 {
-    LOG_DEBUG("GameState::Enter");
-
     _rootEntity = GetWorld().entity();
 }
 
 void GameState::Exit()
 {
-    LOG_DEBUG("GameState::Exit");
-
     if (GetRootEntity() == flecs::entity::null() || !GetWorld().exists(GetRootEntity()))
     {
         return;
@@ -37,12 +32,10 @@ flecs::entity GameState::GetRootEntity() const
 
 void GameState::Pause()
 {
-    LOG_DEBUG("GameState::Pause");
 }
 
 void GameState::Resume()
 {
-    LOG_DEBUG("GameState::Resume");
 }
 
 bool GameState::IsPaused() const

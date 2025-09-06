@@ -9,5 +9,4 @@ BreakoutModule::BreakoutModule(const flecs::world& world)
 {
 }
 
-
 } // namespace Modules

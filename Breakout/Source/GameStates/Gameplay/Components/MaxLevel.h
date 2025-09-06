@@ -2,6 +2,7 @@
 
 #pragma once
 
-struct GameSession
+struct MaxLevel
 {
+    int level = 1;
 };

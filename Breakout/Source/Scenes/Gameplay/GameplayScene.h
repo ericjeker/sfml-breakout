@@ -42,6 +42,7 @@ private:
     void CreateBall(const flecs::world& world, float& zOrder);
     void CreateBackground(const flecs::world& world, float& zOrder);
 
+    // --- Systems ---
     static void ProcessScreenBounce(Transform& t, Velocity& v, const ColliderShape& c, const Radius& r, const Ball& b);
     static void ProcessOutOfBounds(flecs::entity ball, const Transform& t, const Ball& b);
     static void ProcessCollisionDetection(

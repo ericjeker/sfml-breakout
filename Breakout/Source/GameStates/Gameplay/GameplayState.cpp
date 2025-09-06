@@ -2,8 +2,9 @@
 
 #include "GameplayState.h"
 
-#include "Components/GameSession.h"
+#include "Components/CurrentLevel.h"
 #include "Components/Lives.h"
+#include "Components/MaxLevel.h"
 #include "Components/Multiplier.h"
 #include "Components/Score.h"
 #include "Scenes/Debug/DebugScene.h"
@@ -29,7 +30,11 @@ void GameplayState::Enter()
 
     // --- Create the game session ---
     const auto& world = GetWorld();
-    world.entity().add<GameSession>().set<Score>({}).set<Lives>({}).set<Multiplier>({}).child_of(GetRootEntity());
+    world.set<Score>({});
+    world.set<Lives>({});
+    world.set<Multiplier>({});
+    world.set<CurrentLevel>({});
+    world.set<MaxLevel>({2});
 
     auto& sceneManager = GameService::Get<SceneManager>();
 
@@ -60,6 +65,14 @@ void GameplayState::Exit()
     sceneManager.RemoveScene<GameWonScene>();
     sceneManager.RemoveScene<PauseScene>();
     sceneManager.RemoveScene<HudScene>();
+
+    // --- Remove game session singletons ---
+    const auto& world = GetWorld();
+    world.remove<Score>();
+    world.remove<Lives>();
+    world.remove<Multiplier>();
+    world.remove<CurrentLevel>();
+    world.remove<MaxLevel>();
 }
 
 void GameplayState::HandleEvent(const std::optional<sf::Event>& event)
