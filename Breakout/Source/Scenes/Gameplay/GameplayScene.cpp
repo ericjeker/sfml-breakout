@@ -2,36 +2,30 @@
 
 #include "Scenes/Gameplay/GameplayScene.h"
 
-#include "Components/AttachedToPaddle.h"
-#include "Components/Ball.h"
-#include "Components/Block.h"
-#include "Components/ContinueGameIntent.h"
-#include "Components/GameOverIntent.h"
-#include "Components/GameWonIntent.h"
-#include "Components/Health.h"
-#include "Components/Indestructible.h"
-#include "Components/LaunchBallIntent.h"
 #include "Components/MoveIntent.h"
-#include "Components/NavigateToMainMenuIntent.h"
-#include "Components/NextLevelIntent.h"
-#include "Components/Paddle.h"
-#include "Components/PauseGameIntent.h"
-#include "Components/RestartGameIntent.h"
-#include "Components/ResumeGameIntent.h"
-#include "Factories/Block.h"
+#include "Entities/BallEntity.h"
+#include "Entities/BlockEntity.h"
+#include "Entities/PaddleEntity.h"
 #include "GameStates/Gameplay/Components/CurrentLevel.h"
-#include "GameStates/Gameplay/Components/Lives.h"
-#include "GameStates/Gameplay/Components/MaxLevel.h"
-#include "GameStates/Gameplay/Components/Multiplier.h"
-#include "GameStates/Gameplay/Components/Score.h"
-#include "GameStates/MainMenu/MainMenuState.h"
 #include "Prefabs/MoveLeftCommand.h"
 #include "Prefabs/MoveRightCommand.h"
 #include "Scenes/Debug/DebugScene.h"
-#include "Scenes/GameOver/GameOverScene.h"
-#include "Scenes/GameWon/GameWonScene.h"
-#include "Scenes/Hud/HudScene.h"
-#include "Scenes/Pause/PauseScene.h"
+#include "Systems/ApplyPaddlePositionToBallSystem.h"
+#include "Systems/CheckAllBlocksDestroyedSystem.h"
+#include "Systems/CollisionDetectionSystem.h"
+#include "Systems/ConstrainPaddleToScreenSystem.h"
+#include "Systems/Intents/ProcessContinueGameIntent.h"
+#include "Systems/Intents/ProcessGameOverIntent.h"
+#include "Systems/Intents/ProcessGameWonIntent.h"
+#include "Systems/Intents/ProcessLaunchBallIntent.h"
+#include "Systems/Intents/ProcessNavigateToMainMenuIntent.h"
+#include "Systems/Intents/ProcessNextLevelIntent.h"
+#include "Systems/Intents/ProcessPauseGameIntent.h"
+#include "Systems/Intents/ProcessResumeGameIntent.h"
+#include "Systems/OutOfBoundsSystem.h"
+#include "Systems/PaddleMovementSystem.h"
+#include "Systems/ScreenBounceSystem.h"
+#include "Systems/UI/ProcessKeyPressed.h"
 
 #include "Core/Components/DeferredEvent.h"
 #include "Core/Configuration.h"
@@ -39,31 +33,14 @@
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/SceneManager.h"
-#include "Core/Modules/Camera/Components/CameraShakeIntent.h"
 #include "Core/Modules/Input/Components/Command.h"
-#include "Core/Modules/Input/Components/CommandQueue.h"
-#include "Core/Modules/Input/Components/PossessedByPlayer.h"
-#include "Core/Modules/Input/Components/Target.h"
 #include "Core/Modules/Input/Singletons/InputBindings.h"
-#include "Core/Modules/Lifetime/Components/Lifetime.h"
-#include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
-#include "Core/Modules/Physics/Components/Acceleration.h"
-#include "Core/Modules/Physics/Components/ColliderShape.h"
-#include "Core/Modules/Physics/Components/Friction.h"
-#include "Core/Modules/Physics/Components/Velocity.h"
-#include "Core/Modules/Render/Components/Origin.h"
-#include "Core/Modules/Render/Components/Radius.h"
-#include "Core/Modules/Render/Components/Size.h"
-#include "Core/Modules/Render/Components/Transform.h"
-#include "Core/Modules/Render/Factories/Circle.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
 #include "Core/Tags/ScenePaused.h"
 #include "Core/Themes/Nord.h"
-#include "Core/Utils/Collision.h"
 #include "Core/Utils/Logger.h"
-#include "Core/Utils/Vector.h"
 
 #include <fstream>
 #include <iostream>
@@ -95,12 +72,33 @@ void GameplayScene::Initialize()
     float zOrder = 0.f;
     CreateBackground(world, zOrder);
     CreateBlocks(world, zOrder);
-    CreatePaddle(world, zOrder);
-    CreateBall(world, zOrder);
+    PaddleEntity::Create(world, GetRootEntity(), zOrder);
+    BallEntity::Create(world, GetRootEntity(), zOrder);
 
-    // --- Add local systems ---
-    CreateLocalSystems(world);
-    CreateUISystem(world);
+    // --- Paddle & Ball Control ---
+    PaddleMovementSystem::Initialize(world, GetRootEntity());
+    ProcessLaunchBallIntent::Initialize(world, GetRootEntity());
+    ApplyPaddlePositionToBallSystem::Initialize(world, GetRootEntity());
+
+    // --- Physics, Collision, Constraints ---
+    ScreenBounceSystem::Initialize(world, GetRootEntity());
+    CollisionDetectionSystem::Initialize(world, GetRootEntity());
+    ConstrainPaddleToScreenSystem::Initialize(world, GetRootEntity());
+
+    // --- Game Over / Game Won ---
+    // TODO: instead, check if there are no more ball on the screen = GAME OVER or LOSE ONE LIFE
+    OutOfBoundsSystem::Initialize(world, GetRootEntity());
+    CheckAllBlocksDestroyedSystem::Initialize(world, GetRootEntity());
+
+    // --- UI & Intents ---
+    ProcessKeyPressed::Initialize(world, GetRootEntity());
+    ProcessNavigateToMainMenuIntent::Initialize(world, GetRootEntity());
+    ProcessGameOverIntent::Initialize(world, GetRootEntity());
+    ProcessGameWonIntent::Initialize(world, GetRootEntity());
+    ProcessNextLevelIntent::Initialize(world, GetRootEntity());
+    ProcessContinueGameIntent::Initialize(world, GetRootEntity());
+    ProcessResumeGameIntent::Initialize(world, GetRootEntity());
+    ProcessPauseGameIntent::Initialize(world, GetRootEntity());
 }
 
 void GameplayScene::HandleEvent(const std::optional<sf::Event>& event)
@@ -116,8 +114,6 @@ void GameplayScene::HandleEvent(const std::optional<sf::Event>& event)
         // We still filter the scan code as to not populate the ECS with useless entities
         if (keyPressed->scancode == sf::Keyboard::Scancode::Escape || keyPressed->scancode == sf::Keyboard::Scancode::Space)
         {
-            LOG_DEBUG("GameplayScene::HandleEvent: KeyPressed");
-
             // Add a KeyPressed event to this scene, that will later be handled during the update
             GetWorld()
                 .entity()
@@ -144,280 +140,6 @@ void GameplayScene::CreateInputBindings(const flecs::world& world)
     world.set<InputBindings>(
         {{{InputKey::Keyboard(sf::Keyboard::Key::A), moveLeft}, {InputKey::Keyboard(sf::Keyboard::Key::D), moveRight}}}
     );
-}
-
-void GameplayScene::CreateLocalSystems(const flecs::world& world)
-{
-    // --- Paddle Movement System ---
-
-    // Triggered by the Input Bindings and ControlSystem
-    world.system<const MoveIntent, const Target>("PaddleMovementSystem")
-        .kind(flecs::PreUpdate)
-        .each([](const flecs::entity& cmd, const MoveIntent& i, const Target& t) {
-            auto& [acceleration] = t.entity.get_mut<Acceleration>();
-            acceleration.y += i.accelerate.y * 1000.f;
-            acceleration.x += i.accelerate.x * 1000.f;
-
-            // Destroy the command entity
-            cmd.destruct();
-        })
-        .child_of(GetRootEntity());
-
-
-    // --- Launching the Ball ---
-
-    // Launch the ball currently on the paddle
-    world.system<const LaunchBallIntent>("LaunchBallSystem")
-        .kind(flecs::PreUpdate)
-        .each([](const flecs::entity& cmd, const LaunchBallIntent& l) {
-            // Get the ball entity
-            cmd.world().query<const Ball, const AttachedToPaddle>().each(
-                [](const flecs::entity ball, const Ball b, const AttachedToPaddle ap) {
-                    ball.remove<AttachedToPaddle>();
-                    ball.set<Velocity>({{0.f, -500.f}});
-                    ball.set<ColliderShape>({Shape::Circle});
-                }
-            );
-
-            // Destroy the command entity
-            cmd.destruct();
-        })
-        .child_of(GetRootEntity());
-
-    // When the ball is attached to the paddle, move it with the paddle
-    world.system<Transform, const AttachedToPaddle, const Ball>("ApplyPaddlePositionToBall")
-        .each(ApplyPaddlePositionToBall)
-        .child_of(GetRootEntity());
-
-
-    // --- Physics, Collision, Constraints ---
-
-    // Bounce the ball off the walls
-    world.system<Transform, Velocity, const ColliderShape, const Radius, const Ball>("ScreenBounce")
-        .each(ProcessScreenBounce)
-        .child_of(GetRootEntity());
-
-    // Detect a collision with a collider (blocks or paddle)
-    world.system<const Transform, const Size, const Origin, const ColliderShape>("CollisionDetectionSystem")
-        .each(ProcessCollisionDetection)
-        .child_of(GetRootEntity());
-
-    // Constrain paddle to the screen
-    world.system<Transform, const Size, const Paddle>("ConstrainPaddleToScreen")
-        .each(ConstrainPaddleToScreen)
-        .child_of(GetRootEntity());
-
-
-    // --- Game Over / Game Won ---
-
-    // Check if the ball is out of bounds -> GameOver or LoseOneLife
-    // TODO: instead, check if there are no more ball on the screen = GAME OVER or LOSE ONE LIFE
-    world.system<Transform, const Ball>("OutOfBounds").each(ProcessOutOfBounds).child_of(GetRootEntity());
-
-    // Check if there are no more blocks on the screen = WIN
-    world.system("CheckIfAllBlocksDestroyed")
-        .run([&](const flecs::iter& it) {
-            if (it.world().query_builder<const Block>().without<Indestructible>().build().count() > 0)
-            {
-                return;
-            }
-
-            const int currentLevel = it.world().get<CurrentLevel>().level;
-            if (const int& maxLevel = it.world().get<MaxLevel>().level; currentLevel < maxLevel)
-            {
-                LOG_DEBUG("GameplayScene::CheckIfAllBlocksDestroyed -> Add NextLevelIntent");
-                it.world().entity().add<LifetimeOneFrame>().add<Command>().add<NextLevelIntent>().child_of(GetRootEntity());
-            }
-            else
-            {
-                LOG_DEBUG("GameplayScene::CheckIfAllBlocksDestroyed -> Add GameWonIntent");
-                it.world().entity().add<LifetimeOneFrame>().add<Command>().add<GameWonIntent>().child_of(GetRootEntity());
-            }
-        })
-        .child_of(GetRootEntity());
-}
-
-void GameplayScene::CreateUISystem(flecs::world& world)
-{
-    // --- Create the UI ---
-    // Query for KeyPressed and pause the Scene
-    world.system<const KeyPressed>("ProcessKeyPressed")
-        .kind(flecs::PostLoad)
-        // Make sure we process only the KeyPressed events from this scene
-        .with(flecs::ChildOf, GetRootEntity())
-        .each([&](const flecs::entity& e, const KeyPressed& k) {
-            if (k.scancode == sf::Keyboard::Scancode::Escape)
-            {
-                LOG_DEBUG("GameplayScene::ProcessKeyPressed: Escape -> Add PauseGameIntent");
-                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<PauseGameIntent>().child_of(GetRootEntity());
-            }
-            else if (k.scancode == sf::Keyboard::Scancode::Space)
-            {
-                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<LaunchBallIntent>().child_of(GetRootEntity());
-            }
-
-            e.destruct();
-        })
-        .child_of(GetRootEntity());
-
-    // Navigate to the main menu state after quitting the game
-    world.system<const NavigateToMainMenuIntent>("ProcessNavigateToMainMenuIntent")
-        .kind(flecs::PreUpdate)
-        .each([&](const flecs::entity& e, const NavigateToMainMenuIntent i) {
-            // We defer the state change to the end of the frame
-            e.world().entity().set<DeferredEvent>({.callback = [&] {
-                GameService::Get<GameStateManager>().ChangeState(std::make_unique<MainMenuState>(world));
-            }});
-
-            e.destruct();
-        })
-        .child_of(GetRootEntity());
-
-    // Game over, load the game over scene
-    world.system<const GameOverIntent>("ProcessGameOverIntent")
-        .kind(flecs::PreUpdate)
-        .each([](const flecs::entity& e, const GameOverIntent& g) {
-            e.world().entity().set<DeferredEvent>({[] {
-                auto& sceneManager = GameService::Get<SceneManager>();
-                sceneManager.LoadScene<GameOverScene>(SceneLoadMode::Additive);
-            }});
-
-            e.destruct();
-        })
-        .child_of(GetRootEntity());
-
-    // Game won, load the game won scene
-    world.system<const GameWonIntent>("ProcessGameWonIntent")
-        .kind(flecs::PreUpdate)
-        .each([&](const flecs::entity& e, const GameWonIntent& g) {
-            e.world().entity().set<DeferredEvent>({[] {
-                auto& sceneManager = GameService::Get<SceneManager>();
-                sceneManager.LoadScene<GameWonScene>(SceneLoadMode::Additive);
-            }});
-
-            // Get CheckIfAllBlocksDestroyed and disable it
-            if (const auto system = GetRootEntity().lookup("CheckIfAllBlocksDestroyed"); system.is_valid())
-            {
-                LOG_DEBUG("GameplayScene::ProcessGameWonIntent -> Disable CheckIfAllBlocksDestroyed");
-                system.disable();
-            }
-
-            PauseGame(e.world());
-
-            e.destruct();
-        })
-        .child_of(GetRootEntity());
-
-    // Next level
-    world.system<const NextLevelIntent>("ProcessNextLevelIntent")
-        .kind(flecs::PreUpdate)
-        .each([&](const flecs::entity& e, const NextLevelIntent& i) {
-            // We defer the state change to the end of the frame
-            e.world().entity().set<DeferredEvent>({.callback = [&] {
-                auto& sceneManager = GameService::Get<SceneManager>();
-                sceneManager.LoadScene<GameplayScene>(SceneLoadMode::Single);
-                sceneManager.LoadScene<DebugScene>(SceneLoadMode::Additive);
-                sceneManager.LoadScene<HudScene>(SceneLoadMode::Additive);
-            }});
-
-            // Move to the next level and reset the multiplier
-            e.world().get_mut<CurrentLevel>().level++;
-            e.world().get_mut<Multiplier>().multiplier = 1;
-
-            e.destruct();
-        })
-        .child_of(GetRootEntity());
-
-    // Restart the game, reset the score, lives and multiplier
-    world.system<const RestartGameIntent>("ProcessRestartGameIntent")
-        .kind(flecs::PreUpdate)
-        .each([&](const flecs::entity& e, const RestartGameIntent& i) {
-            // We defer the state change to the end of the frame
-            e.world().entity().set<DeferredEvent>({.callback = [&] {
-                auto& sceneManager = GameService::Get<SceneManager>();
-                sceneManager.LoadScene<GameplayScene>(SceneLoadMode::Single);
-                sceneManager.LoadScene<DebugScene>(SceneLoadMode::Additive);
-                sceneManager.LoadScene<HudScene>(SceneLoadMode::Additive);
-            }});
-
-            e.world().get_mut<CurrentLevel>().level = 1;
-            e.world().get_mut<Score>().score = 0;
-            e.world().get_mut<Score>().blocksDestroyed = 0;
-            e.world().get_mut<Lives>().lives = 3;
-            e.world().get_mut<Multiplier>().multiplier = 1;
-
-            e.destruct();
-        });
-
-    // After losing one life, continue playing
-    world.system<const ContinueGameIntent>("ProcessContinueGameIntent")
-        .kind(flecs::PreUpdate)
-        .each([&](const flecs::entity& e, const ContinueGameIntent& i) {
-            // Create a ball and place it on the paddle
-            float zOrder = 1.f;
-            CreateBall(world, ++zOrder);
-            // Center the paddle again on the screen
-            e.world().query<const Paddle>().each([](const flecs::entity& paddle, const Paddle& p) {
-                paddle.set<Transform>({{Configuration::RESOLUTION.x / 2, Configuration::RESOLUTION.y - 100.f}});
-            });
-        });
-
-    // Resume the game, enable the entities again
-    world.system<const ResumeGameIntent>("ProcessResumeGameIntent")
-        .kind(flecs::PreUpdate)
-        .each([rootEntity = GetRootEntity()](const flecs::entity& e, const ResumeGameIntent& r) {
-            e.world().entity().set<DeferredEvent>({[] {
-                auto& sceneManager = GameService::Get<SceneManager>();
-                sceneManager.UnloadScene<PauseScene>();
-            }});
-
-            rootEntity.remove<ScenePaused>();
-
-            // Query for the Paddle and Ball to enable them
-            e.world()
-                .query_builder<>()
-                .scope_open()
-                .with<Ball>()
-                .oper(flecs::Or)
-                .with<Paddle>()
-                .scope_close()
-                .with(flecs::Disabled)
-                .optional()
-                .with(flecs::ChildOf, rootEntity)
-                .each([](const flecs::entity& entity) { entity.enable(); });
-
-            e.destruct();
-        })
-        .child_of(GetRootEntity());
-
-    // Pause the game, disable the entities
-    world.system<const PauseGameIntent>("ProcessPauseGameIntent")
-        .kind(flecs::PreUpdate)
-        .each([this](const flecs::entity& e, const PauseGameIntent& p) { ProcessPauseGameIntent(e, p); })
-        .child_of(GetRootEntity());
-}
-
-void GameplayScene::CreatePaddle(const flecs::world& world, float& zOrder)
-{
-    constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
-
-    Factories::Rectangle::Create(
-        world,
-        {
-            .size = {100.f, 20.f},
-            .color = NordTheme::Aurora1,
-            .origin = {0.5f, 0.5f},
-            .position = {CENTER_X, Configuration::RESOLUTION.y - 100.f},
-            .zOrder = 0.f,
-        }
-    )
-        .child_of(GetRootEntity())
-        .add<PossessedByPlayer>()
-        .add<Paddle>()
-        .set<Acceleration>({})
-        .set<Friction>({.friction = 10.f})
-        .set<Velocity>({})
-        .set<ColliderShape>({Shape::Rectangle});
 }
 
 std::map<char, GameplayScene::BlockDefinition> GameplayScene::LoadBlockDefinitions(const std::string& filename)
@@ -483,8 +205,6 @@ void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
 
         for (int col = 0; col < line.size(); ++col)
         {
-            LOG_DEBUG("GameplayScene::CreateBlocks -> line: {}, col: {}", row, col);
-
             constexpr float TOP_MARGIN = 200.f;
 
             const char symbol = line[col];
@@ -499,8 +219,12 @@ void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
             float x = leftMargin + col * (BLOCK_SIZE.x + BLOCK_SPACING);
             float y = TOP_MARGIN + row * (BLOCK_SIZE.y + BLOCK_SPACING);
 
-            Factories::CreateBlock(world, {.position = {x, y}, .color = color, .size = BLOCK_SIZE, .zOrder = zOrder, .health = health, .isIndestructible = isIndestructible})
-                .child_of(GetRootEntity());
+            BlockEntity::Create(
+                world,
+                GetRootEntity(),
+                {.position = {x, y}, .color = color, .size = BLOCK_SIZE, .zOrder = zOrder, .health = health, .isIndestructible = isIndestructible
+                }
+            );
         }
 
         ++row;
@@ -509,27 +233,6 @@ void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
     zOrder += 1.f;
 }
 
-void GameplayScene::CreateBall(const flecs::world& world, float& zOrder)
-{
-    constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
-    constexpr float RADIUS = 10.f;
-
-    Factories::Circle::Create(
-        world,
-        {
-            .radius = RADIUS,
-            .color = sf::Color::White,
-            .origin = {0.5f, 0.5f},
-            .position = {CENTER_X, Configuration::RESOLUTION.y - 125.f},
-            .zOrder = ++zOrder,
-        }
-    )
-        .child_of(GetRootEntity())
-        // TODO: maybe just AttachedTo and add a socket information
-        .add<AttachedToPaddle>()
-        .add<Ball>()
-        .set<Velocity>({});
-}
 void GameplayScene::CreateBackground(const flecs::world& world, float& zOrder)
 {
     // --- Create Background ---
@@ -543,246 +246,4 @@ void GameplayScene::CreateBackground(const flecs::world& world, float& zOrder)
         }
     )
         .child_of(GetRootEntity());
-}
-
-void GameplayScene::ProcessScreenBounce(Transform& t, Velocity& v, const ColliderShape& c, const Radius& r, const Ball& b)
-{
-    const float radius = r.radius;
-
-    if (t.position.x - radius < 0.f)
-    {
-        v.velocity.x *= -1.f;
-        t.position.x = radius;
-    }
-    else if (t.position.x + radius > Configuration::RESOLUTION.x)
-    {
-        v.velocity.x *= -1.f;
-        t.position.x = Configuration::RESOLUTION.x - radius;
-    }
-
-    if (t.position.y - radius < 0.f)
-    {
-        v.velocity.y *= -1.f;
-        t.position.y = radius;
-    }
-}
-
-void GameplayScene::ProcessOutOfBounds(const flecs::entity ball, const Transform& t, const Ball& b)
-{
-    if (t.position.y > Configuration::RESOLUTION.y)
-    {
-        LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> Destroy ball");
-        ball.destruct();
-
-        // Lose one life
-        LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> LoseOneLife");
-        ball.world().get_mut<Lives>().lives -= 1;
-        if (ball.world().get_mut<Lives>().lives <= 0)
-        {
-            // Game over
-            LOG_DEBUG("GameplayScene::ProcessOutOfBounds -> Add GameOverIntent");
-            ball.world().entity().add<LifetimeOneFrame>().add<Command>().add<GameOverIntent>();
-        }
-        else
-        {
-            // Continue playing...
-            ball.world().entity().add<LifetimeOneFrame>().add<Command>().add<ContinueGameIntent>();
-        }
-
-        ball.world().get_mut<Multiplier>().multiplier = 1;
-    }
-}
-
-void GameplayScene::ProcessCollisionDetection(
-    const flecs::entity& blockEntity,
-    const Transform& transform,
-    const Size& size,
-    const Origin& origin,
-    const ColliderShape& c
-)
-{
-    ZoneScopedN("GameplayScene::CollisionDetectionSystem");
-
-    // Calculate actual collision bounds using transform, size, and origin
-    const sf::Vector2f actualOrigin = size.size.componentWiseMul(origin.origin);
-    const sf::FloatRect colliderBounds(
-        {
-            transform.position.x - actualOrigin.x,
-            transform.position.y - actualOrigin.y,
-        },
-        {size.size.x, size.size.y}
-    );
-
-    // Check if this is a paddle collision
-    const bool isPaddle = blockEntity.has<Paddle>();
-
-    // We query for all the balls
-    blockEntity.world().query<Transform, Velocity, const Radius, const ColliderShape, const Ball>().each(
-        [blockEntity, colliderBounds, isPaddle](
-            const flecs::entity& ballEntity,
-            Transform& ballTransform,
-            Velocity& ballVelocity,
-            const Radius& ballRadius,
-            const ColliderShape& c,
-            const Ball& b
-        ) {
-            const CollisionInfo
-                collisionInfo = Collision::CheckAABBCircleCollision(colliderBounds, ballTransform.position, ballRadius.radius);
-
-            if (!collisionInfo.hasCollision)
-            {
-                return;
-            }
-
-            // Add the debug information
-            ballEntity.world().entity().set<Lifetime>({.5f}).set<CollisionInfo>(collisionInfo);
-
-            // Move circle out of penetration
-            ballTransform.position = ballTransform.position + collisionInfo.normal * collisionInfo.penetrationDepth;
-
-            if (isPaddle)
-            {
-                // Calculate where on the paddle the ball hit relative to the paddle center
-                const float paddleHalfWidth = colliderBounds.size.x * 0.5f;
-                const float paddleCenter = colliderBounds.position.x + paddleHalfWidth;
-                const float hitOffset = collisionInfo.contactPoint.x - paddleCenter;
-
-                // Normalize to range [-1, 1]
-                const float normalizedHit = std::clamp(hitOffset / paddleHalfWidth, -1.0f, 1.0f);
-
-                // Create deflection based on hit position
-                constexpr float DEFLECTION_STRENGTH = 0.5f;
-
-                // Modify the normal to add horizontal deflection
-                sf::Vector2f modifiedNormal = collisionInfo.normal;
-                modifiedNormal.x += normalizedHit * DEFLECTION_STRENGTH;
-                modifiedNormal = modifiedNormal.normalized();
-
-                // Reflect with modified normal
-                ballVelocity.velocity = CalculateReflection(ballVelocity.velocity, modifiedNormal);
-
-                // Get the game session and reset the multiplier
-                blockEntity.world().get_mut<Multiplier>().multiplier = 1;
-            }
-            else
-            {
-                // Reflect velocity along collision normal
-                ballVelocity.velocity = CalculateReflection(ballVelocity.velocity, collisionInfo.normal);
-
-                if (blockEntity.has<Indestructible>())
-                {
-                    return;
-                }
-
-                // Remove one health from the block
-                auto& [health] = blockEntity.get_mut<Health>();
-                health -= 1;
-
-                if (health <= 0)
-                {
-                    // Destroy the block
-                    blockEntity.destruct();
-
-                    // Update the score
-                    int& multiplier = blockEntity.world().get_mut<Multiplier>().multiplier;
-                    auto& score = blockEntity.world().get_mut<Score>();
-                    score.score += 100 * multiplier;
-                    score.blocksDestroyed += 1;
-                    multiplier += 1;
-
-                    // Trigger a shake (e.g., when something explodes)
-                    blockEntity.world().entity().set<CameraShakeIntent>({
-                        .intensity = 3.0f, // Shake strength
-                        .duration = 0.3f   // Half a second
-                    });
-                }
-            }
-        }
-    );
-}
-
-void GameplayScene::ConstrainPaddleToScreen(Transform& t, const Size& s, const Paddle& p)
-{
-    const float halfSize = s.size.x / 2;
-
-    if (t.position.x - halfSize < 0.f)
-    {
-        t.position.x = halfSize;
-    }
-    else if (t.position.x + halfSize > Configuration::RESOLUTION.x)
-    {
-        t.position.x = Configuration::RESOLUTION.x - halfSize;
-    }
-}
-
-void GameplayScene::ProcessPauseGameIntent(const flecs::entity& e, const PauseGameIntent& p)
-{
-    LOG_DEBUG("GameplayScene::PauseGameSystem");
-
-    e.world().entity().set<DeferredEvent>({[] {
-        LOG_DEBUG("GameplayScene::PauseGameSystem -> Load Pause Scene");
-        auto& sceneManager = GameService::Get<SceneManager>();
-        sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
-    }});
-
-    PauseGame(e.world());
-
-    // Destroy the command entity
-    LOG_DEBUG("GameplayScene::PauseGameSystem -> Destroy PauseGameIntent");
-    e.destruct();
-}
-
-void GameplayScene::PauseGame(const flecs::world& w)
-{
-    GetRootEntity().add<ScenePaused>();
-
-    // Query for the Paddle and Ball to disable them
-    w.query_builder<>()
-        .scope_open()
-        .with<Ball>()
-        .oper(flecs::Or)
-        .with<Paddle>()
-        .scope_close()
-        .with(flecs::ChildOf, GetRootEntity())
-        .each([](const flecs::entity& entity) { entity.disable(); });
-}
-
-void GameplayScene::ApplyPaddlePositionToBall(const flecs::entity& e, Transform& t, const AttachedToPaddle& ap, const Ball& b)
-{
-    // Get the paddle
-    e.world().query<const Transform, const Paddle>().each(
-        [&ballTransform = t](const Transform& paddleTransform, const Paddle& p) {
-            ballTransform.position.x = paddleTransform.position.x;
-        }
-    );
-}
-
-sf::Vector2f GameplayScene::CalculateReflection(const sf::Vector2f& velocity, const sf::Vector2f& normal)
-{
-    // Reflect velocity along collision normal
-    sf::Vector2f reflected = velocity - 2.f * Vector::Dot(velocity, normal) * normal;
-
-    // Preserve the current speed
-    const float currentSpeed = velocity.length();
-
-    // Define the minimum vertical velocity required
-    constexpr float MIN_VERTICAL_VELOCITY = 150.f;
-
-    if (std::abs(reflected.y) < MIN_VERTICAL_VELOCITY)
-    {
-        reflected.y = std::copysign(MIN_VERTICAL_VELOCITY, reflected.y);
-    }
-
-    // Scale the velocity to maintain the same speed
-    if (reflected.length() > 0.f)
-    {
-        reflected *= currentSpeed / reflected.length();
-    }
-    else
-    {
-        // Fallback in case of zero velocity
-        reflected = sf::Vector2f{0.f, MIN_VERTICAL_VELOCITY};
-    }
-
-    return reflected;
 }

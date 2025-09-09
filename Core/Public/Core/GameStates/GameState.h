@@ -18,7 +18,7 @@ public:
     virtual void Enter();
     virtual void Exit();
 
-    flecs::entity GetRootEntity() const;
+    [[nodiscard]] flecs::entity GetRootEntity() const;
 
     void Pause();
     void Resume();
@@ -26,12 +26,10 @@ public:
 
     virtual void HandleEvent(const std::optional<sf::Event>& event);
 
-    flecs::world& GetWorld();
+    [[nodiscard]] flecs::world& GetWorld() ;
     [[nodiscard]] const flecs::world& GetWorld() const;
 
 private:
     flecs::world& _world;
     flecs::entity _rootEntity;
 };
-
-

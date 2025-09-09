@@ -58,7 +58,7 @@ UIModule::UIModule(const flecs::world& world)
     // Handle mouse-released events and hit test on all the UI components
     world.system<const MouseReleased>("UIHitTest")
         .kind(flecs::PreUpdate)
-        .each([&](const flecs::iter& it, size_t index, const MouseReleased& mouseReleased) {
+        .each([](const flecs::iter& it, size_t index, const MouseReleased& mouseReleased) {
             // We have a mouseReleased event. Now, find any clickable entities that were hit.
             if (mouseReleased.button != sf::Mouse::Button::Left)
             {
@@ -67,7 +67,7 @@ UIModule::UIModule(const flecs::world& world)
 
             // Query the world for all entities that are Clickable and have the necessary components
             it.world().query<const Clickable, const Event, const Transform, const Size>().each(
-                [&](const Clickable& clickable, const Event& eventTrigger, const Transform& t, const Size& s) {
+                [&mouseReleased](const flecs::entity& e, const Clickable& clickable, const Event& eventTrigger, const Transform& t, const Size& s) {
                     sf::FloatRect bounds;
                     bounds.size = s.size;
                     bounds.position = t.position;
@@ -79,7 +79,7 @@ UIModule::UIModule(const flecs::world& world)
                     if (bounds.contains(sf::Vector2f(worldPosition)))
                     {
                         // The mouse press hit this clickable entity
-                        eventTrigger.callback(it.world());
+                        eventTrigger.callback(e.world());
                     }
                 }
             );

@@ -14,6 +14,6 @@ public:
     void HandleEvent(const std::optional<sf::Event>& event) override;
 
 private:
-    void CreateLocalSystems(flecs::world& world);
+    void CreateLocalSystems(const flecs::world& world);
     void CreateUIEntities(const flecs::world& world);
 };

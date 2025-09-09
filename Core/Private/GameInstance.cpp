@@ -25,12 +25,12 @@ void GameInstance::Initialize()
     GetWorld().set<WindowSize>({.currentSize = window.getSize(), .refSize = Configuration::RESOLUTION});
 }
 
-void GameInstance::Run(sf::RenderWindow& renderWindow) const
+void GameInstance::Run(sf::RenderWindow& renderWindow)
 {
     ZoneScopedN("GameInstance::Run");
 
     // --- Get the only Flecs World ---
-    const auto& world = GetWorld();
+    flecs::world& world = GetWorld();
 
     // --- Game loop ---
     LOG_DEBUG("GameInstance::Run: Starting game loop");
@@ -123,19 +123,19 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow) const
     }
 }
 
-void GameInstance::RunDeferredEvents(const flecs::world& world)
+void GameInstance::RunDeferredEvents(flecs::world& world)
 {
     ZoneScopedN("GameInstance::RunDeferredEvents");
 
     // We will collect all the callbacks and entities to destroy here.
     // This is done because Flecs can't destroy an entity while it's iterating.
     std::vector<flecs::entity> toDelete;
-    std::vector<std::function<void()>> callbacks;
+    std::vector<std::function<void(flecs::world&)>> callbacks;
     callbacks.reserve(32);
     toDelete.reserve(32);
 
     // --- Loop the entities ---
-    world.each<DeferredEvent>([&](flecs::entity e, const DeferredEvent& ev) {
+    world.each<DeferredEvent>([&](flecs::entity e, DeferredEvent& ev) {
         callbacks.emplace_back(ev.callback);
         toDelete.emplace_back(e);
     });
@@ -143,7 +143,7 @@ void GameInstance::RunDeferredEvents(const flecs::world& world)
     // --- Run the callbacks ---
     for (auto& cb : callbacks)
     {
-        cb();
+        cb(world);
     }
 
     // --- Destroy the entities ---

@@ -45,11 +45,9 @@ public:
     void SetPath(const std::string& path);
 
     // --- World & Entity Management ---
-    flecs::world& GetWorld();
+    [[nodiscard]] flecs::world& GetWorld();
     [[nodiscard]] const flecs::world& GetWorld() const;
-
-    flecs::entity& GetRootEntity();
-    [[nodiscard]] const flecs::entity& GetRootEntity() const;
+    [[nodiscard]] flecs::entity GetRootEntity() const;
 
 private:
     std::string _name;
@@ -61,5 +59,3 @@ private:
 
     bool _isLoaded = false;
 };
-
-

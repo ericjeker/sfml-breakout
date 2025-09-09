@@ -72,12 +72,7 @@ const flecs::world& Scene::GetWorld() const
     return _world;
 }
 
-flecs::entity& Scene::GetRootEntity()
-{
-    return _rootEntity;
-}
-
-const flecs::entity& Scene::GetRootEntity() const
+flecs::entity Scene::GetRootEntity() const
 {
     return _rootEntity;
 }

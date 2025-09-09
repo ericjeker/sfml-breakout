@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "Singletons/WindowSize.h"
-
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include <flecs.h>
@@ -22,14 +20,14 @@ public:
      * This is the big RUN function that stats everything
      * @param renderWindow
      */
-    void Run(sf::RenderWindow& renderWindow) const;
+    void Run(sf::RenderWindow& renderWindow);
     void HandleEvents(sf::RenderWindow& renderWindow) const;
-    static void RunDeferredEvents(const flecs::world& world);
+    static void RunDeferredEvents(flecs::world& world);
 
     void RequestExit();
     [[nodiscard]] bool ShouldExit() const;
 
-    flecs::world& GetWorld();
+    [[nodiscard]] flecs::world& GetWorld();
     [[nodiscard]] const flecs::world& GetWorld() const;
 
 private:

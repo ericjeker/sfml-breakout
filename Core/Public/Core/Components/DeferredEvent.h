@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include <flecs.h>
 #include <functional>
 
 
 struct DeferredEvent
 {
-    std::function<void()> callback;
+    std::function<void(flecs::world&)> callback;
 };

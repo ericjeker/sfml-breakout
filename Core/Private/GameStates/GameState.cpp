@@ -7,6 +7,7 @@ GameState::GameState(flecs::world& world)
     : _world(world)
 {
 }
+
 void GameState::Enter()
 {
     _rootEntity = GetWorld().entity();

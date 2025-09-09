@@ -28,7 +28,7 @@ struct ButtonParams
     sf::Vector2f padding = {20.0f, 10.0f};
     float zOrder = 0;
     // TODO: Add outline parameter
-    std::function<void(const flecs::world& world)> onClick = nullptr;
+    std::function<void(const flecs::world&)> onClick = nullptr;
 };
 
 struct Button

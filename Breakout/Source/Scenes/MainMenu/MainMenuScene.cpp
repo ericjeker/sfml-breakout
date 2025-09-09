@@ -78,7 +78,7 @@ void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
     }
 }
 
-void MainMenuScene::CreateLocalSystems(flecs::world& world)
+void MainMenuScene::CreateLocalSystems(const flecs::world& world)
 {
     // As usual, we process the pressed keys to add the matching intents.
     world.system<const KeyPressed>("ProcessKeyPressed")
@@ -96,13 +96,15 @@ void MainMenuScene::CreateLocalSystems(flecs::world& world)
     // The created intents are processed here
     world.system<const ExitGameIntent>("ExitGameSystem")
         .each([](const flecs::iter& it, size_t, const ExitGameIntent i) {
-            it.world().entity().set<DeferredEvent>({.callback = [&] { GameService::Get<GameInstance>().RequestExit(); }});
+            it.world().entity().set<DeferredEvent>({.callback = [](const flecs::world& world) {
+                GameService::Get<GameInstance>().RequestExit();
+            }});
         })
         .child_of(GetRootEntity());
 
     world.system<const StartGameIntent>("StartGameSystem")
         .each([&](const flecs::iter& it, size_t, const StartGameIntent i) {
-            it.world().entity().set<DeferredEvent>({.callback = [&] {
+            it.world().entity().set<DeferredEvent>({.callback = [](flecs::world& world) {
                 GameService::Get<GameStateManager>().ChangeState(std::make_unique<GameplayState>(world));
             }});
         })
