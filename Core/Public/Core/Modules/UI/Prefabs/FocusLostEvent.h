@@ -4,9 +4,7 @@
 
 namespace Prefabs
 {
-
-struct ExitGameIntent
+struct FocusLostEvent
 {
 };
-
-}
+} // namespace Prefabs

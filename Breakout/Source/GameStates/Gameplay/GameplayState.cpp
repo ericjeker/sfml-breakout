@@ -10,6 +10,7 @@
 #include "Scenes/Debug/DebugScene.h"
 #include "Scenes/GameOver/GameOverScene.h"
 #include "Scenes/GameWon/GameWonScene.h"
+#include "Scenes/Gameplay/Components/PauseGameIntent.h"
 #include "Scenes/Gameplay/GameplayScene.h"
 #include "Scenes/Hud/HudScene.h"
 #include "Scenes/Pause/PauseScene.h"
@@ -17,6 +18,9 @@
 #include "Core/GameStates/GameState.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
+#include "Core/Modules/Input/Components/Command.h"
+#include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
+#include "Core/Modules/UI/Prefabs/FocusLostEvent.h"
 
 GameplayState::GameplayState(flecs::world& world)
     : GameState(world)
@@ -77,17 +81,8 @@ void GameplayState::Exit()
 
 void GameplayState::HandleEvent(const std::optional<sf::Event>& event)
 {
-    auto& sceneManager = GameService::Get<SceneManager>();
-
     if (event->is<sf::Event::FocusLost>())
     {
-        //sceneManager.GetScene<GameplayScene>().Pause();
-        if (!sceneManager.GetScene<PauseScene>().IsLoaded() && !sceneManager.GetScene<GameOverScene>().IsLoaded())
-        {
-            sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
-        }
-    }
-    else if (event->is<sf::Event::FocusGained>())
-    {
+        GetWorld().entity().is_a<Prefabs::FocusLostEvent>();
     }
 }

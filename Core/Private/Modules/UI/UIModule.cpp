@@ -11,6 +11,8 @@
 #include "Core/Modules/UI/Components/ButtonBackground.h"
 #include "Core/Modules/UI/Components/ButtonText.h"
 #include "Core/Modules/UI/Components/Clickable.h"
+#include "Core/Modules/UI/Components/FocusGained.h"
+#include "Core/Modules/UI/Components/FocusLost.h"
 #include "Core/Modules/UI/Components/Hoverable.h"
 #include "Core/Modules/UI/Components/Interactable.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
@@ -19,6 +21,8 @@
 #include "Core/Modules/UI/Components/MousePressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
+#include "Core/Modules/UI/Prefabs/FocusGainedEvent.h"
+#include "Core/Modules/UI/Prefabs/FocusLostEvent.h"
 #include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
 #include "Core/Modules/UI/Prefabs/KeyReleasedEvent.h"
 #include "Core/Modules/UI/Prefabs/MousePressedEvent.h"
@@ -34,6 +38,8 @@ UIModule::UIModule(const flecs::world& world)
     world.prefab<Prefabs::MouseReleasedEvent>().add<LifetimeOneFrame>().add<MouseReleased>();
     world.prefab<Prefabs::KeyPressedEvent>().add<LifetimeOneFrame>().add<KeyPressed>();
     world.prefab<Prefabs::KeyReleasedEvent>().add<LifetimeOneFrame>().add<KeyReleased>();
+    world.prefab<Prefabs::FocusLostEvent>().add<LifetimeOneFrame>().add<FocusLost>();
+    world.prefab<Prefabs::FocusGainedEvent>().add<LifetimeOneFrame>().add<FocusGained>();
 
     // --- Declare Components ---
     world.component<ButtonBackground>();
@@ -49,7 +55,7 @@ UIModule::UIModule(const flecs::world& world)
     // --- Declare Systems ---
 
     // Update the mouse position every frame
-    world.system("UIInputSystem").kind(flecs::PostLoad).run([](const flecs::iter& it) {
+    world.system("UIInputSystem").write<MousePosition>().kind(flecs::PostLoad).run([](const flecs::iter& it) {
         const auto& renderWindow = GameService::Get<sf::RenderWindow>();
         const auto pos = sf::Mouse::getPosition(renderWindow);
         it.world().set<MousePosition>({.position = pos});

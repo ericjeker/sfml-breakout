@@ -12,14 +12,21 @@
 #include "Core/Components/DeferredEvent.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
+#include "Core/Singletons/FrameCount.h"
 
 namespace
 {
 
 void Update(const flecs::entity& e, const NextLevelIntent& i)
 {
+    const int frameCount = e.world().get<FrameCount>().frameCount;
+    LOG_DEBUG("ProcessNextLevelIntent::Update -> FrameCount: {}", std::to_string(frameCount));
+
     // We defer the state change to the end of the frame
     e.world().entity().set<DeferredEvent>({.callback = [&](const flecs::world& world) {
+        const int frameCount = world.get<FrameCount>().frameCount;
+        LOG_DEBUG("ProcessNextLevelIntent -> Processing DeferredEvent -> Load Next Level in frame {}", frameCount);
+
         auto& sceneManager = GameService::Get<SceneManager>();
         sceneManager.LoadScene<GameplayScene>(SceneLoadMode::Single);
         sceneManager.LoadScene<DebugScene>(SceneLoadMode::Additive);
@@ -37,5 +44,5 @@ void Update(const flecs::entity& e, const NextLevelIntent& i)
 
 void ProcessNextLevelIntent::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
-    world.system<const NextLevelIntent>("ProcessNextLevelIntent").kind(flecs::PreUpdate).each(Update).child_of(rootEntity);
+    world.system<const NextLevelIntent>("ProcessNextLevelIntent").kind(flecs::PreStore).each(Update).child_of(rootEntity);
 }

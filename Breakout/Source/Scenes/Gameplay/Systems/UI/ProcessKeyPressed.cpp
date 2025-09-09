@@ -17,6 +17,8 @@ namespace
 
 void Update(const flecs::entity& e, const KeyPressed& k)
 {
+    LOG_DEBUG("GameplayScene::ProcessKeyPressed");
+
     if (k.scancode == sf::Keyboard::Scancode::Escape)
     {
         LOG_DEBUG("GameplayScene::ProcessKeyPressed: Escape -> Add PauseGameIntent");
@@ -36,6 +38,8 @@ void ProcessKeyPressed::Initialize(const flecs::world& world, const flecs::entit
 {
     world.system<const KeyPressed>("ProcessKeyPressed")
         .kind(flecs::PostLoad)
+        .write<PauseGameIntent>()
+        .write<LaunchBallIntent>()
         // Make sure we process only the KeyPressed events from this scene
         .with(flecs::ChildOf, rootEntity)
         .each(Update)

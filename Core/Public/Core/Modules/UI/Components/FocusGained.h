@@ -2,11 +2,6 @@
 
 #pragma once
 
-namespace Prefabs
-{
-
-struct StartGameIntent
+struct FocusGained
 {
 };
-
-}

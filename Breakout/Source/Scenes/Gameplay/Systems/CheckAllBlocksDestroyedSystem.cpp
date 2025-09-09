@@ -11,6 +11,7 @@
 
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
+#include "Core/Singletons/FrameCount.h"
 #include "Core/Utils/Logger.h"
 
 namespace
@@ -18,21 +19,25 @@ namespace
 
 void Update(const flecs::iter& it)
 {
-    if (it.world().query_builder<const Block>().without<Indestructible>().build().count() > 0)
+    const auto& world = it.world();
+    if (world.query_builder<const Block>().without<Indestructible>().build().count() > 0)
     {
         return;
     }
 
-    const int currentLevel = it.world().get<CurrentLevel>().level;
-    if (const int& maxLevel = it.world().get<MaxLevel>().level; currentLevel < maxLevel)
+    const int frameCount = world.get<FrameCount>().frameCount;
+    LOG_DEBUG("GameplayScene::CheckIfAllBlocksDestroyed -> All blocks destroyed in frame {}", frameCount);
+
+    const int currentLevel = world.get<CurrentLevel>().level;
+    if (const int& maxLevel = world.get<MaxLevel>().level; currentLevel < maxLevel)
     {
         LOG_DEBUG("GameplayScene::CheckIfAllBlocksDestroyed -> Add NextLevelIntent");
-        it.world().entity().add<LifetimeOneFrame>().add<Command>().add<NextLevelIntent>();
+        world.entity().add<LifetimeOneFrame>().add<Command>().add<NextLevelIntent>();
     }
     else
     {
         LOG_DEBUG("GameplayScene::CheckIfAllBlocksDestroyed -> Add GameWonIntent");
-        it.world().entity().add<LifetimeOneFrame>().add<Command>().add<GameWonIntent>();
+        world.entity().add<LifetimeOneFrame>().add<Command>().add<GameWonIntent>();
     }
 }
 
@@ -40,5 +45,6 @@ void Update(const flecs::iter& it)
 
 void CheckAllBlocksDestroyedSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
-    world.system("CheckAllBlocksDestroyedSystem").run(Update).child_of(rootEntity);
+    // Unmatched task
+    world.system("CheckAllBlocksDestroyedSystem").kind(flecs::PostUpdate).write<NextLevelIntent>().run(Update).child_of(rootEntity);
 }

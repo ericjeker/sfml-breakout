@@ -25,6 +25,7 @@
 #include "Systems/OutOfBoundsSystem.h"
 #include "Systems/PaddleMovementSystem.h"
 #include "Systems/ScreenBounceSystem.h"
+#include "Systems/UI/ProcessFocusLost.h"
 #include "Systems/UI/ProcessKeyPressed.h"
 
 #include "Core/Components/DeferredEvent.h"
@@ -91,6 +92,7 @@ void GameplayScene::Initialize()
     CheckAllBlocksDestroyedSystem::Initialize(world, GetRootEntity());
 
     // --- UI & Intents ---
+    ProcessFocusLost::Initialize(world, GetRootEntity());
     ProcessKeyPressed::Initialize(world, GetRootEntity());
     ProcessNavigateToMainMenuIntent::Initialize(world, GetRootEntity());
     ProcessGameOverIntent::Initialize(world, GetRootEntity());

@@ -5,8 +5,9 @@
 #include "GameStates/Gameplay/GameplayState.h"
 #include "Scenes/MainMenu/Components/ExitGameIntent.h"
 #include "Scenes/MainMenu/Components/StartGameIntent.h"
-#include "Scenes/MainMenu/Prefabs/ExitGameIntent.h"
-#include "Scenes/MainMenu/Prefabs/StartGameIntent.h"
+#include "Systems/ProcessExitGameIntent.h"
+#include "Systems/ProcessKeyPressed.h"
+#include "Systems/ProcessStartGameIntent.h"
 
 #include "Core/Components/DeferredEvent.h"
 #include "Core/Components/WindowResizeIntent.h"
@@ -40,15 +41,14 @@ void MainMenuScene::Initialize()
     LOG_DEBUG("MainMenuScene:Initialize");
     Scene::Initialize();
 
-    auto& world = GetWorld();
+    const auto& world = GetWorld();
 
-    // --- Declare local prefabs ---
-    world.prefab<Prefabs::ExitGameIntent>().add<LifetimeOneFrame>().add<Command>().add<ExitGameIntent>();
-    world.prefab<Prefabs::StartGameIntent>().add<LifetimeOneFrame>().add<Command>().add<StartGameIntent>();
+    CreateUIEntities(world);
 
     // --- Declare local systems ---
-    CreateUIEntities(world);
-    CreateLocalSystems(world);
+    ProcessKeyPressed::Initialize(world, GetRootEntity());
+    ProcessExitGameIntent::Initialize(world, GetRootEntity());
+    ProcessStartGameIntent::Initialize(world, GetRootEntity());
 }
 
 void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
@@ -78,43 +78,10 @@ void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
     }
 }
 
-void MainMenuScene::CreateLocalSystems(const flecs::world& world)
-{
-    // As usual, we process the pressed keys to add the matching intents.
-    world.system<const KeyPressed>("ProcessKeyPressed")
-        .kind(flecs::PostLoad)
-        .each([](const flecs::entity& e, const KeyPressed& k) {
-            if (k.scancode == sf::Keyboard::Scancode::Escape)
-            {
-                e.world().entity().is_a<Prefabs::ExitGameIntent>();
-            }
-
-            e.destruct();
-        })
-        .child_of(GetRootEntity());
-
-    // The created intents are processed here
-    world.system<const ExitGameIntent>("ExitGameSystem")
-        .each([](const flecs::iter& it, size_t, const ExitGameIntent i) {
-            it.world().entity().set<DeferredEvent>({.callback = [](const flecs::world& world) {
-                GameService::Get<GameInstance>().RequestExit();
-            }});
-        })
-        .child_of(GetRootEntity());
-
-    world.system<const StartGameIntent>("StartGameSystem")
-        .each([&](const flecs::iter& it, size_t, const StartGameIntent i) {
-            it.world().entity().set<DeferredEvent>({.callback = [](flecs::world& world) {
-                GameService::Get<GameStateManager>().ChangeState(std::make_unique<GameplayState>(world));
-            }});
-        })
-        .child_of(GetRootEntity());
-}
-
 void MainMenuScene::CreateUIEntities(const flecs::world& world)
 {
-    const float centerX = Configuration::RESOLUTION.x / 2.f;
-    const float centerY = Configuration::RESOLUTION.y / 2.f;
+    constexpr float centerX = Configuration::RESOLUTION.x / 2.f;
+    constexpr float centerY = Configuration::RESOLUTION.y / 2.f;
 
     float zOrder = 0;
 
@@ -167,7 +134,8 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
             .backgroundColor = sf::Color::Transparent,
             .position = {centerX, centerY},
             .zOrder = zOrder++,
-            .onClick = [](const flecs::world& stage) { stage.entity().is_a<Prefabs::StartGameIntent>(); },
+            .onClick = [](const flecs::world& stage
+                       ) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<StartGameIntent>(); },
         }
     )
         .child_of(GetRootEntity());
@@ -183,7 +151,8 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
             .backgroundColor = sf::Color::Transparent,
             .position = {centerX, centerY + 100},
             .zOrder = zOrder++,
-            .onClick = [](const flecs::world& stage) { stage.entity().is_a<Prefabs::ExitGameIntent>(); },
+            .onClick = [](const flecs::world& stage
+                       ) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<ExitGameIntent>(); },
         }
     )
         .child_of(GetRootEntity());

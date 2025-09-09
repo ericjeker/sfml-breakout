@@ -18,6 +18,8 @@ namespace
 std::function<void(flecs::entity, ResumeGameIntent)> Update(const flecs::entity& rootEntity)
 {
     return [rootEntity](const flecs::entity& e, const ResumeGameIntent& r) {
+        LOG_DEBUG("GameplayScene::ResumeGameSystem");
+
         e.world().entity().set<DeferredEvent>({[](const flecs::world& world) {
             auto& sceneManager = GameService::Get<SceneManager>();
             sceneManager.UnloadScene<PauseScene>();
