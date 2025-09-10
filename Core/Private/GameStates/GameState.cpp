@@ -43,10 +43,6 @@ bool GameState::IsPaused() const
 {
 }
 
-void GameState::HandleEvent(const std::optional<sf::Event>& event)
-{
-}
-
 flecs::world& GameState::GetWorld()
 {
     return _world;

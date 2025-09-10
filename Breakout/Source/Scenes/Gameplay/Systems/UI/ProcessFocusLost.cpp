@@ -18,7 +18,10 @@ void Update(const flecs::entity e, const FocusLost f)
 
 } // namespace
 
+namespace GamePlay
+{
 void ProcessFocusLost::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<const FocusLost>().write<PauseGameIntent>().each(Update).child_of(rootEntity);
 }
+} // namespace GamePlay

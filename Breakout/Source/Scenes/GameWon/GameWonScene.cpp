@@ -96,44 +96,6 @@ void GameWonScene::Initialize()
     ).child_of(GetRootEntity());
 }
 
-
-void GameWonScene::HandleEvent(const std::optional<sf::Event>& event)
-{
-    if (!IsLoaded())
-    {
-        return;
-    }
-
-    if (const auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>())
-    {
-        if (mouseReleased->button != sf::Mouse::Button::Left)
-        {
-            return;
-        }
-
-        // MouseReleasedEvent is treated by the UIInputSystem that will do a hit test on clickable elements
-        GetWorld().entity().is_a<Prefabs::MouseReleasedEvent>().set<MouseReleased>(
-            {.position = mouseReleased->position, .button = mouseReleased->button}
-        );
-    }
-
-    if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
-    {
-        // We still filter the scan code as to not populate the ECS with useless entities
-        if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
-        {
-            // Add a KeyPressed event in the world that will be handled later during the update
-            GetWorld().entity().is_a<Prefabs::KeyPressedEvent>().set<KeyPressed>({
-                .code = keyPressed->code,
-                .scancode = keyPressed->scancode,
-                .alt = keyPressed->alt,
-                .control = keyPressed->control,
-                .shift = keyPressed->shift,
-            });
-        }
-    }
-}
-
 void GameWonScene::CreateUISystems(const flecs::world& world)
 {
     // Query for KeyPressed
@@ -143,9 +105,8 @@ void GameWonScene::CreateUISystems(const flecs::world& world)
             if (k.scancode == sf::Keyboard::Scancode::Escape)
             {
                 e.world().entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMainMenuIntent>();
+                e.destruct();
             }
-
-            e.destruct();
         })
         .child_of(GetRootEntity());
 }

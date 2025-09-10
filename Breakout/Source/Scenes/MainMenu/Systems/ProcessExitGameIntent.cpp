@@ -20,7 +20,10 @@ void Update(const flecs::iter& it, size_t, const ExitGameIntent i)
 
 } // namespace
 
+namespace MainMenu
+{
 void ProcessExitGameIntent::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<const ExitGameIntent>("ProcessExitGameIntent").each(Update).child_of(rootEntity);
 }
+} // namespace MainMenu

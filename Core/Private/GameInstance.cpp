@@ -9,6 +9,11 @@
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/SceneManager.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
+#include "Core/Modules/UI/Components/KeyPressed.h"
+#include "Core/Modules/UI/Components/MouseReleased.h"
+#include "Core/Modules/UI/Prefabs/FocusLostEvent.h"
+#include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
+#include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 #include "Core/Singletons/FrameCount.h"
 #include "Core/Singletons/WindowSize.h"
 #include "Core/Utils/Logger.h"
@@ -67,6 +72,7 @@ void GameInstance::Run(sf::RenderWindow& renderWindow)
 void GameInstance::HandleEvents(sf::RenderWindow& renderWindow) const
 {
     ZoneScopedN("GameInstance::HandleEvents");
+    const auto& world = GetWorld();
 
     while (const auto event = renderWindow.pollEvent())
     {
@@ -76,7 +82,6 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow) const
         }
         else if (const auto* resized = event->getIf<sf::Event::Resized>())
         {
-            const auto& world = GetWorld();
 
             assert(world.has<WindowSize>() && "WindowSize singleton does not exist.");
             auto& [size, refSize] = world.get_mut<WindowSize>();
@@ -100,26 +105,28 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow) const
                 .transformRatio = transformRatio,
             });
 
-            LOG_DEBUG(
-                std::format(
-                    "GameInstance::HandleEvents: Window resized from {}x{} to {}x{}, scale: {:.3f}, transform: "
-                    "{:.3f}x{:.3f}",
-                    size.x,
-                    size.y,
-                    resized->size.x,
-                    resized->size.y,
-                    scaleRatio,
-                    transformRatio.x,
-                    transformRatio.y
-                )
-            );
-
             size = resized->size;
         }
-
-        // We delegate the event to the game state manager and scene manager
-        GameService::Get<GameStateManager>().HandleEvent(event);
-        GameService::Get<SceneManager>().HandleEvent(event);
+        else if (event->is<sf::Event::FocusLost>())
+        {
+            world.entity().is_a<Prefabs::FocusLostEvent>();
+        }
+        else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+        {
+            world.entity().is_a<Prefabs::KeyPressedEvent>().set<KeyPressed>({
+                .code = keyPressed->code,
+                .scancode = keyPressed->scancode,
+                .alt = keyPressed->alt,
+                .control = keyPressed->control,
+                .shift = keyPressed->shift,
+            });
+        }
+        else if (const auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>())
+        {
+            world.entity().is_a<Prefabs::MouseReleasedEvent>().set<MouseReleased>(
+                {.position = mouseReleased->position, .button = mouseReleased->button}
+            );
+        }
     }
 }
 

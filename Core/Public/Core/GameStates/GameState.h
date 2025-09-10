@@ -3,10 +3,8 @@
 #pragma once
 
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Window/Event.hpp>
 
 #include <flecs.h>
-#include <optional>
 
 
 class GameState
@@ -23,8 +21,6 @@ public:
     void Pause();
     void Resume();
     [[nodiscard]] bool IsPaused() const;
-
-    virtual void HandleEvent(const std::optional<sf::Event>& event);
 
     [[nodiscard]] flecs::world& GetWorld() ;
     [[nodiscard]] const flecs::world& GetWorld() const;

@@ -11,7 +11,6 @@ public:
     explicit MainMenuScene(flecs::world& world);
 
     void Initialize() override;
-    void HandleEvent(const std::optional<sf::Event>& event) override;
 
 private:
     void CreateUIEntities(const flecs::world& world);

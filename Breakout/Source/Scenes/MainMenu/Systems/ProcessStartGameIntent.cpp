@@ -21,7 +21,11 @@ void Update(const flecs::iter& it, size_t, const StartGameIntent i)
 
 } // namespace
 
+namespace MainMenu
+{
 void ProcessStartGameIntent::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
+    LOG_DEBUG("ProcessStartGameIntent::Initialize");
     world.system<const StartGameIntent>("ProcessStartGameIntent").each(Update).child_of(rootEntity);
 }
+} // namespace MainMenu

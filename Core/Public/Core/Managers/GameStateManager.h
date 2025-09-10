@@ -31,9 +31,6 @@ public:
     void PopState();
     void ChangeState(std::unique_ptr<GameState> state);
 
-    // Delegate event handling to the current top state
-    void HandleEvent(const std::optional<sf::Event>& event);
-
 private:
     std::unique_ptr<GameState> _currentState;
     std::stack<std::unique_ptr<GameState>> _stateStack;

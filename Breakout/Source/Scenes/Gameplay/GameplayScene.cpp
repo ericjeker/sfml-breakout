@@ -28,18 +28,15 @@
 #include "Systems/UI/ProcessFocusLost.h"
 #include "Systems/UI/ProcessKeyPressed.h"
 
-#include "Core/Components/DeferredEvent.h"
 #include "Core/Configuration.h"
 #include "Core/Managers/FileManager.h"
 #include "Core/Managers/GameService.h"
-#include "Core/Managers/GameStateManager.h"
-#include "Core/Managers/SceneManager.h"
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Input/Singletons/InputBindings.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
-#include "Core/Tags/ScenePaused.h"
+#include "Core/Scenes/Tags/ScenePaused.h"
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"
 
@@ -92,8 +89,8 @@ void GameplayScene::Initialize()
     CheckAllBlocksDestroyedSystem::Initialize(world, GetRootEntity());
 
     // --- UI & Intents ---
-    ProcessFocusLost::Initialize(world, GetRootEntity());
-    ProcessKeyPressed::Initialize(world, GetRootEntity());
+    GamePlay::ProcessFocusLost::Initialize(world, GetRootEntity());
+    GamePlay::ProcessKeyPressed::Initialize(world, GetRootEntity());
     ProcessNavigateToMainMenuIntent::Initialize(world, GetRootEntity());
     ProcessGameOverIntent::Initialize(world, GetRootEntity());
     ProcessGameWonIntent::Initialize(world, GetRootEntity());
@@ -101,35 +98,6 @@ void GameplayScene::Initialize()
     ProcessContinueGameIntent::Initialize(world, GetRootEntity());
     ProcessResumeGameIntent::Initialize(world, GetRootEntity());
     ProcessPauseGameIntent::Initialize(world, GetRootEntity());
-}
-
-void GameplayScene::HandleEvent(const std::optional<sf::Event>& event)
-{
-    // Only process when active
-    if (GetRootEntity().has<ScenePaused>())
-    {
-        return;
-    }
-
-    if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
-    {
-        // We still filter the scan code as to not populate the ECS with useless entities
-        if (keyPressed->scancode == sf::Keyboard::Scancode::Escape || keyPressed->scancode == sf::Keyboard::Scancode::Space)
-        {
-            // Add a KeyPressed event to this scene, that will later be handled during the update
-            GetWorld()
-                .entity()
-                .is_a<Prefabs::KeyPressedEvent>()
-                .set<KeyPressed>({
-                    .code = keyPressed->code,
-                    .scancode = keyPressed->scancode,
-                    .alt = keyPressed->alt,
-                    .control = keyPressed->control,
-                    .shift = keyPressed->shift,
-                })
-                .child_of(GetRootEntity());
-        }
-    }
 }
 
 void GameplayScene::CreateInputBindings(const flecs::world& world)
@@ -237,7 +205,6 @@ void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
 
 void GameplayScene::CreateBackground(const flecs::world& world, float& zOrder)
 {
-    // --- Create Background ---
     Factories::Rectangle::Create(
         world,
         {

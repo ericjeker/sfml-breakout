@@ -8,6 +8,7 @@
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
+#include "Core/Scenes/Tags/ScenePaused.h"
 #include "Core/Utils/Logger.h"
 
 #include <SFML/Window/Keyboard.hpp>
@@ -15,33 +16,49 @@
 namespace
 {
 
-void Update(const flecs::entity& e, const KeyPressed& k)
+std::function<void(flecs::entity, KeyPressed)> Update(flecs::entity rootEntity)
 {
-    LOG_DEBUG("GameplayScene::ProcessKeyPressed");
+    return [rootEntity](const flecs::entity& e, const KeyPressed& k) {
+        if (rootEntity.has<ScenePaused>())
+        {
+            return;
+        }
 
-    if (k.scancode == sf::Keyboard::Scancode::Escape)
-    {
-        LOG_DEBUG("GameplayScene::ProcessKeyPressed: Escape -> Add PauseGameIntent");
-        e.world().entity().add<LifetimeOneFrame>().add<Command>().add<PauseGameIntent>();
-    }
-    else if (k.scancode == sf::Keyboard::Scancode::Space)
-    {
-        e.world().entity().add<LifetimeOneFrame>().add<Command>().add<LaunchBallIntent>();
-    }
+        bool eventHandled = true;
 
-    e.destruct();
+        if (k.scancode == sf::Keyboard::Scancode::Escape)
+        {
+            LOG_DEBUG("Gameplay::ProcessKeyPressed: Escape -> Add PauseGameIntent");
+            e.world().entity().add<LifetimeOneFrame>().add<Command>().add<PauseGameIntent>();
+        }
+        else if (k.scancode == sf::Keyboard::Scancode::Space)
+        {
+            e.world().entity().add<LifetimeOneFrame>().add<Command>().add<LaunchBallIntent>();
+        }
+        else
+        {
+            eventHandled = false;
+        }
+
+        if (eventHandled)
+        {
+            e.destruct();
+        }
+    };
 }
 
 } // namespace
 
+namespace GamePlay
+{
 void ProcessKeyPressed::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
-    world.system<const KeyPressed>("ProcessKeyPressed")
+    LOG_DEBUG("Gameplay::ProcessKeyPressed::Initialize");
+    world.system<const KeyPressed>("Gameplay::ProcessKeyPressed")
         .kind(flecs::PostLoad)
         .write<PauseGameIntent>()
         .write<LaunchBallIntent>()
-        // Make sure we process only the KeyPressed events from this scene
-        .with(flecs::ChildOf, rootEntity)
-        .each(Update)
+        .each(Update(rootEntity))
         .child_of(rootEntity);
 }
+} // namespace GamePlay

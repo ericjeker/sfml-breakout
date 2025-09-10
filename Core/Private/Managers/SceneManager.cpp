@@ -6,7 +6,7 @@
 #include <ranges>
 #include <tracy/Tracy.hpp>
 
-void SceneManager::UnloadAll()
+void SceneManager::UnloadAll() const
 {
     ZoneScopedN("SceneManager::UnloadAll");
     for (const auto& typeIdx : _sceneOrder)
@@ -14,20 +14,5 @@ void SceneManager::UnloadAll()
         const auto& scene = _scenes.at(typeIdx);
         scene->SetLoaded(false);
         scene->Shutdown();
-    }
-}
-
-void SceneManager::HandleEvent(const std::optional<sf::Event>& event)
-{
-    ZoneScopedN("SceneManager::HandleEvent");
-    for (const auto& typeIdx : _sceneOrder)
-    {
-        const auto& scene = _scenes.at(typeIdx);
-        if (!scene->IsLoaded())
-        {
-            continue;
-        }
-
-        scene->HandleEvent(event);
     }
 }

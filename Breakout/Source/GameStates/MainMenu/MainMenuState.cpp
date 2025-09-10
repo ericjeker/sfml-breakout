@@ -31,7 +31,3 @@ void MainMenuState::Exit()
     auto& sceneManager = GameService::Get<SceneManager>();
     sceneManager.RemoveScene<MainMenuScene>();
 }
-
-void MainMenuState::HandleEvent(const std::optional<sf::Event>& event)
-{
-}

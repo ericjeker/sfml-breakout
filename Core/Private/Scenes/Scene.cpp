@@ -28,10 +28,6 @@ void Scene::Shutdown()
     });
 }
 
-void Scene::HandleEvent(const std::optional<sf::Event>& event)
-{
-}
-
 bool Scene::IsLoaded() const
 {
     return _isLoaded;
@@ -40,26 +36,6 @@ bool Scene::IsLoaded() const
 void Scene::SetLoaded(const bool loaded)
 {
     _isLoaded = loaded;
-}
-
-const std::string& Scene::GetName() const
-{
-    return _name;
-}
-
-const std::string& Scene::GetPath() const
-{
-    return _path;
-}
-
-void Scene::SetName(const std::string& name)
-{
-    _name = name;
-}
-
-void Scene::SetPath(const std::string& path)
-{
-    _path = path;
 }
 
 flecs::world& Scene::GetWorld()

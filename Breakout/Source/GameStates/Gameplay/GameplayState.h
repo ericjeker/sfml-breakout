@@ -12,7 +12,5 @@ public:
     explicit GameplayState(flecs::world& world);
     void Enter() override;
     void Exit() override;
-
-    void HandleEvent(const std::optional<sf::Event>& event) override;
 };
 

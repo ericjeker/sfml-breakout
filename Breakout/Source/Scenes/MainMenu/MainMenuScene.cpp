@@ -19,12 +19,8 @@
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
-#include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MousePressed.h"
-#include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
-#include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
-#include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"
@@ -46,36 +42,9 @@ void MainMenuScene::Initialize()
     CreateUIEntities(world);
 
     // --- Declare local systems ---
-    ProcessKeyPressed::Initialize(world, GetRootEntity());
-    ProcessExitGameIntent::Initialize(world, GetRootEntity());
-    ProcessStartGameIntent::Initialize(world, GetRootEntity());
-}
-
-void MainMenuScene::HandleEvent(const std::optional<sf::Event>& event)
-{
-    if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
-    {
-        if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
-        {
-            GetWorld().entity().is_a<Prefabs::KeyPressedEvent>().set<KeyPressed>({
-                .code = keyPressed->code,
-                .scancode = keyPressed->scancode,
-                .alt = keyPressed->alt,
-                .control = keyPressed->control,
-                .shift = keyPressed->shift,
-            });
-        }
-    }
-    else if (const auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>())
-    {
-        if (mouseReleased->button == sf::Mouse::Button::Left)
-        {
-            // MouseReleasedEvent is treated by the UIInputSystem that will do a hit test on clickable elements
-            GetWorld().entity().is_a<Prefabs::MouseReleasedEvent>().set<MouseReleased>(
-                {.position = mouseReleased->position, .button = mouseReleased->button}
-            );
-        }
-    }
+    MainMenu::ProcessKeyPressed::Initialize(world, GetRootEntity());
+    MainMenu::ProcessExitGameIntent::Initialize(world, GetRootEntity());
+    MainMenu::ProcessStartGameIntent::Initialize(world, GetRootEntity());
 }
 
 void MainMenuScene::CreateUIEntities(const flecs::world& world)

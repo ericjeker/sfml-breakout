@@ -32,17 +32,9 @@ public:
      */
     virtual void Shutdown();
 
-    virtual void HandleEvent(const std::optional<sf::Event>& event);
-
     // --- Scene States ---
     [[nodiscard]] bool IsLoaded() const;
     void SetLoaded(bool loaded);
-
-    // --- Scene Description ---
-    [[nodiscard]] const std::string& GetName() const;
-    [[nodiscard]] const std::string& GetPath() const;
-    void SetName(const std::string& name);
-    void SetPath(const std::string& path);
 
     // --- World & Entity Management ---
     [[nodiscard]] flecs::world& GetWorld();
@@ -50,9 +42,6 @@ public:
     [[nodiscard]] flecs::entity GetRootEntity() const;
 
 private:
-    std::string _name;
-    std::string _path;
-
     // Flecs entities for singletons
     flecs::world& _world;
     flecs::entity _rootEntity;

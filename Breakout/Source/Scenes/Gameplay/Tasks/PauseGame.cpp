@@ -5,7 +5,7 @@
 #include "Scenes/Gameplay/Components/Ball.h"
 #include "Scenes/Gameplay/Components/Paddle.h"
 
-#include "Core/Tags/ScenePaused.h"
+#include "Core/Scenes/Tags/ScenePaused.h"
 
 
 void PauseGame::Run(const flecs::world& world, const flecs::entity& rootEntity)

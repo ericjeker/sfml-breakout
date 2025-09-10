@@ -4,8 +4,12 @@
 
 #include <flecs.h>
 
+namespace MainMenu
+{
 
 struct ProcessKeyPressed
 {
     static void Initialize(const flecs::world& world, const flecs::entity& rootEntity);
 };
+
+}

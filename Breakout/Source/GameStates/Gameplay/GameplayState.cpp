@@ -78,11 +78,3 @@ void GameplayState::Exit()
     world.remove<CurrentLevel>();
     world.remove<MaxLevel>();
 }
-
-void GameplayState::HandleEvent(const std::optional<sf::Event>& event)
-{
-    if (event->is<sf::Event::FocusLost>())
-    {
-        GetWorld().entity().is_a<Prefabs::FocusLostEvent>();
-    }
-}

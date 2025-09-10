@@ -40,13 +40,3 @@ void GameStateManager::ChangeState(std::unique_ptr<GameState> state)
     _stateStack.push(std::move(state));
     _stateStack.top()->Enter();
 }
-
-void GameStateManager::HandleEvent(const std::optional<sf::Event>& event)
-{
-    if (_stateStack.empty())
-    {
-        return;
-    }
-
-    _stateStack.top()->HandleEvent(event);
-}
