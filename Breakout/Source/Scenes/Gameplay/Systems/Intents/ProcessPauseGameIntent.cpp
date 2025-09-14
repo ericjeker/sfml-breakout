@@ -18,10 +18,8 @@ namespace
 std::function<void(flecs::entity, PauseGameIntent)> Update(const flecs::entity& rootEntity)
 {
     return [rootEntity](const flecs::entity& e, const PauseGameIntent& p) {
-        LOG_DEBUG("GameplayScene::PauseGameSystem");
 
         e.world().entity().set<DeferredEvent>({[](const flecs::world& world) {
-            LOG_DEBUG("GameplayScene::PauseGameSystem -> Load Pause Scene");
             auto& sceneManager = GameService::Get<SceneManager>();
             sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
         }});
@@ -29,7 +27,6 @@ std::function<void(flecs::entity, PauseGameIntent)> Update(const flecs::entity& 
         PauseGame::Run(e.world(), rootEntity);
 
         // Destroy the command entity
-        LOG_DEBUG("GameplayScene::PauseGameSystem -> Destroy PauseGameIntent");
         e.destruct();
     };
 };

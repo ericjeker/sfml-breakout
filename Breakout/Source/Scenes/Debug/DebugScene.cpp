@@ -40,11 +40,12 @@ DebugScene::DebugScene(flecs::world& world)
 void DebugScene::Initialize()
 {
     Scene::Initialize();
+    GetRootEntity().set_name("DebugScene");
 
     const auto& world = GetWorld();
 
     // --- Systems ---
-    world.system<const TextRenderable, const FPS>().each(CalculateFPS).child_of(GetRootEntity());
+    world.system<const TextRenderable, const FPS>("UpdateFPS").each(CalculateFPS).child_of(GetRootEntity());
 
     // --- Resources ---
     Prefabs::Text::Create(
@@ -58,7 +59,6 @@ void DebugScene::Initialize()
             .position = {5.f, 5.f},
         }
     )
-        .child_of(GetRootEntity())
-        .add<FPS>();
-
+        .add<FPS>()
+        .child_of(GetRootEntity());
 }

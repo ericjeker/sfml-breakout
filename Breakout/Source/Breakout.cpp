@@ -27,8 +27,13 @@ void Breakout::Initialize()
     GameService::Get<ResourceManager>().LoadResourcesFromManifest("Assets/Manifest.json");
 
     // --- Initialize the World with global systems and singletons ---
-    // clang-format off
     auto& world = GetWorld();
+
+    // Creates REST server on port 27750
+    world.set<flecs::Rest>({});
+
+    // clang-format off
+    world.import<flecs::stats>(); // gather stats
     world.import<Modules::CameraModule>();
     world.import<Modules::InputModule>();
     world.import<Modules::LifetimeModule>();

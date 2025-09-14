@@ -21,6 +21,7 @@ std::function<void(flecs::entity, KeyPressed)> Update(flecs::entity rootEntity)
     return [rootEntity](const flecs::entity& e, const KeyPressed& k) {
         if (rootEntity.has<ScenePaused>())
         {
+            LOG_DEBUG("Gameplay::ProcessKeyPressed: ScenePaused -> Return");
             return;
         }
 
@@ -33,6 +34,7 @@ std::function<void(flecs::entity, KeyPressed)> Update(flecs::entity rootEntity)
         }
         else if (k.scancode == sf::Keyboard::Scancode::Space)
         {
+            LOG_DEBUG("Gameplay::ProcessKeyPressed: Escape -> Add LaunchBallIntent");
             e.world().entity().add<LifetimeOneFrame>().add<Command>().add<LaunchBallIntent>();
         }
         else
@@ -42,6 +44,7 @@ std::function<void(flecs::entity, KeyPressed)> Update(flecs::entity rootEntity)
 
         if (eventHandled)
         {
+            LOG_DEBUG("Gameplay::ProcessKeyPressed: Key Handled, destroying.");
             e.destruct();
         }
     };
@@ -53,8 +56,7 @@ namespace GamePlay
 {
 void ProcessKeyPressed::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
-    LOG_DEBUG("Gameplay::ProcessKeyPressed::Initialize");
-    world.system<const KeyPressed>("Gameplay::ProcessKeyPressed")
+    world.system<const KeyPressed>("ProcessKeyPressed")
         .kind(flecs::PostLoad)
         .write<PauseGameIntent>()
         .write<LaunchBallIntent>()

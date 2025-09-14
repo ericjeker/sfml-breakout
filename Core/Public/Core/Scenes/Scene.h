@@ -32,6 +32,9 @@ public:
      */
     virtual void Shutdown();
 
+    std::string GetName() const;
+    void SetName(std::string name);
+
     // --- Scene States ---
     [[nodiscard]] bool IsLoaded() const;
     void SetLoaded(bool loaded);
@@ -46,5 +49,6 @@ private:
     flecs::world& _world;
     flecs::entity _rootEntity;
 
+    std::string _name = "Scene";
     bool _isLoaded = false;
 };

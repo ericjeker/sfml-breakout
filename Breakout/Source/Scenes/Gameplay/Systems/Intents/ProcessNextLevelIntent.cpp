@@ -23,7 +23,7 @@ void Update(const flecs::entity& e, const NextLevelIntent& i)
     LOG_DEBUG("ProcessNextLevelIntent::Update -> FrameCount: {}", std::to_string(frameCount));
 
     // We defer the state change to the end of the frame
-    e.world().entity().set<DeferredEvent>({.callback = [&](const flecs::world& world) {
+    e.world().entity().set<DeferredEvent>({.callback = [](const flecs::world& world) {
         const int frameCount = world.get<FrameCount>().frameCount;
         LOG_DEBUG("ProcessNextLevelIntent -> Processing DeferredEvent -> Load Next Level in frame {}", frameCount);
 

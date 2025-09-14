@@ -20,6 +20,7 @@ HudScene::HudScene(flecs::world& world)
 void HudScene::Initialize()
 {
     Scene::Initialize();
+    GetRootEntity().set_name("HudScene");
 
     const auto& world = GetWorld();
 
@@ -109,5 +110,6 @@ void HudScene::Initialize()
                 {textBounds.size.x * origin.x + textBounds.position.x,
                  textBounds.size.y * origin.y + textBounds.position.y}
             );
-        });
+        })
+        .child_of(GetRootEntity());
 }

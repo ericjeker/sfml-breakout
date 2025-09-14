@@ -12,20 +12,13 @@
 #include "Core/Components/DeferredEvent.h"
 #include "Core/Components/WindowResizeIntent.h"
 #include "Core/Configuration.h"
-#include "Core/GameInstance.h"
 #include "Core/Managers/GameService.h"
-#include "Core/Managers/GameStateManager.h"
-#include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
-#include "Core/Modules/UI/Components/MousePressed.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
-#include "Core/Utils/Logger.h"
-
-#include <format>
 
 MainMenuScene::MainMenuScene(flecs::world& world)
     : Scene(world)
@@ -34,8 +27,8 @@ MainMenuScene::MainMenuScene(flecs::world& world)
 
 void MainMenuScene::Initialize()
 {
-    LOG_DEBUG("MainMenuScene:Initialize");
     Scene::Initialize();
+    GetRootEntity().set_name("MainMenuScene");
 
     const auto& world = GetWorld();
 
@@ -64,10 +57,12 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
             .zOrder = zOrder++,
         }
     )
+        .set_name("Background")
         .child_of(GetRootEntity());
 
     // --- Reference Rectangles
     Factories::Rectangle::Create(world, {.size = {10.f, 10.f}, .color = NordTheme::SnowStorm3, .position = {20.f, 20.f}, .zOrder = zOrder++})
+        .set_name("ReferenceRect.TopLeft")
         .child_of(GetRootEntity());
     Factories::Rectangle::Create(
         world,
@@ -76,6 +71,7 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
          .position = {Configuration::RESOLUTION.x - 30.f, Configuration::RESOLUTION.y - 30.f},
          .zOrder = zOrder++}
     )
+        .set_name("ReferenceRect.BottomRight")
         .child_of(GetRootEntity());
 
     // --- Add Title ---
@@ -90,6 +86,7 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
          .position = {centerX, centerY - 200},
          .zOrder = zOrder++}
     )
+        .set_name("Title")
         .child_of(GetRootEntity());
 
     // --- Add Play Button ---
@@ -107,6 +104,7 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
                        ) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<StartGameIntent>(); },
         }
     )
+        .set_name("PlayButton")
         .child_of(GetRootEntity());
 
     // --- Add Exit Button ---
@@ -124,5 +122,6 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
                        ) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<ExitGameIntent>(); },
         }
     )
+        .set_name("ExitButton")
         .child_of(GetRootEntity());
 }

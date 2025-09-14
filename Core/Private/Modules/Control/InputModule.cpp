@@ -7,7 +7,8 @@
 #include "Core/Modules/Input/Components/Target.h"
 #include "Core/Modules/Input/Singletons/InputBindings.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
-
+#include "Core/Singletons/FrameCount.h"
+#include "Core/Utils/Logger.h"
 
 namespace Modules
 {
@@ -23,8 +24,15 @@ InputModule::InputModule(const flecs::world& world)
         .term_at(0)
         .singleton()
         .kind(flecs::PostLoad)
+        // If we don't specify we write commands then we risk having a frame lag
+        .write<Command>()
         .each([&](const flecs::iter& it, size_t, const InputBindings& b) {
+            // Query the player currently possessed
             const auto q = it.world().query<const PossessedByPlayer>();
+            if (q.count() == 0)
+            {
+                return;
+            }
 
             // Loop each binding to see if the input is activated
             for (const auto& [inputKey, prefab] : b.map)
@@ -38,11 +46,11 @@ InputModule::InputModule(const flecs::world& world)
                 //   - Add the Command as child_of the entity
                 //   - Add a Seq number to guarantee the sequence of commands
                 q.each([&](flecs::entity e, const PossessedByPlayer& p) {
-                    it.world().entity().is_a(prefab).add<LifetimeOneFrame>().add<Target>().set<Target>({e});
+                    const auto entity = it.world().entity().is_a(prefab).add<LifetimeOneFrame>().add<Command>().add<Target>().set<Target>({e});
+                    LOG_DEBUG("InputModule::AddIntent -> entity: {}, framecount: {}", entity.id(), e.world().get<FrameCount>().frameCount);
                 });
             }
         });
 }
-
 
 } // namespace Modules

@@ -17,8 +17,6 @@
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
-#include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
-#include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"
@@ -31,7 +29,7 @@ GameOverScene::GameOverScene(flecs::world& world)
 void GameOverScene::Initialize()
 {
     Scene::Initialize();
-    LOG_DEBUG("GameOverScene::Initialize");
+    GetRootEntity().set_name("GameOverScene");
 
     constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
     constexpr float CENTER_Y = Configuration::RESOLUTION.y / 2;

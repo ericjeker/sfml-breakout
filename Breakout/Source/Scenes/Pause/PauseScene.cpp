@@ -6,6 +6,8 @@
 #include "Scenes/Gameplay/Components/NavigateToMainMenuIntent.h"
 #include "Scenes/Gameplay/Components/ResumeGameIntent.h"
 #include "Scenes/Gameplay/GameplayScene.h"
+#include "Scenes/Gameplay/Systems/Intents/ProcessNavigateToMainMenuIntent.h"
+#include "Scenes/Gameplay/Systems/Intents/ProcessResumeGameIntent.h"
 
 #include "Core/Components/DeferredEvent.h"
 #include "Core/Configuration.h"
@@ -17,8 +19,6 @@
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
-#include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
-#include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Scenes/Tags/ScenePaused.h"
 #include "Core/Themes/Nord.h"
@@ -31,8 +31,8 @@ PauseScene::PauseScene(flecs::world& world)
 
 void PauseScene::Initialize()
 {
-    LOG_DEBUG("PauseScene::Initialize");
     Scene::Initialize();
+    GetRootEntity().set_name("PauseScene");
 
     constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
     constexpr float CENTER_Y = Configuration::RESOLUTION.y / 2;
@@ -41,6 +41,8 @@ void PauseScene::Initialize()
 
     // --- Create Local Systems ---
     CreateUISystems(world);
+    ProcessNavigateToMainMenuIntent::Initialize(world, GetRootEntity());
+    ProcessResumeGameIntent::Initialize(world, GetRootEntity());
 
     // --- Create entities ---
     float zOrder = 0.f;
@@ -110,8 +112,9 @@ void PauseScene::Initialize()
 void PauseScene::CreateUISystems(const flecs::world& world)
 {
     // Query for KeyPressed
-    world.system<const KeyPressed>("Pause::ProcessKeyPressed")
+    world.system<const KeyPressed>("ProcessKeyPressed")
         .kind(flecs::PostLoad)
+        .write<ResumeGameIntent>()
         .each([rootEntity = GetRootEntity()](const flecs::entity& e, const KeyPressed& k) {
             if (rootEntity.has<ScenePaused>())
             {
@@ -124,6 +127,7 @@ void PauseScene::CreateUISystems(const flecs::world& world)
                 e.world().entity().add<LifetimeOneFrame>().add<Command>().add<ResumeGameIntent>();
             }
 
+            LOG_DEBUG("PauseScene::ProcessKeyPressed: Event Handled, destroying.");
             e.destruct();
         })
         .child_of(GetRootEntity());

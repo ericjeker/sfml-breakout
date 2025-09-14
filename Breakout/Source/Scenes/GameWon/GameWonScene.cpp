@@ -99,7 +99,7 @@ void GameWonScene::Initialize()
 void GameWonScene::CreateUISystems(const flecs::world& world)
 {
     // Query for KeyPressed
-    world.system<const KeyPressed>("ProcessKeyPressed")
+    world.system<const KeyPressed>("GameWon::ProcessKeyPressed")
         .kind(flecs::PostLoad)
         .each([](const flecs::entity& e, const KeyPressed& k) {
             if (k.scancode == sf::Keyboard::Scancode::Escape)

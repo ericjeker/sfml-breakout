@@ -25,7 +25,6 @@
 #include "Systems/OutOfBoundsSystem.h"
 #include "Systems/PaddleMovementSystem.h"
 #include "Systems/ScreenBounceSystem.h"
-#include "Systems/UI/ProcessFocusLost.h"
 #include "Systems/UI/ProcessKeyPressed.h"
 
 #include "Core/Configuration.h"
@@ -34,9 +33,6 @@
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Input/Singletons/InputBindings.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
-#include "Core/Modules/UI/Components/KeyPressed.h"
-#include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
-#include "Core/Scenes/Tags/ScenePaused.h"
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"
 
@@ -60,7 +56,9 @@ void GameplayScene::Initialize()
     LOG_DEBUG("GameplayScene:Initialize");
     Scene::Initialize();
 
-    auto& world = GetWorld();
+    GetRootEntity().set_name("GameplayScene");
+
+    const auto& world = GetWorld();
 
     // TODO: Asserts that necessary module are present in the world
 
@@ -89,7 +87,7 @@ void GameplayScene::Initialize()
     CheckAllBlocksDestroyedSystem::Initialize(world, GetRootEntity());
 
     // --- UI & Intents ---
-    GamePlay::ProcessFocusLost::Initialize(world, GetRootEntity());
+    //GamePlay::ProcessFocusLost::Initialize(world, GetRootEntity());
     GamePlay::ProcessKeyPressed::Initialize(world, GetRootEntity());
     ProcessNavigateToMainMenuIntent::Initialize(world, GetRootEntity());
     ProcessGameOverIntent::Initialize(world, GetRootEntity());
@@ -103,8 +101,8 @@ void GameplayScene::Initialize()
 void GameplayScene::CreateInputBindings(const flecs::world& world)
 {
     // Create command prefabs
-    auto moveLeft = world.prefab<Prefabs::MoveLeftCommand>().add<Command>().set<MoveIntent>({{-1.f, 0.f}}).child_of(GetRootEntity());
-    auto moveRight = world.prefab<Prefabs::MoveRightCommand>().add<Command>().set<MoveIntent>({{1.f, 0.f}}).child_of(GetRootEntity());
+    auto moveLeft = world.prefab<Prefabs::MoveLeftCommand>().set<MoveIntent>({{-1.f, 0.f}});
+    auto moveRight = world.prefab<Prefabs::MoveRightCommand>().set<MoveIntent>({{1.f, 0.f}});
 
     // Bind the left and right movement to A and D
     world.set<InputBindings>(

@@ -4,14 +4,23 @@
 
 #include "Scenes/Gameplay/Components/MoveIntent.h"
 
+#include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Input/Components/Target.h"
 #include "Core/Modules/Physics/Components/Acceleration.h"
+#include "Core/Singletons/FrameCount.h"
+#include "Core/Utils/Logger.h"
 
 namespace
 {
 
 void Update(const flecs::entity& cmd, const MoveIntent& i, const Target& t)
 {
+    LOG_DEBUG(
+        "PaddleMovementSystem::Update -> MoveIntent, entity: {}, framecount: {}",
+        cmd.id(),
+        cmd.world().get<FrameCount>().frameCount
+    );
+
     auto& [acceleration] = t.entity.get_mut<Acceleration>();
     acceleration.y += i.accelerate.y * 1000.f;
     acceleration.x += i.accelerate.x * 1000.f;
@@ -24,5 +33,10 @@ void Update(const flecs::entity& cmd, const MoveIntent& i, const Target& t)
 
 void PaddleMovementSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
-    world.system<const MoveIntent, const Target>("PaddleMovementSystem").kind(flecs::PreUpdate).each(Update).child_of(rootEntity);
+    LOG_DEBUG("PaddleMovementSystem::Initialize, scene: {}", rootEntity.id());
+    world.system<const MoveIntent, const Target>("PaddleMovementSystem")
+        .kind(flecs::PreUpdate)
+        .read<Command>()
+        .each(Update)
+        .child_of(rootEntity);
 }

@@ -28,6 +28,16 @@ void Scene::Shutdown()
     });
 }
 
+void Scene::SetName(const std::string name)
+{
+    _name = name;
+}
+
+std::string Scene::GetName() const
+{
+    return _name;
+}
+
 bool Scene::IsLoaded() const
 {
     return _isLoaded;
