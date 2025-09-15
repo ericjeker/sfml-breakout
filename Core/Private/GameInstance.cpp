@@ -8,6 +8,7 @@
 #include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/SceneManager.h"
+#include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
@@ -98,7 +99,7 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow) const
                 {(static_cast<float>(resized->size.x) - static_cast<float>(refSize.x) * scaleRatio) / 2.f,
                  (static_cast<float>(resized->size.y) - static_cast<float>(refSize.y) * scaleRatio) / 2.f};
 
-            world.entity().add<LifetimeOneFrame>().set<WindowResizeIntent>({
+            world.entity().add<LifetimeOneFrame>().add<Command>().set<WindowResizeIntent>({
                 .newSize = resized->size,
                 .oldSize = size,
                 .scaleRatio = scaleRatio,

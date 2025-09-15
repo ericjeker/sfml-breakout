@@ -18,8 +18,9 @@ namespace
 std::function<void(flecs::entity, PauseGameIntent)> Update(const flecs::entity& rootEntity)
 {
     return [rootEntity](const flecs::entity& e, const PauseGameIntent& p) {
-
+        LOG_DEBUG("ProcessPauseGameIntent::Update -> Add deferred event");
         e.world().entity().set<DeferredEvent>({[](const flecs::world& world) {
+            LOG_DEBUG("ProcessPauseGameIntent::Update -> Deferred event -> Load PauseScene");
             auto& sceneManager = GameService::Get<SceneManager>();
             sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
         }});

@@ -21,6 +21,7 @@
 #include "Systems/Intents/ProcessNavigateToMainMenuIntent.h"
 #include "Systems/Intents/ProcessNextLevelIntent.h"
 #include "Systems/Intents/ProcessPauseGameIntent.h"
+#include "Systems/Intents/ProcessRestartGameIntent.h"
 #include "Systems/Intents/ProcessResumeGameIntent.h"
 #include "Systems/OutOfBoundsSystem.h"
 #include "Systems/PaddleMovementSystem.h"
@@ -30,7 +31,6 @@
 #include "Core/Configuration.h"
 #include "Core/Managers/FileManager.h"
 #include "Core/Managers/GameService.h"
-#include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Input/Singletons/InputBindings.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
 #include "Core/Themes/Nord.h"
@@ -96,6 +96,7 @@ void GameplayScene::Initialize()
     ProcessContinueGameIntent::Initialize(world, GetRootEntity());
     ProcessResumeGameIntent::Initialize(world, GetRootEntity());
     ProcessPauseGameIntent::Initialize(world, GetRootEntity());
+    ProcessRestartGameIntent::Initialize(world, GetRootEntity());
 }
 
 void GameplayScene::CreateInputBindings(const flecs::world& world)

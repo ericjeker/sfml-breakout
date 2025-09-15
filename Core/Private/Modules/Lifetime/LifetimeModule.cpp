@@ -16,7 +16,7 @@ void UpdateLifetime(const flecs::iter& it, size_t, Lifetime& lifetime)
     lifetime.lifetime -= it.delta_time();
 }
 
-void LifetimeCull(const flecs::entity e, const Lifetime& lifetime)
+void LifetimeCull(const flecs::entity& e, const Lifetime& lifetime)
 {
     if (lifetime.lifetime <= 0.f)
     {
@@ -29,9 +29,9 @@ void LifetimeCull(const flecs::entity e, const Lifetime& lifetime)
  *
  * @param e The flecs::entity object that needs to be destroyed.
  */
-void DestroyEntity(const flecs::entity e, const LifetimeOneFrame&)
+void DestroyEntity(const flecs::entity& e, const LifetimeOneFrame&)
 {
-    LOG_DEBUG("LifetimeModule::DestroyEntity -> Destroying entity, entity: {}, framecount: {}", e.id(), e.world().get<FrameCount>().frameCount);
+    LOG_DEBUG("LifetimeModule::DestroyEntity -> Destroying entity: {}, frame: {}", e.id(), e.world().get<FrameCount>().frameCount);
     e.destruct();
 }
 

@@ -15,10 +15,10 @@
 namespace
 {
 
-std::function<void(flecs::entity, ResumeGameIntent)> Update(const flecs::entity& rootEntity)
+auto Update(const flecs::entity& rootEntity)
 {
     return [rootEntity](const flecs::entity& e, const ResumeGameIntent& r) {
-        LOG_DEBUG("GameplayScene::ResumeGameSystem");
+        LOG_DEBUG("GameplayScene::ResumeGameSystem -> event: {}", e.id());
 
         e.world().entity().set<DeferredEvent>({[](const flecs::world& world) {
             auto& sceneManager = GameService::Get<SceneManager>();
@@ -35,5 +35,6 @@ std::function<void(flecs::entity, ResumeGameIntent)> Update(const flecs::entity&
 
 void ProcessResumeGameIntent::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
+    LOG_DEBUG("ProcessResumeGameIntent::Initialize");
     world.system<const ResumeGameIntent>("ProcessResumeGameIntent").kind(flecs::PreUpdate).each(Update(rootEntity)).child_of(rootEntity);
 }

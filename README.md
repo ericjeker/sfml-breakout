@@ -88,11 +88,10 @@ System phases are called in the following order:
 
 * Add UI events taken from the events pool
 * Add control commands from InputBindings
-
-#### flecs::PreUpdate
-
 * Process UI events & Control commands
   * Hit Test on UI Elements
+
+#### flecs::PreUpdate
 
 #### flecs::OnUpdate
 

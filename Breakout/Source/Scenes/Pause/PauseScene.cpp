@@ -41,8 +41,6 @@ void PauseScene::Initialize()
 
     // --- Create Local Systems ---
     CreateUISystems(world);
-    ProcessNavigateToMainMenuIntent::Initialize(world, GetRootEntity());
-    ProcessResumeGameIntent::Initialize(world, GetRootEntity());
 
     // --- Create entities ---
     float zOrder = 0.f;
@@ -123,11 +121,10 @@ void PauseScene::CreateUISystems(const flecs::world& world)
 
             if (k.scancode == sf::Keyboard::Scancode::Escape)
             {
-                LOG_DEBUG("PauseScene::ProcessKeyPressed: Escape -> Add ResumeGameIntent");
                 e.world().entity().add<LifetimeOneFrame>().add<Command>().add<ResumeGameIntent>();
+                LOG_DEBUG("PauseScene::ProcessKeyPressed: Escape -> Add ResumeGameIntent");
             }
 
-            LOG_DEBUG("PauseScene::ProcessKeyPressed: Event Handled, destroying.");
             e.destruct();
         })
         .child_of(GetRootEntity());

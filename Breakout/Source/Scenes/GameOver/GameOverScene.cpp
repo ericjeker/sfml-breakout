@@ -19,7 +19,6 @@
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
-#include "Core/Utils/Logger.h"
 
 GameOverScene::GameOverScene(flecs::world& world)
     : Scene(world)
@@ -79,7 +78,7 @@ void GameOverScene::Initialize()
             .backgroundColor = sf::Color::Transparent,
             .position = {CENTER_X, CENTER_Y},
             .zOrder = ++zOrder,
-            .onClick = [](const flecs::world& stage) { stage.entity().add<LifetimeOneFrame>().add<RestartGameIntent>(); },
+            .onClick = [](const flecs::world& stage) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<RestartGameIntent>(); },
         }
     )
         .child_of(GetRootEntity());
@@ -95,7 +94,7 @@ void GameOverScene::Initialize()
          .position = {CENTER_X, CENTER_Y + 100},
          .zOrder = ++zOrder,
          .onClick = [](const flecs::world& stage
-                    ) { stage.entity().add<LifetimeOneFrame>().add<NavigateToMainMenuIntent>(); }}
+                    ) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMainMenuIntent>(); }}
     ).child_of(GetRootEntity());
 }
 

@@ -12,9 +12,8 @@
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
-#include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
-#include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
+#include "Core/Singletons/FrameCount.h"
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"
 
@@ -76,7 +75,15 @@ void GameWonScene::Initialize()
             .backgroundColor = sf::Color::Transparent,
             .position = {CENTER_X, CENTER_Y},
             .zOrder = ++zOrder,
-            .onClick = [](const flecs::world& stage) { stage.entity().add<LifetimeOneFrame>().add<RestartGameIntent>(); },
+            .onClick =
+                [](const flecs::world& stage) {
+                    const auto entity = stage.entity().add<LifetimeOneFrame>().add<Command>().add<RestartGameIntent>();
+                    LOG_DEBUG(
+                        "GameWonScene::RestartButton::onClick -> Add RestartGameIntent, entity: {}, framecount: {}",
+                        entity.id(),
+                        stage.get<FrameCount>().frameCount
+                    );
+                },
         }
     )
         .child_of(GetRootEntity());
@@ -91,8 +98,11 @@ void GameWonScene::Initialize()
          .backgroundColor = sf::Color::Transparent,
          .position = {CENTER_X, CENTER_Y + 100},
          .zOrder = ++zOrder,
-         .onClick = [](const flecs::world& stage
-                    ) { stage.entity().add<LifetimeOneFrame>().add<NavigateToMainMenuIntent>(); }}
+         .onClick =
+             [](const flecs::world& stage) {
+                 LOG_DEBUG("GameWonScene::RestartButton::onClick -> Add NavigateToMainMenuIntent");
+                 stage.entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMainMenuIntent>();
+             }}
     ).child_of(GetRootEntity());
 }
 
@@ -101,6 +111,7 @@ void GameWonScene::CreateUISystems(const flecs::world& world)
     // Query for KeyPressed
     world.system<const KeyPressed>("GameWon::ProcessKeyPressed")
         .kind(flecs::PostLoad)
+        .write<NavigateToMainMenuIntent>()
         .each([](const flecs::entity& e, const KeyPressed& k) {
             if (k.scancode == sf::Keyboard::Scancode::Escape)
             {

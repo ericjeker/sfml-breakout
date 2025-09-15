@@ -34,7 +34,7 @@ void GameplayState::Enter()
     world.set<Lives>({});
     world.set<Multiplier>({});
     world.set<CurrentLevel>({});
-    world.set<MaxLevel>({2});
+    world.set<MaxLevel>({1});
 
     auto& sceneManager = GameService::Get<SceneManager>();
 

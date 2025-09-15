@@ -2,6 +2,8 @@
 
 #include "Core/Modules/UI/UIModule.h"
 
+#include "../../../../Breakout/Source/Scenes/Gameplay/Components/RestartGameIntent.h"
+
 #include "Core/Components/Event.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
@@ -63,7 +65,8 @@ UIModule::UIModule(const flecs::world& world)
 
     // Handle mouse-released events and hit test on all the UI components
     world.system<const MouseReleased>("UIHitTest")
-        .kind(flecs::PreUpdate)
+        .immediate()
+        .kind(flecs::PostLoad)
         .each([](const flecs::iter& it, size_t index, const MouseReleased& mouseReleased) {
             // We have a mouseReleased event. Now, find any clickable entities that were hit.
             if (mouseReleased.button != sf::Mouse::Button::Left)
