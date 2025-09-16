@@ -25,7 +25,7 @@ GameWonScene::GameWonScene(flecs::world& world)
 void GameWonScene::Initialize()
 {
     Scene::Initialize();
-    LOG_DEBUG("GameWonScene::Initialize");
+    GetRootEntity().set_name("GameWonScene");
 
     constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
     constexpr float CENTER_Y = Configuration::RESOLUTION.y / 2;
@@ -109,10 +109,12 @@ void GameWonScene::Initialize()
 void GameWonScene::CreateUISystems(const flecs::world& world)
 {
     // Query for KeyPressed
-    world.system<const KeyPressed>("GameWon::ProcessKeyPressed")
+    world.system<const KeyPressed>("GameWonScene.ProcessKeyPressed")
         .kind(flecs::PostLoad)
         .write<NavigateToMainMenuIntent>()
         .each([](const flecs::entity& e, const KeyPressed& k) {
+            LOG_DEBUG("GameWonScene::ProcessKeyPressed");
+
             if (k.scancode == sf::Keyboard::Scancode::Escape)
             {
                 e.world().entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMainMenuIntent>();

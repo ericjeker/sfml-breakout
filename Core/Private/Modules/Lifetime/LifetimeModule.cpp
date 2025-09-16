@@ -31,7 +31,7 @@ void LifetimeCull(const flecs::entity& e, const Lifetime& lifetime)
  */
 void DestroyEntity(const flecs::entity& e, const LifetimeOneFrame&)
 {
-    LOG_DEBUG("LifetimeModule::DestroyEntity -> Destroying entity: {}, frame: {}", e.id(), e.world().get<FrameCount>().frameCount);
+    //LOG_DEBUG("LifetimeModule::DestroyEntity -> Destroying entity: {}, frame: {}", e.id(), e.world().get<FrameCount>().frameCount);
     e.destruct();
 }
 

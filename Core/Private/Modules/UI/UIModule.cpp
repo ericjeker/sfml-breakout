@@ -2,8 +2,6 @@
 
 #include "Core/Modules/UI/UIModule.h"
 
-#include "../../../../Breakout/Source/Scenes/Gameplay/Components/RestartGameIntent.h"
-
 #include "Core/Components/Event.h"
 #include "Core/Managers/GameService.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
@@ -65,6 +63,7 @@ UIModule::UIModule(const flecs::world& world)
 
     // Handle mouse-released events and hit test on all the UI components
     world.system<const MouseReleased>("UIHitTest")
+        // The UIHitTest need to be immediate to merge the world state so the intents are process within the same frame
         .immediate()
         .kind(flecs::PostLoad)
         .each([](const flecs::iter& it, size_t index, const MouseReleased& mouseReleased) {

@@ -5,10 +5,10 @@
 #include <flecs.h>
 
 
-namespace GamePlay
+namespace Gameplay
 {
 struct ProcessFocusLost
 {
     static void Initialize(const flecs::world& world, const flecs::entity& rootEntity);
 };
-} // namespace GamePlay
+} // namespace Gameplay

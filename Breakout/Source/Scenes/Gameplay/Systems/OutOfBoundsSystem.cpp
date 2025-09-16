@@ -48,5 +48,9 @@ void Update(const flecs::entity ball, const Transform& t, const Ball& b)
 
 void OutOfBoundsSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
-    world.system<Transform, const Ball>("OutOfBoundsSystem").each(Update).child_of(rootEntity);
+    world.system<Transform, const Ball>("OutOfBoundsSystem")
+        .write<ContinueGameIntent>()
+        .write<GameOverIntent>()
+        .each(Update)
+        .child_of(rootEntity);
 }

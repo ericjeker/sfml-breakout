@@ -55,7 +55,6 @@ void GameplayScene::Initialize()
 {
     LOG_DEBUG("GameplayScene:Initialize");
     Scene::Initialize();
-
     GetRootEntity().set_name("GameplayScene");
 
     const auto& world = GetWorld();
@@ -87,8 +86,8 @@ void GameplayScene::Initialize()
     CheckAllBlocksDestroyedSystem::Initialize(world, GetRootEntity());
 
     // --- UI & Intents ---
-    //GamePlay::ProcessFocusLost::Initialize(world, GetRootEntity());
-    GamePlay::ProcessKeyPressed::Initialize(world, GetRootEntity());
+    //Gameplay::ProcessFocusLost::Initialize(world, GetRootEntity());
+    Gameplay::ProcessKeyPressed::Initialize(world, GetRootEntity());
     ProcessNavigateToMainMenuIntent::Initialize(world, GetRootEntity());
     ProcessGameOverIntent::Initialize(world, GetRootEntity());
     ProcessGameWonIntent::Initialize(world, GetRootEntity());
@@ -147,7 +146,6 @@ void GameplayScene::CreateBlocks(const flecs::world& world, float& zOrder)
 {
     // Which level are we playing?
     int& currentLevel = world.get_mut<CurrentLevel>().level;
-    LOG_DEBUG("GameplayScene::CreateBlocks -> currentLevel: {}", currentLevel);
 
     // Load the block definition file (json)
     const auto blockDefinitions = LoadBlockDefinitions("Content/Levels/Definitions.json");

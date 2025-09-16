@@ -124,10 +124,10 @@ CameraModule::CameraModule(const flecs::world& world)
 
     // --- Declare Systems ---
     world.system<const WindowResizeIntent>("UpdateViewport").kind(flecs::PostLoad).each(UpdateViewport);
+    world.system<const CameraShakeIntent>("ProcessCameraShakeIntent").each(ProcessCameraShakeIntent);
     world.system("ApplyCameraToWindow").kind(flecs::PreStore).run([](const flecs::iter& i) {
         GameService::Get<sf::RenderWindow>().setView(i.world().get<MainCamera>().view);
     });
-    world.system<const CameraShakeIntent>("ProcessCameraShakeIntent").each(ProcessCameraShakeIntent);
     world.system<CameraShake>("UpdateCameraShake").kind(flecs::PreStore).each(UpdateCameraShake);
 }
 

@@ -31,7 +31,7 @@ void GameplayState::Enter()
     // --- Create the game session ---
     const auto& world = GetWorld();
     world.set<Score>({});
-    world.set<Lives>({});
+    world.set<Lives>({1});
     world.set<Multiplier>({});
     world.set<CurrentLevel>({});
     world.set<MaxLevel>({1});

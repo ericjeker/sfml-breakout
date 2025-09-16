@@ -29,8 +29,11 @@ void Breakout::Initialize()
     // --- Initialize the World with global systems and singletons ---
     auto& world = GetWorld();
 
+#ifdef DEBUG
     // Creates REST server on port 27750
+    LOG_DEBUG("Breakout::Initialization: Creating flecs REST server");
     world.set<flecs::Rest>({});
+#endif
 
     // clang-format off
     world.import<flecs::stats>(); // gather stats

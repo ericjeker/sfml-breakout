@@ -4,5 +4,5 @@
 
 struct Lives
 {
-    int lives = 3;
+    int lives = 1;
 };

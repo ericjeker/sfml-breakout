@@ -46,6 +46,5 @@ auto Update()
 
 void ProcessRestartGameIntent::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
-    LOG_DEBUG("ProcessRestartGameIntent::Initialize");
     world.system<const RestartGameIntent>("ProcessRestartGameIntent").kind(flecs::PreUpdate).each(Update()).child_of(rootEntity);
 }

@@ -273,8 +273,8 @@ RenderModule::RenderModule(const flecs::world& world)
     world.system<const Transform, SpriteRenderable>("ApplyTransformToSprite").kind(flecs::PreStore).each(ApplyTransformToSprite);
 
     // --- Render all the Renderable Components ---
-    world.system().kind(flecs::OnStore).run(Render);
-    world.system().kind(flecs::OnStore).run(RenderAllParticles);
+    world.system("Render").kind(flecs::OnStore).run(Render);
+    world.system("RenderParticles").kind(flecs::OnStore).run(RenderAllParticles);
 }
 
 } // namespace Modules

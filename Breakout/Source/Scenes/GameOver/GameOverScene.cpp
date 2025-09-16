@@ -2,7 +2,6 @@
 
 #include "GameOverScene.h"
 
-#include "GameStates/Gameplay/GameplayState.h"
 #include "Scenes/Gameplay/Components/NavigateToMainMenuIntent.h"
 #include "Scenes/Gameplay/Components/RestartGameIntent.h"
 #include "Scenes/Gameplay/GameplayScene.h"
@@ -10,7 +9,6 @@
 #include "Core/Components/DeferredEvent.h"
 #include "Core/Configuration.h"
 #include "Core/Managers/GameService.h"
-#include "Core/Managers/GameStateManager.h"
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
@@ -18,6 +16,7 @@
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
+#include "Core/Scenes/Tags/ScenePaused.h"
 #include "Core/Themes/Nord.h"
 
 GameOverScene::GameOverScene(flecs::world& world)
@@ -78,7 +77,8 @@ void GameOverScene::Initialize()
             .backgroundColor = sf::Color::Transparent,
             .position = {CENTER_X, CENTER_Y},
             .zOrder = ++zOrder,
-            .onClick = [](const flecs::world& stage) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<RestartGameIntent>(); },
+            .onClick = [](const flecs::world& stage
+                       ) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<RestartGameIntent>(); },
         }
     )
         .child_of(GetRootEntity());
@@ -101,15 +101,15 @@ void GameOverScene::Initialize()
 void GameOverScene::CreateUISystems(const flecs::world& world)
 {
     // Query for KeyPressed
-    world.system<const KeyPressed>("ProcessKeyPressed")
+    world.system<const KeyPressed>("GameOverScene.ProcessKeyPressed")
         .kind(flecs::PostLoad)
         .each([](const flecs::entity& e, const KeyPressed& k) {
+            LOG_DEBUG("GameOverScene::ProcessKeyPressed");
             if (k.scancode == sf::Keyboard::Scancode::Escape)
             {
                 e.world().entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMainMenuIntent>();
+                e.destruct();
             }
-
-            e.destruct();
         })
         .child_of(GetRootEntity());
 }

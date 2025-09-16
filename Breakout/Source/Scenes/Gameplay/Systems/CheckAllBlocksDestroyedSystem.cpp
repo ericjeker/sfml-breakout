@@ -57,6 +57,7 @@ void CheckAllBlocksDestroyedSystem::Initialize(const flecs::world& world, const 
     world.system("CheckAllBlocksDestroyedSystem")
         .kind(flecs::PostUpdate)
         .write<NextLevelIntent>()
+        .write<GameWonIntent>()
         .run(Update(rootEntity))
         .child_of(rootEntity);
 }

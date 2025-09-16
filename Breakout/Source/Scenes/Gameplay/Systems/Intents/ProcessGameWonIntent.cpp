@@ -16,6 +16,8 @@ namespace
 std::function<void(flecs::entity, GameWonIntent)> Update(const flecs::entity& rootEntity)
 {
     return [rootEntity](const flecs::entity& e, const GameWonIntent& g) {
+        LOG_DEBUG("GameplayScene::ProcessGameWonIntent -> event: {}", e.id());
+
         e.world().entity().set<DeferredEvent>({[](const flecs::world& world) {
             auto& sceneManager = GameService::Get<SceneManager>();
             sceneManager.LoadScene<GameWonScene>(SceneLoadMode::Additive);
