@@ -2,6 +2,8 @@
 
 #include "Scenes/Debug/DebugScene.h"
 
+#include "Modules/Breakout/Singletons/GameStatePlaying.h"
+
 #include "Core/Managers/GameService.h"
 #include "Core/Modules/Render/Components/TextRenderable.h"
 #include "Core/Modules/Render/RenderModule.h"
@@ -45,7 +47,8 @@ void DebugScene::Initialize()
     const auto& world = GetWorld();
 
     // --- Systems ---
-    world.system<const TextRenderable, const FPS>("UpdateFPS").each(CalculateFPS).child_of(GetRootEntity());
+    world.system<const TextRenderable, const FPS>("UpdateFPS")
+        .each(CalculateFPS).child_of(GetRootEntity());
 
     // --- Resources ---
     Prefabs::Text::Create(

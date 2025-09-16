@@ -2,6 +2,7 @@
 
 #include "GameOverScene.h"
 
+#include "Modules/Breakout/Singletons/GameStateGameLost.h"
 #include "Scenes/Gameplay/Components/NavigateToMainMenuIntent.h"
 #include "Scenes/Gameplay/Components/RestartGameIntent.h"
 #include "Scenes/Gameplay/GameplayScene.h"
@@ -103,6 +104,7 @@ void GameOverScene::CreateUISystems(const flecs::world& world)
     // Query for KeyPressed
     world.system<const KeyPressed>("GameOverScene.ProcessKeyPressed")
         .kind(flecs::PostLoad)
+        .with<GameStateGameLost>().singleton()
         .each([](const flecs::entity& e, const KeyPressed& k) {
             LOG_DEBUG("GameOverScene::ProcessKeyPressed");
             if (k.scancode == sf::Keyboard::Scancode::Escape)

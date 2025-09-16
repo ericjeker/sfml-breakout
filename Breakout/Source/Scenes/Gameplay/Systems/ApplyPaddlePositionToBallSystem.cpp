@@ -2,6 +2,7 @@
 
 #include "ApplyPaddlePositionToBallSystem.h"
 
+#include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/AttachedToPaddle.h"
 #include "Scenes/Gameplay/Components/Ball.h"
 #include "Scenes/Gameplay/Components/Paddle.h"
@@ -25,5 +26,7 @@ void Update(const flecs::entity& e, Transform& t, const AttachedToPaddle& ap, co
 
 void ApplyPaddlePositionToBallSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
-    world.system<Transform, const AttachedToPaddle, const Ball>("ApplyPaddlePositionToBall").each(Update).child_of(rootEntity);
+    world.system<Transform, const AttachedToPaddle, const Ball>("ApplyPaddlePositionToBall")
+        .with<GameStatePlaying>().singleton()
+        .each(Update).child_of(rootEntity);
 }

@@ -15,14 +15,8 @@
 #include "Systems/CollisionDetectionSystem.h"
 #include "Systems/ConstrainPaddleToScreenSystem.h"
 #include "Systems/Intents/ProcessContinueGameIntent.h"
-#include "Systems/Intents/ProcessGameOverIntent.h"
-#include "Systems/Intents/ProcessGameWonIntent.h"
 #include "Systems/Intents/ProcessLaunchBallIntent.h"
-#include "Systems/Intents/ProcessNavigateToMainMenuIntent.h"
 #include "Systems/Intents/ProcessNextLevelIntent.h"
-#include "Systems/Intents/ProcessPauseGameIntent.h"
-#include "Systems/Intents/ProcessRestartGameIntent.h"
-#include "Systems/Intents/ProcessResumeGameIntent.h"
 #include "Systems/OutOfBoundsSystem.h"
 #include "Systems/PaddleMovementSystem.h"
 #include "Systems/ScreenBounceSystem.h"
@@ -88,14 +82,8 @@ void GameplayScene::Initialize()
     // --- UI & Intents ---
     //Gameplay::ProcessFocusLost::Initialize(world, GetRootEntity());
     Gameplay::ProcessKeyPressed::Initialize(world, GetRootEntity());
-    ProcessNavigateToMainMenuIntent::Initialize(world, GetRootEntity());
-    ProcessGameOverIntent::Initialize(world, GetRootEntity());
-    ProcessGameWonIntent::Initialize(world, GetRootEntity());
     ProcessNextLevelIntent::Initialize(world, GetRootEntity());
     ProcessContinueGameIntent::Initialize(world, GetRootEntity());
-    ProcessResumeGameIntent::Initialize(world, GetRootEntity());
-    ProcessPauseGameIntent::Initialize(world, GetRootEntity());
-    ProcessRestartGameIntent::Initialize(world, GetRootEntity());
 }
 
 void GameplayScene::CreateInputBindings(const flecs::world& world)

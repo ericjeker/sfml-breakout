@@ -25,7 +25,7 @@ void GameInstance::Initialize()
 {
     ZoneScopedN("GameInstance::Initialize");
 
-    // --- Set the initial window size ---
+    // --- Set the initial window size used for resizing ---
     LOG_DEBUG("GameInstance::Run: Setting initial window size");
     const auto& window = GameService::Get<sf::RenderWindow>();
     GetWorld().set<WindowSize>({.currentSize = window.getSize(), .refSize = Configuration::RESOLUTION});

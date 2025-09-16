@@ -2,6 +2,7 @@
 
 #include "ProcessKeyPressed.h"
 
+#include "Modules/Breakout/Singletons/GameStateMenu.h"
 #include "Scenes/MainMenu/Components/ExitGameIntent.h"
 
 #include "Core/Modules/Input/Components/Command.h"
@@ -31,7 +32,12 @@ namespace MainMenu
 
 void ProcessKeyPressed::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
-    world.system<const KeyPressed>("ProcessKeyPressed").kind(flecs::PostLoad).each(Update).child_of(rootEntity);
+    world.system<const KeyPressed>("ProcessKeyPressed")
+        .kind(flecs::PostLoad)
+        .write<ExitGameIntent>()
+        .with<GameStateMenu>().singleton()
+        .each(Update)
+        .child_of(rootEntity);
 }
 
-}
+} // namespace MainMenu

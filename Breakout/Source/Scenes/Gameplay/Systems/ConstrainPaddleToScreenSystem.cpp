@@ -2,6 +2,7 @@
 
 #include "ConstrainPaddleToScreenSystem.h"
 
+#include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/Paddle.h"
 
 #include "Core/Configuration.h"
@@ -29,5 +30,8 @@ void Update(Transform& t, const Size& s, const Paddle& p)
 
 void ConstrainPaddleToScreenSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
-    world.system<Transform, const Size, const Paddle>("ConstrainPaddleToScreenSystem").each(Update).child_of(rootEntity);
+    world.system<Transform, const Size, const Paddle>("ConstrainPaddleToScreenSystem")
+        .with<GameStatePlaying>().singleton()
+        .each(Update)
+        .child_of(rootEntity);
 }

@@ -2,6 +2,7 @@
 
 #include "PaddleMovementSystem.h"
 
+#include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/MoveIntent.h"
 
 #include "Core/Modules/Input/Components/Command.h"
@@ -28,6 +29,7 @@ void PaddleMovementSystem::Initialize(const flecs::world& world, const flecs::en
     world.system<const MoveIntent, const Target>("PaddleMovementSystem")
         .kind(flecs::PreUpdate)
         .read<Command>()
+        .with<GameStatePlaying>().singleton()
         .each(Update)
         .child_of(rootEntity);
 }

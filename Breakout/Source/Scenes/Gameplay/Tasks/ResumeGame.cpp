@@ -5,14 +5,9 @@
 #include "Scenes/Gameplay/Components/Ball.h"
 #include "Scenes/Gameplay/Components/Paddle.h"
 
-#include "Core/Scenes/Tags/ScenePaused.h"
 
-
-void ResumeGame::Run(const flecs::world& world, const flecs::entity& rootEntity)
+void ResumeGame::Run(const flecs::world& world)
 {
-    assert(rootEntity.is_valid());
-    rootEntity.remove<ScenePaused>();
-
     // Query for the Paddle and Ball to enable them
     world.query_builder<>()
         .scope_open()
@@ -22,6 +17,5 @@ void ResumeGame::Run(const flecs::world& world, const flecs::entity& rootEntity)
         .scope_close()
         .with(flecs::Disabled)
         .optional()
-        .with(flecs::ChildOf, rootEntity)
         .each([](const flecs::entity& entity) { entity.enable(); });
 }

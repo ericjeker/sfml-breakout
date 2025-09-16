@@ -2,6 +2,8 @@
 
 #include "ProcessKeyPressed.h"
 
+#include "Modules/Breakout/Components/TransitionGameStateIntent.h"
+#include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/LaunchBallIntent.h"
 #include "Scenes/Gameplay/Components/PauseGameIntent.h"
 
@@ -30,7 +32,7 @@ auto Update(flecs::entity rootEntity)
         if (k.scancode == sf::Keyboard::Scancode::Escape)
         {
             LOG_DEBUG("Gameplay::ProcessKeyPressed -> Escape -> Pause Game");
-            e.world().entity().add<LifetimeOneFrame>().add<Command>().add<PauseGameIntent>();
+            e.world().entity().set<TransitionGameStateIntent>({GameTransitions::PauseGame});
         }
         else if (k.scancode == sf::Keyboard::Scancode::Space)
         {
@@ -59,6 +61,8 @@ void ProcessKeyPressed::Initialize(const flecs::world& world, const flecs::entit
         .kind(flecs::PreUpdate)
         .write<PauseGameIntent>()
         .write<LaunchBallIntent>()
+        .with<GameStatePlaying>()
+        .singleton()
         .each(Update(rootEntity))
         .child_of(rootEntity);
 }

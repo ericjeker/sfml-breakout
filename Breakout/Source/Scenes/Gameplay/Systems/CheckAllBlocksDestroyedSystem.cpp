@@ -4,6 +4,8 @@
 
 #include "GameStates/Gameplay/Components/CurrentLevel.h"
 #include "GameStates/Gameplay/Components/MaxLevel.h"
+#include "Modules/Breakout/Components/TransitionGameStateIntent.h"
+#include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/Block.h"
 #include "Scenes/Gameplay/Components/GameWonIntent.h"
 #include "Scenes/Gameplay/Components/Indestructible.h"
@@ -11,22 +13,21 @@
 
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
-#include "Core/Scenes/Tags/ScenePaused.h"
 #include "Core/Singletons/FrameCount.h"
 #include "Core/Utils/Logger.h"
 
 namespace
 {
 
-auto Update(const flecs::entity& rootEntity)
+auto Update()
 {
-    return [rootEntity](const flecs::iter& it) {
-        if (rootEntity.has<ScenePaused>())
+    return [](const flecs::iter& it) {
+        const auto& world = it.world();
+        if (!world.has<GameStatePlaying>())
         {
             return;
         }
 
-        const auto& world = it.world();
         if (world.query_builder<const Block>().without<Indestructible>().build().count() > 0)
         {
             return;
@@ -39,12 +40,12 @@ auto Update(const flecs::entity& rootEntity)
         if (const int& maxLevel = world.get<MaxLevel>().level; currentLevel < maxLevel)
         {
             LOG_DEBUG("GameplayScene::CheckIfAllBlocksDestroyed -> Add NextLevelIntent");
-        world.entity().add<LifetimeOneFrame>().add<Command>().add<NextLevelIntent>();
+            world.entity().add<LifetimeOneFrame>().add<Command>().add<NextLevelIntent>();
         }
         else
         {
             LOG_DEBUG("GameplayScene::CheckIfAllBlocksDestroyed -> Add GameWonIntent");
-        world.entity().add<LifetimeOneFrame>().add<Command>().add<GameWonIntent>();
+            world.entity().set<TransitionGameStateIntent>({GameTransitions::GameWon});
         }
     };
 }
@@ -58,6 +59,6 @@ void CheckAllBlocksDestroyedSystem::Initialize(const flecs::world& world, const 
         .kind(flecs::PostUpdate)
         .write<NextLevelIntent>()
         .write<GameWonIntent>()
-        .run(Update(rootEntity))
+        .run(Update())
         .child_of(rootEntity);
 }

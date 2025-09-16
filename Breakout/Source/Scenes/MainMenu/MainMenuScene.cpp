@@ -3,18 +3,15 @@
 #include "Scenes/MainMenu/MainMenuScene.h"
 
 #include "GameStates/Gameplay/GameplayState.h"
+#include "Modules/Breakout/Components/TransitionGameStateIntent.h"
 #include "Scenes/MainMenu/Components/ExitGameIntent.h"
-#include "Scenes/MainMenu/Components/StartGameIntent.h"
 #include "Systems/ProcessExitGameIntent.h"
 #include "Systems/ProcessKeyPressed.h"
-#include "Systems/ProcessStartGameIntent.h"
 
 #include "Core/Components/DeferredEvent.h"
 #include "Core/Components/WindowResizeIntent.h"
 #include "Core/Configuration.h"
 #include "Core/Managers/GameService.h"
-#include "Core/Modules/Input/Components/Command.h"
-#include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
@@ -37,7 +34,6 @@ void MainMenuScene::Initialize()
     // --- Declare local systems ---
     MainMenu::ProcessKeyPressed::Initialize(world, GetRootEntity());
     MainMenu::ProcessExitGameIntent::Initialize(world, GetRootEntity());
-    MainMenu::ProcessStartGameIntent::Initialize(world, GetRootEntity());
 }
 
 void MainMenuScene::CreateUIEntities(const flecs::world& world)
@@ -101,7 +97,7 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
             .position = {centerX, centerY},
             .zOrder = zOrder++,
             .onClick = [](const flecs::world& stage
-                       ) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<StartGameIntent>(); },
+                       ) { stage.entity().set<TransitionGameStateIntent>({GameTransitions::StartPlaying}); },
         }
     )
         .set_name("PlayButton")
@@ -118,8 +114,7 @@ void MainMenuScene::CreateUIEntities(const flecs::world& world)
             .backgroundColor = sf::Color::Transparent,
             .position = {centerX, centerY + 100},
             .zOrder = zOrder++,
-            .onClick = [](const flecs::world& stage
-                       ) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<ExitGameIntent>(); },
+            .onClick = [](const flecs::world& stage) { stage.entity().add<ExitGameIntent>(); },
         }
     )
         .set_name("ExitButton")

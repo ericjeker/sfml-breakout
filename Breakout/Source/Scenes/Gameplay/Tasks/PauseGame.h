@@ -7,5 +7,5 @@
 
 struct PauseGame
 {
-    static void Run(const flecs::world& world, const flecs::entity& rootEntity);
+    static void Run(const flecs::world& world);
 };

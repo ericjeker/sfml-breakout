@@ -4,6 +4,7 @@
 
 #include "GameStates/Gameplay/Components/Multiplier.h"
 #include "GameStates/Gameplay/Components/Score.h"
+#include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/Ball.h"
 #include "Scenes/Gameplay/Components/Health.h"
 #include "Scenes/Gameplay/Components/Indestructible.h"
@@ -165,6 +166,7 @@ void ProcessCollisionDetection(
 void CollisionDetectionSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<const Transform, const Size, const Origin, const ColliderShape>("CollisionDetectionSystem")
+        .with<GameStatePlaying>().singleton()
         .each(ProcessCollisionDetection)
         .child_of(rootEntity);
 }

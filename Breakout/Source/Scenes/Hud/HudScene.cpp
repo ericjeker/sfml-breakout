@@ -5,8 +5,10 @@
 #include "GameStates/Gameplay/Components/Lives.h"
 #include "GameStates/Gameplay/Components/Multiplier.h"
 #include "GameStates/Gameplay/Components/Score.h"
+#include "Modules/Breakout/Singletons/GameStatePlaying.h"
 
 #include "Core/Configuration.h"
+#include "Core/GameStates/GameState.h"
 #include "Core/Modules/Render/Components/Origin.h"
 #include "Core/Modules/Render/Components/TextRenderable.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
@@ -67,6 +69,7 @@ void HudScene::Initialize()
     // --- Create local systems ---
     world.system<const Score>("DisplayScoreSystem")
         .kind(flecs::PostUpdate)
+        .with<GameStatePlaying>().singleton()
         .each([scoreEntity](const Score& score) {
             const auto& [text] = scoreEntity.get<TextRenderable>();
             const auto& [origin] = scoreEntity.get<Origin>();
@@ -83,6 +86,7 @@ void HudScene::Initialize()
 
     world.system<const Lives>("DisplayLivesSystem")
         .kind(flecs::PostUpdate)
+        .with<GameStatePlaying>().singleton()
         .each([livesEntity](const Lives& lives) {
             const auto& [text] = livesEntity.get<TextRenderable>();
             const auto& [origin] = livesEntity.get<Origin>();
@@ -99,6 +103,7 @@ void HudScene::Initialize()
 
     world.system<const Multiplier>("DisplayMultiplierSystem")
         .kind(flecs::PostUpdate)
+        .with<GameStatePlaying>().singleton()
         .each([multEntity](const Multiplier& multiplier) {
             const auto& [text] = multEntity.get<TextRenderable>();
             const auto& [origin] = multEntity.get<Origin>();

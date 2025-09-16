@@ -2,6 +2,8 @@
 
 #include "GameWonScene.h"
 
+#include "Modules/Breakout/Components/TransitionGameStateIntent.h"
+#include "Modules/Breakout/Singletons/GameStateGameWon.h"
 #include "Scenes/Gameplay/Components/NavigateToMainMenuIntent.h"
 #include "Scenes/Gameplay/Components/RestartGameIntent.h"
 
@@ -98,11 +100,8 @@ void GameWonScene::Initialize()
          .backgroundColor = sf::Color::Transparent,
          .position = {CENTER_X, CENTER_Y + 100},
          .zOrder = ++zOrder,
-         .onClick =
-             [](const flecs::world& stage) {
-                 LOG_DEBUG("GameWonScene::RestartButton::onClick -> Add NavigateToMainMenuIntent");
-                 stage.entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMainMenuIntent>();
-             }}
+         .onClick = [](const flecs::world& stage
+                    ) { stage.entity().set<TransitionGameStateIntent>({GameTransitions::OpenMenu}); }}
     ).child_of(GetRootEntity());
 }
 
@@ -111,13 +110,13 @@ void GameWonScene::CreateUISystems(const flecs::world& world)
     // Query for KeyPressed
     world.system<const KeyPressed>("GameWonScene.ProcessKeyPressed")
         .kind(flecs::PostLoad)
-        .write<NavigateToMainMenuIntent>()
+        .write<TransitionGameStateIntent>()
+        .with<GameStateGameWon>().singleton()
         .each([](const flecs::entity& e, const KeyPressed& k) {
             LOG_DEBUG("GameWonScene::ProcessKeyPressed");
-
             if (k.scancode == sf::Keyboard::Scancode::Escape)
             {
-                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMainMenuIntent>();
+                e.world().entity().set<TransitionGameStateIntent>({GameTransitions::OpenMenu});
                 e.destruct();
             }
         })

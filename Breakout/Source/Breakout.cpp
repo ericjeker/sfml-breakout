@@ -3,6 +3,7 @@
 #include "Breakout.h"
 
 #include "GameStates/MainMenu/MainMenuState.h"
+#include "Modules/Breakout/BreakoutModule.h"
 
 #include "Core/Managers/AudioManager.h"
 #include "Core/Managers/GameService.h"
@@ -44,6 +45,7 @@ void Breakout::Initialize()
     world.import<Modules::ParticlesModule>();
     world.import<Modules::RenderModule>();
     world.import<Modules::UIModule>();
+    world.import<Modules::BreakoutModule>();
     // clang-format on
 
     // --- Load the initial state where the initial scene will be loaded ---

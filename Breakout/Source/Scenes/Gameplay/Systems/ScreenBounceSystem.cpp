@@ -2,6 +2,7 @@
 
 #include "ScreenBounceSystem.h"
 
+#include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/Ball.h"
 
 #include "Core/Configuration.h"
@@ -40,6 +41,7 @@ void ProcessScreenBounce(Transform& t, Velocity& v, const ColliderShape& c, cons
 void ScreenBounceSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<Transform, Velocity, const ColliderShape, const Radius, const Ball>("ScreenBounceSystem")
-    .each(ProcessScreenBounce)
-    .child_of(rootEntity);
+        .with<GameStatePlaying>().singleton()
+        .each(ProcessScreenBounce)
+        .child_of(rootEntity);
 }

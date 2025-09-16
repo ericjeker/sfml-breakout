@@ -4,6 +4,7 @@
 
 #include "GameStates/Gameplay/Components/Lives.h"
 #include "GameStates/Gameplay/Components/Multiplier.h"
+#include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/Ball.h"
 #include "Scenes/Gameplay/Components/ContinueGameIntent.h"
 #include "Scenes/Gameplay/Components/GameOverIntent.h"
@@ -51,6 +52,7 @@ void OutOfBoundsSystem::Initialize(const flecs::world& world, const flecs::entit
     world.system<Transform, const Ball>("OutOfBoundsSystem")
         .write<ContinueGameIntent>()
         .write<GameOverIntent>()
+        .with<GameStatePlaying>().singleton()
         .each(Update)
         .child_of(rootEntity);
 }
