@@ -2,8 +2,8 @@
 
 #include "GameOverScene.h"
 
-#include "../Gameplay/Components/Intents/NavigateToMenuIntent.h"
-#include "../Gameplay/Components/Intents/RestartGameIntent.h"
+#include "Modules/Breakout/Components/Intents/NavigateToMenuIntent.h"
+#include "Modules/Breakout/Components/Intents/RestartGameIntent.h"
 #include "Modules/Breakout/Singletons/GameStateGameLost.h"
 #include "Scenes/Gameplay/GameplayScene.h"
 
@@ -33,6 +33,7 @@ void GameOverScene::Initialize()
 
     const auto& world = GetWorld();
 
+    // --- Create Local Systems ---
     CreateUISystems(world);
 
     // --- Create entities ---
@@ -97,6 +98,7 @@ void GameOverScene::Initialize()
     ).child_of(GetRootEntity());
 }
 
+// TODO: replace by key bindings system at the event level
 void GameOverScene::CreateUISystems(const flecs::world& world)
 {
     // Query for KeyPressed

@@ -11,6 +11,7 @@
 
 - [ ] All the systems should be in their own files.
 - [ ] Some Prefabs are actually factories, they should be namespaced accordingly.
+- [ ] All the KeyPressed Systems should be using a key binding instead of a hardcoded key.
 
 ## Bugs / Improvements
 

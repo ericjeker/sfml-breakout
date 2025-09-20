@@ -2,8 +2,8 @@
 
 #include "Scenes/Pause/PauseScene.h"
 
+#include "../../Modules/Breakout/Components/Intents/ResumeGameIntent.h"
 #include "../../Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
-#include "../Gameplay/Components/Intents/ResumeGameIntent.h"
 #include "Modules/Breakout/Singletons/GameStatePaused.h"
 #include "Scenes/Gameplay/GameplayScene.h"
 

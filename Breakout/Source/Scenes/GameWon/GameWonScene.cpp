@@ -2,9 +2,9 @@
 
 #include "GameWonScene.h"
 
-#include "../../Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
+#include "Modules/Breakout/Components/Intents/RestartGameIntent.h"
+#include "Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
 #include "Modules/Breakout/Singletons/GameStateGameWon.h"
-#include "Scenes/Gameplay/Components/Intents/RestartGameIntent.h"
 
 #include "Core/Configuration.h"
 #include "Core/Modules/Input/Components/Command.h"
@@ -33,6 +33,7 @@ void GameWonScene::Initialize()
 
     const auto& world = GetWorld();
 
+    // --- Create Local Systems ---
     CreateUISystems(world);
 
     // --- Create entities ---
@@ -104,6 +105,7 @@ void GameWonScene::Initialize()
     ).child_of(GetRootEntity());
 }
 
+// TODO: replace by key bindings system at the event level
 void GameWonScene::CreateUISystems(const flecs::world& world)
 {
     // Query for KeyPressed

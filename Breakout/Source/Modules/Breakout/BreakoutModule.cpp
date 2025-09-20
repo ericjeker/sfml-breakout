@@ -3,18 +3,9 @@
 #include "BreakoutModule.h"
 
 #include "Components/Intents/TransitionGameStateIntent.h"
-#include "GameStates/Gameplay/GameplayState.h"
-#include "GameStates/Menu/MenuState.h"
 #include "Modules/Breakout/Singletons/Lives.h"
 #include "Modules/Breakout/Singletons/Multiplier.h"
 #include "Modules/Breakout/Singletons/Score.h"
-#include "Scenes/Debug/DebugScene.h"
-#include "Scenes/GameOver/GameOverScene.h"
-#include "Scenes/GameWon/GameWonScene.h"
-#include "Scenes/Gameplay/GameplayScene.h"
-#include "Scenes/Gameplay/Tasks/PauseGame.h"
-#include "Scenes/Hud/HudScene.h"
-#include "Scenes/Pause/PauseScene.h"
 #include "Singletons/CurrentLevel.h"
 #include "Singletons/GameStateGameLost.h"
 #include "Singletons/GameStateGameWon.h"
@@ -22,97 +13,20 @@
 #include "Singletons/GameStatePaused.h"
 #include "Singletons/GameStatePlaying.h"
 #include "Singletons/MaxLevel.h"
-
-#include "Core/GameService.h"
-#include "Core/Managers/GameStateManager.h"
-#include "Core/Modules/Window/Components/DeferredEvent.h"
-#include "Core/Utils/Logger.h"
-
-namespace
-{
-
-auto ProcessGameInstanceStateTransition()
-{
-    return [](const flecs::entity& e, const TransitionGameStateIntent& intent) {
-        const auto& world = e.world();
-
-        world.remove<GameStatePlaying>();
-        world.remove<GameStatePaused>();
-        world.remove<GameStateMenu>();
-        world.remove<GameStateGameWon>();
-        world.remove<GameStateGameLost>();
-
-        switch (intent.state)
-        {
-            case GameTransitions::OpenMenu:
-                LOG_DEBUG("BreakoutModule::ProcessGameInstanceStateTransition -> OpenMenu");
-                e.world().entity().set<DeferredEvent>({.callback = [](flecs::world& world) {
-                    GameService::Get<GameStateManager>().ChangeState(std::make_unique<MenuState>(world));
-                }});
-                e.world().add<GameStateMenu>();
-                break;
-            case GameTransitions::StartPlaying:
-                LOG_DEBUG("BreakoutModule::ProcessGameInstanceStateTransition -> StartPlaying");
-                e.world().entity().set<DeferredEvent>({.callback = [](flecs::world& world) {
-                    GameService::Get<GameStateManager>().ChangeState(std::make_unique<GameplayState>(world));
-                }});
-                e.world().add<GameStatePlaying>();
-                break;
-            case GameTransitions::RestartPlaying:
-                LOG_DEBUG("BreakoutModule::ProcessGameInstanceStateTransition -> RestartPlaying");
-                world.entity().set<DeferredEvent>({[](const flecs::world& world) {
-                    auto& sceneManager = GameService::Get<SceneManager>();
-                    sceneManager.LoadScene<GameplayScene>(SceneLoadMode::Single);
-                    sceneManager.LoadScene<DebugScene>(SceneLoadMode::Additive);
-                    sceneManager.LoadScene<HudScene>(SceneLoadMode::Additive);
-                }});
-
-                world.set<Score>({.score = 0});
-                world.set<Lives>({3});
-                world.set<Multiplier>({1});
-                world.set<CurrentLevel>({1});
-
-                e.world().add<GameStatePlaying>();
-                break;
-            case GameTransitions::PauseGame:
-                LOG_DEBUG("BreakoutModule::ProcessGameInstanceStateTransition -> PauseGame");
-                e.world().entity().set<DeferredEvent>({[](const flecs::world& world) {
-                    auto& sceneManager = GameService::Get<SceneManager>();
-                    sceneManager.LoadScene<PauseScene>(SceneLoadMode::Additive);
-                }});
-                e.world().add<GameStatePaused>();
-                break;
-            case GameTransitions::ResumePlaying:
-                LOG_DEBUG("BreakoutModule::ProcessGameInstanceStateTransition -> ResumePlaying");
-                e.world().entity().set<DeferredEvent>({[](const flecs::world& world) {
-                    auto& sceneManager = GameService::Get<SceneManager>();
-                    sceneManager.UnloadScene<PauseScene>();
-                }});
-                e.world().add<GameStatePlaying>();
-                break;
-            case GameTransitions::GameWon:
-                LOG_DEBUG("BreakoutModule::ProcessGameInstanceStateTransition -> GameWon");
-                e.world().entity().set<DeferredEvent>({[](const flecs::world& world) {
-                    auto& sceneManager = GameService::Get<SceneManager>();
-                    sceneManager.LoadScene<GameWonScene>(SceneLoadMode::Additive);
-                }});
-                e.world().add<GameStateGameWon>();
-                break;
-            case GameTransitions::GameLost:
-                LOG_DEBUG("BreakoutModule::ProcessGameInstanceStateTransition -> GameLost");
-                e.world().entity().set<DeferredEvent>({[](const flecs::world& world) {
-                    auto& sceneManager = GameService::Get<SceneManager>();
-                    sceneManager.LoadScene<GameOverScene>(SceneLoadMode::Additive);
-                }});
-                e.world().add<GameStateGameLost>();
-                break;
-        }
-
-        e.destruct();
-    };
-}
-
-} // namespace
+#include "Systems/ApplyPaddlePositionToBallSystem.h"
+#include "Systems/CheckAllBlocksDestroyedSystem.h"
+#include "Systems/CollisionDetectionSystem.h"
+#include "Systems/ConstrainPaddleToScreenSystem.h"
+#include "Systems/Hud/UpdateLivesWidget.h"
+#include "Systems/Hud/UpdateMultiplierWidget.h"
+#include "Systems/Hud/UpdateScoreWidget.h"
+#include "Systems/Intents/ProcessContinueGameIntent.h"
+#include "Systems/Intents/ProcessLaunchBallIntent.h"
+#include "Systems/Intents/ProcessNextLevelIntent.h"
+#include "Systems/Intents/ProcessTransitionGameStateIntent.h"
+#include "Systems/OutOfBoundsSystem.h"
+#include "Systems/PaddleMovementSystem.h"
+#include "Systems/ScreenBounceSystem.h"
 
 namespace Modules
 {
@@ -139,14 +53,34 @@ BreakoutModule::BreakoutModule(const flecs::world& world)
     world.add<GameStateMenu>();
 
     // --- Register Systems ---
-    world.system<const TransitionGameStateIntent>("ProcessGameInstanceStateTransition")
-        .write<GameStatePlaying>()
-        .write<GameStatePaused>()
-        .write<GameStateMenu>()
-        .write<GameStateGameWon>()
-        .write<GameStateGameLost>()
-        .kind(flecs::PreUpdate)
-        .each(ProcessGameInstanceStateTransition());
+    // --- Paddle & Ball Control ---
+    PaddleMovementSystem::Register(world);
+    ProcessLaunchBallIntent::Register(world);
+    ApplyPaddlePositionToBallSystem::Register(world);
+
+    // --- Physics, Collision, Constraints ---
+    ScreenBounceSystem::Register(world);
+    CollisionDetectionSystem::Register(world);
+    ConstrainPaddleToScreenSystem::Register(world);
+
+    // --- Game Over / Game Won ---
+    // TODO: instead, check if there are no more ball on the screen = GAME OVER or LOSE ONE LIFE
+    OutOfBoundsSystem::Register(world);
+    CheckAllBlocksDestroyedSystem::Register(world);
+
+    // --- UI & Intents ---
+    // TODO: ProcessKeyPressed should use bindings
+    //Gameplay::ProcessFocusLost::Initialize(world);
+    //Gameplay::ProcessKeyPressed::Register(world);
+    ProcessNextLevelIntent::Register(world);
+    ProcessContinueGameIntent::Register(world);
+    ProcessTransitionGameStateIntent::Register(world);
+
+    // --- HUD ---
+    UpdateScoreWidget::Register(world);
+    UpdateMultiplierWidget::Register(world);
+    UpdateLivesWidget::Register(world);
+
 }
 
 } // namespace Modules

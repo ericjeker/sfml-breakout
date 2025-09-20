@@ -1,0 +1,49 @@
+// Copyright (c) Eric Jeker 2025.
+
+#include "ScreenBounceSystem.h"
+
+#include "Modules/Breakout/Components/Ball.h"
+#include "Modules/Breakout/Singletons/GameStatePlaying.h"
+
+#include "Core/Configuration.h"
+#include "Core/Modules/Physics/Components/ColliderShape.h"
+#include "Core/Modules/Physics/Components/Velocity.h"
+#include "Core/Modules/Render/Components/Radius.h"
+#include "Core/Modules/Render/Components/Transform.h"
+
+namespace
+{
+
+auto Update()
+{
+    return [](Transform& t, Velocity& v, const ColliderShape& c, const Radius& r, const Ball& b) {
+        const float radius = r.radius;
+
+        if (t.position.x - radius < 0.f)
+        {
+            v.velocity.x *= -1.f;
+            t.position.x = radius;
+        }
+        else if (t.position.x + radius > Configuration::RESOLUTION.x)
+        {
+            v.velocity.x *= -1.f;
+            t.position.x = Configuration::RESOLUTION.x - radius;
+        }
+
+        if (t.position.y - radius < 0.f)
+        {
+            v.velocity.y *= -1.f;
+            t.position.y = radius;
+        }
+    };
+}
+
+} // namespace
+
+void ScreenBounceSystem::Register(const flecs::world& world)
+{
+    world.system<Transform, Velocity, const ColliderShape, const Radius, const Ball>("ScreenBounceSystem")
+        .with<GameStatePlaying>()
+        .singleton()
+        .each(Update());
+}

@@ -2,7 +2,7 @@
 
 #include "PaddleEntity.h"
 
-#include "Scenes/Gameplay/Components/Paddle.h"
+#include "Modules/Breakout/Components/Paddle.h"
 
 #include "Core/Configuration.h"
 #include "Core/Modules/Input/Components/PossessedByPlayer.h"
@@ -18,22 +18,20 @@ flecs::entity PaddleEntity::Create(const flecs::world& world, const flecs::entit
 {
     constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
 
-    return Factories::Rectangle::Create(
-        world,
-        {
-            .size = {100.f, 20.f},
-            .color = NordTheme::Aurora1,
-            .origin = {0.5f, 0.5f},
-            .position = {CENTER_X, Configuration::RESOLUTION.y - 100.f},
-            .zOrder = 0.f,
-        }
-    )
-        .child_of(rootEntity)
-        .add<PossessedByPlayer>()
-        .add<Paddle>()
-        .set<Acceleration>({})
-        .set<Friction>({.friction = 10.f})
-        .set<Velocity>({})
-        .set<ColliderShape>({Shape::Rectangle});
-
+    return Factories::Rectangle::
+        Create(world,
+               {
+                   .size = {100.f, 20.f},
+                   .color = NordTheme::Aurora1,
+                   .origin = {0.5f, 0.5f},
+                   .position = {CENTER_X, Configuration::RESOLUTION.y - 100.f},
+                   .zOrder = 0.f,
+               })
+            .child_of(rootEntity)
+            .add<PossessedByPlayer>()
+            .add<Paddle>()
+            .set<Acceleration>({})
+            .set<Friction>({.friction = 10.f})
+            .set<Velocity>({})
+            .set<ColliderShape>({Shape::Rectangle});
 }

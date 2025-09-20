@@ -2,9 +2,9 @@
 
 #include "BlockEntity.h"
 
-#include "Scenes/Gameplay/Components/Block.h"
-#include "Scenes/Gameplay/Components/Health.h"
-#include "Scenes/Gameplay/Components/Indestructible.h"
+#include "Modules/Breakout/Components/Block.h"
+#include "Modules/Breakout/Components/Health.h"
+#include "Modules/Breakout/Components/Indestructible.h"
 
 #include "Core/Modules/Physics/Components/ColliderShape.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"

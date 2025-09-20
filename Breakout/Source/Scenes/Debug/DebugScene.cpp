@@ -8,12 +8,6 @@
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
 
-namespace
-{
-
-
-} // namespace
-
 DebugScene::DebugScene(flecs::world& world)
     : Scene(world)
 {

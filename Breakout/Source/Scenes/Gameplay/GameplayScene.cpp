@@ -2,25 +2,25 @@
 
 #include "Scenes/Gameplay/GameplayScene.h"
 
-#include "../../Modules/Breakout/Singletons/CurrentLevel.h"
-#include "Components/MoveIntent.h"
 #include "Entities/BallEntity.h"
 #include "Entities/BlockEntity.h"
 #include "Entities/PaddleEntity.h"
-#include "Prefabs/MoveLeftCommand.h"
-#include "Prefabs/MoveRightCommand.h"
+#include "Modules/Breakout/Components/MoveIntent.h"
+#include "Modules/Breakout/Prefabs/MoveLeftCommand.h"
+#include "Modules/Breakout/Prefabs/MoveRightCommand.h"
+#include "Modules/Breakout/Singletons/CurrentLevel.h"
+#include "Modules/Breakout/Systems/ApplyPaddlePositionToBallSystem.h"
+#include "Modules/Breakout/Systems/CheckAllBlocksDestroyedSystem.h"
+#include "Modules/Breakout/Systems/CollisionDetectionSystem.h"
+#include "Modules/Breakout/Systems/ConstrainPaddleToScreenSystem.h"
+#include "Modules/Breakout/Systems/Intents/ProcessContinueGameIntent.h"
+#include "Modules/Breakout/Systems/Intents/ProcessLaunchBallIntent.h"
+#include "Modules/Breakout/Systems/Intents/ProcessNextLevelIntent.h"
+#include "Modules/Breakout/Systems/OutOfBoundsSystem.h"
+#include "Modules/Breakout/Systems/PaddleMovementSystem.h"
+#include "Modules/Breakout/Systems/ScreenBounceSystem.h"
+#include "Modules/Breakout/Systems/UI/ProcessKeyPressed.h"
 #include "Scenes/Debug/DebugScene.h"
-#include "Systems/ApplyPaddlePositionToBallSystem.h"
-#include "Systems/CheckAllBlocksDestroyedSystem.h"
-#include "Systems/CollisionDetectionSystem.h"
-#include "Systems/ConstrainPaddleToScreenSystem.h"
-#include "Systems/Intents/ProcessContinueGameIntent.h"
-#include "Systems/Intents/ProcessLaunchBallIntent.h"
-#include "Systems/Intents/ProcessNextLevelIntent.h"
-#include "Systems/OutOfBoundsSystem.h"
-#include "Systems/PaddleMovementSystem.h"
-#include "Systems/ScreenBounceSystem.h"
-#include "Systems/UI/ProcessKeyPressed.h"
 
 #include "Core/Configuration.h"
 #include "Core/GameService.h"
@@ -64,26 +64,7 @@ void GameplayScene::Initialize()
     PaddleEntity::Create(world, GetRootEntity(), zOrder);
     BallEntity::Create(world, GetRootEntity(), zOrder);
 
-    // --- Paddle & Ball Control ---
-    PaddleMovementSystem::Register(world, GetRootEntity());
-    ProcessLaunchBallIntent::Register(world, GetRootEntity());
-    ApplyPaddlePositionToBallSystem::Register(world, GetRootEntity());
 
-    // --- Physics, Collision, Constraints ---
-    ScreenBounceSystem::Register(world, GetRootEntity());
-    CollisionDetectionSystem::Register(world, GetRootEntity());
-    ConstrainPaddleToScreenSystem::Register(world, GetRootEntity());
-
-    // --- Game Over / Game Won ---
-    // TODO: instead, check if there are no more ball on the screen = GAME OVER or LOSE ONE LIFE
-    OutOfBoundsSystem::Register(world, GetRootEntity());
-    CheckAllBlocksDestroyedSystem::Register(world, GetRootEntity());
-
-    // --- UI & Intents ---
-    //Gameplay::ProcessFocusLost::Initialize(world, GetRootEntity());
-    Gameplay::ProcessKeyPressed::Register(world, GetRootEntity());
-    ProcessNextLevelIntent::Register(world, GetRootEntity());
-    ProcessContinueGameIntent::Register(world, GetRootEntity());
 }
 
 void GameplayScene::CreateInputBindings(const flecs::world& world)
