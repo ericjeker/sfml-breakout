@@ -12,7 +12,7 @@ namespace
 
 auto Update()
 {
-    return [](const flecs::iter& it, size_t, const TextRenderable& textRenderable, const FPSWidget&) {
+    return [](const flecs::iter& it, size_t, const TextRenderable& textRenderable) {
         static float sinceLastUpdate = 0.f;
         static int frameCount = 0;
         const float deltaTime = it.world().delta_time();
@@ -33,5 +33,5 @@ auto Update()
 
 void CalculateFpsSystem::Register(const flecs::world& world)
 {
-    world.system<const TextRenderable, const FPSWidget>("Debug::CalculateFPSSystem").each(Update());
+    world.system<const TextRenderable>("Debug::CalculateFPSSystem").with<const FPSWidget>().each(Update());
 }
