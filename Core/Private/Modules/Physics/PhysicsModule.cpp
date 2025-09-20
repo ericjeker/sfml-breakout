@@ -2,7 +2,8 @@
 
 #include "Core/Modules/Physics/PhysicsModule.h"
 
-#include "Core/Managers/GameService.h"
+#include "Core/GameService.h"
+
 #include "Core/Modules/Physics/Components/Acceleration.h"
 #include "Core/Modules/Physics/Components/ColliderShape.h"
 #include "Core/Modules/Physics/Components/CollisionInfo.h"

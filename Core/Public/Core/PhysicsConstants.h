@@ -6,6 +6,7 @@
 
 #include <SFML/System/Vector2.hpp>
 
+// TODO: Move that to the Physics module
 namespace PhysicsConstants
 {
 // Gravity values (our world use centimeters and seconds)

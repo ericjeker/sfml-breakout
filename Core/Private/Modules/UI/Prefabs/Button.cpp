@@ -2,8 +2,7 @@
 
 #include "Core/Modules/UI/Prefabs/Button.h"
 
-#include "Core/Components/Event.h"
-#include "Core/Managers/GameService.h"
+#include "Core/GameService.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Render/Components/RectangleRenderable.h"
 #include "Core/Modules/Render/Components/Size.h"
@@ -14,6 +13,7 @@
 #include "Core/Modules/UI/Components/ButtonText.h"
 #include "Core/Modules/UI/Components/Clickable.h"
 #include "Core/Modules/UI/Components/Interactable.h"
+#include "Core/Modules/Window/Components/Event.h"
 
 
 namespace Prefabs

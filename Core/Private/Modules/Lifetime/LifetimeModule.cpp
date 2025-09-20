@@ -4,9 +4,6 @@
 
 #include "Core/Modules/Lifetime/Components/Lifetime.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
-#include "Core/Singletons/FrameCount.h"
-#include "Core/Utils/Logger.h"
-
 
 namespace
 {
@@ -31,7 +28,6 @@ void LifetimeCull(const flecs::entity& e, const Lifetime& lifetime)
  */
 void DestroyEntity(const flecs::entity& e, const LifetimeOneFrame&)
 {
-    //LOG_DEBUG("LifetimeModule::DestroyEntity -> Destroying entity: {}, frame: {}", e.id(), e.world().get<FrameCount>().frameCount);
     e.destruct();
 }
 

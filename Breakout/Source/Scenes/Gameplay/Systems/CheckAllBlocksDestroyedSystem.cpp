@@ -2,18 +2,18 @@
 
 #include "CheckAllBlocksDestroyedSystem.h"
 
+#include "../Components/Intents/GameWonIntent.h"
+#include "../Components/Intents/NextLevelIntent.h"
 #include "GameStates/Gameplay/Components/CurrentLevel.h"
 #include "GameStates/Gameplay/Components/MaxLevel.h"
 #include "Modules/Breakout/Components/TransitionGameStateIntent.h"
 #include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/Block.h"
-#include "Scenes/Gameplay/Components/GameWonIntent.h"
 #include "Scenes/Gameplay/Components/Indestructible.h"
-#include "Scenes/Gameplay/Components/NextLevelIntent.h"
 
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
-#include "Core/Singletons/FrameCount.h"
+#include "Core/Modules/Window/Singletons/FrameCount.h"
 #include "Core/Utils/Logger.h"
 
 namespace

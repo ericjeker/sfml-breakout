@@ -2,10 +2,8 @@
 
 #include "Core/GameInstance.h"
 
-#include "Core/Components/DeferredEvent.h"
-#include "Core/Components/WindowResizeIntent.h"
 #include "Core/Configuration.h"
-#include "Core/Managers/GameService.h"
+#include "Core/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/SceneManager.h"
 #include "Core/Modules/Input/Components/Command.h"
@@ -15,8 +13,10 @@
 #include "Core/Modules/UI/Prefabs/FocusLostEvent.h"
 #include "Core/Modules/UI/Prefabs/KeyPressedEvent.h"
 #include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
-#include "Core/Singletons/FrameCount.h"
-#include "Core/Singletons/WindowSize.h"
+#include "Core/Modules/Window/Components/DeferredEvent.h"
+#include "Core/Modules/Window/Components/WindowResizeIntent.h"
+#include "Core/Modules/Window/Singletons/FrameCount.h"
+#include "Core/Modules/Window/Singletons/WindowSize.h"
 #include "Core/Utils/Logger.h"
 
 #include <tracy/Tracy.hpp>
@@ -25,9 +25,9 @@ void GameInstance::Initialize()
 {
     ZoneScopedN("GameInstance::Initialize");
 
-    // --- Set the initial window size used for resizing ---
-    LOG_DEBUG("GameInstance::Run: Setting initial window size");
     const auto& window = GameService::Get<sf::RenderWindow>();
+
+    // --- Set the initial window size used when resizing ---
     GetWorld().set<WindowSize>({.currentSize = window.getSize(), .refSize = Configuration::RESOLUTION});
 }
 
@@ -39,7 +39,6 @@ void GameInstance::Run(sf::RenderWindow& renderWindow)
     flecs::world& world = GetWorld();
 
     // --- Game loop ---
-    LOG_DEBUG("GameInstance::Run: Starting game loop");
     sf::Clock clock;
     while (renderWindow.isOpen() && !ShouldExit())
     {
@@ -73,6 +72,7 @@ void GameInstance::Run(sf::RenderWindow& renderWindow)
 void GameInstance::HandleEvents(sf::RenderWindow& renderWindow) const
 {
     ZoneScopedN("GameInstance::HandleEvents");
+
     const auto& world = GetWorld();
 
     while (const auto event = renderWindow.pollEvent())
@@ -83,7 +83,7 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow) const
         }
         else if (const auto* resized = event->getIf<sf::Event::Resized>())
         {
-
+            // TODO: Might as well move all this jazz in its own function
             assert(world.has<WindowSize>() && "WindowSize singleton does not exist.");
             auto& [size, refSize] = world.get_mut<WindowSize>();
 
@@ -110,10 +110,12 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow) const
         }
         else if (event->is<sf::Event::FocusLost>())
         {
+            // It's up to the game to handle a focus-lost event, we just log it here
             world.entity().is_a<Prefabs::FocusLostEvent>();
         }
         else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
         {
+            // We log all the key pressed events, the game will later handle them
             world.entity().is_a<Prefabs::KeyPressedEvent>().set<KeyPressed>({
                 .code = keyPressed->code,
                 .scancode = keyPressed->scancode,
@@ -124,6 +126,7 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow) const
         }
         else if (const auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>())
         {
+            // Same here for the mouse events
             world.entity().is_a<Prefabs::MouseReleasedEvent>().set<MouseReleased>(
                 {.position = mouseReleased->position, .button = mouseReleased->button}
             );
@@ -136,7 +139,7 @@ void GameInstance::RunDeferredEvents(flecs::world& world)
     ZoneScopedN("GameInstance::RunDeferredEvents");
 
     // We will collect all the callbacks and entities to destroy here.
-    // This is done because Flecs can't destroy an entity while it's iterating.
+    // Flecs can't destroy an entity while it's iterating as it's in staging.
     std::vector<flecs::entity> toDelete;
     std::vector<std::function<void(flecs::world&)>> callbacks;
     callbacks.reserve(32);
@@ -148,7 +151,7 @@ void GameInstance::RunDeferredEvents(flecs::world& world)
         toDelete.emplace_back(e);
     });
 
-    // --- Run the callbacks ---
+    // --- Run the callbacks (lambdas) ---
     for (auto& cb : callbacks)
     {
         cb(world);

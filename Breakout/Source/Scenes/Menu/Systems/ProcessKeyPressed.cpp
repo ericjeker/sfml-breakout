@@ -3,7 +3,7 @@
 #include "ProcessKeyPressed.h"
 
 #include "Modules/Breakout/Singletons/GameStateMenu.h"
-#include "Scenes/MainMenu/Components/ExitGameIntent.h"
+#include "Scenes/Menu/Components/ExitGameIntent.h"
 
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
@@ -15,19 +15,19 @@ namespace
 
 void Update(const flecs::entity& e, const KeyPressed& k)
 {
-    LOG_DEBUG("MainMenu::ProcessKeyPressed::Update -> KeyPressed");
+    LOG_DEBUG("Menu::ProcessKeyPressed::Update -> KeyPressed");
     if (k.scancode == sf::Keyboard::Scancode::Escape)
     {
         e.world().entity().add<LifetimeOneFrame>().add<Command>().add<ExitGameIntent>();
     }
 
-    LOG_DEBUG("MainMenu::ProcessKeyPressed: Key Handled, destroying.");
+    LOG_DEBUG("Menu::ProcessKeyPressed: Key Handled, destroying.");
     e.destruct();
 }
 
 } // namespace
 
-namespace MainMenu
+namespace Menu
 {
 
 void ProcessKeyPressed::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
@@ -40,4 +40,4 @@ void ProcessKeyPressed::Initialize(const flecs::world& world, const flecs::entit
         .child_of(rootEntity);
 }
 
-} // namespace MainMenu
+} // namespace Menu

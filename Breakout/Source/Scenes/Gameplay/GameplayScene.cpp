@@ -2,6 +2,7 @@
 
 #include "Scenes/Gameplay/GameplayScene.h"
 
+#include "Core/GameService.h"
 #include "Components/MoveIntent.h"
 #include "Entities/BallEntity.h"
 #include "Entities/BlockEntity.h"
@@ -24,7 +25,6 @@
 
 #include "Core/Configuration.h"
 #include "Core/Managers/FileManager.h"
-#include "Core/Managers/GameService.h"
 #include "Core/Modules/Input/Singletons/InputBindings.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
 #include "Core/Themes/Nord.h"

@@ -2,19 +2,19 @@
 
 #include "BreakoutModule.h"
 
+#include "Core/GameService.h"
 #include "Components/TransitionGameStateIntent.h"
 #include "GameStates/Gameplay/Components/CurrentLevel.h"
 #include "GameStates/Gameplay/Components/Lives.h"
 #include "GameStates/Gameplay/Components/Multiplier.h"
 #include "GameStates/Gameplay/Components/Score.h"
 #include "GameStates/Gameplay/GameplayState.h"
-#include "GameStates/MainMenu/MainMenuState.h"
+#include "GameStates/Menu/MenuState.h"
 #include "Scenes/Debug/DebugScene.h"
 #include "Scenes/GameOver/GameOverScene.h"
 #include "Scenes/GameWon/GameWonScene.h"
 #include "Scenes/Gameplay/GameplayScene.h"
 #include "Scenes/Gameplay/Tasks/PauseGame.h"
-#include "Scenes/Gameplay/Tasks/ResumeGame.h"
 #include "Scenes/Hud/HudScene.h"
 #include "Scenes/Pause/PauseScene.h"
 #include "Singletons/GameStateGameLost.h"
@@ -23,8 +23,7 @@
 #include "Singletons/GameStatePaused.h"
 #include "Singletons/GameStatePlaying.h"
 
-#include "Core/Components/DeferredEvent.h"
-#include "Core/Managers/GameService.h"
+#include "Core/Modules/Window/Components/DeferredEvent.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Utils/Logger.h"
 
@@ -47,7 +46,7 @@ auto ProcessGameInstanceStateTransition()
             case GameTransitions::OpenMenu:
                 LOG_DEBUG("BreakoutModule::ProcessGameInstanceStateTransition -> OpenMenu");
                 e.world().entity().set<DeferredEvent>({.callback = [](flecs::world& world) {
-                    GameService::Get<GameStateManager>().ChangeState(std::make_unique<MainMenuState>(world));
+                    GameService::Get<GameStateManager>().ChangeState(std::make_unique<MenuState>(world));
                 }});
                 e.world().add<GameStateMenu>();
                 break;

@@ -2,7 +2,8 @@
 
 #include "Core/Modules/UI/Prefabs/Text.h"
 
-#include "Core/Managers/GameService.h"
+#include "Core/GameService.h"
+
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Render/Components/Origin.h"
 #include "Core/Modules/Render/Components/TextRenderable.h"

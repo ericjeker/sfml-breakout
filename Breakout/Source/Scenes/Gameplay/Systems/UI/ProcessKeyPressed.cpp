@@ -2,10 +2,10 @@
 
 #include "ProcessKeyPressed.h"
 
+#include "../../Components/Intents/LaunchBallIntent.h"
+#include "../../Components/Intents/PauseGameIntent.h"
 #include "Modules/Breakout/Components/TransitionGameStateIntent.h"
 #include "Modules/Breakout/Singletons/GameStatePlaying.h"
-#include "Scenes/Gameplay/Components/LaunchBallIntent.h"
-#include "Scenes/Gameplay/Components/PauseGameIntent.h"
 
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"

@@ -1,42 +1,39 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Scenes/MainMenu/MainMenuScene.h"
-
 #include "GameStates/Gameplay/GameplayState.h"
 #include "Modules/Breakout/Components/TransitionGameStateIntent.h"
-#include "Scenes/MainMenu/Components/ExitGameIntent.h"
+#include "Scenes/Menu/Components/ExitGameIntent.h"
+#include "Scenes/Menu/MenuScene.h"
 #include "Systems/ProcessExitGameIntent.h"
 #include "Systems/ProcessKeyPressed.h"
 
-#include "Core/Components/DeferredEvent.h"
-#include "Core/Components/WindowResizeIntent.h"
 #include "Core/Configuration.h"
-#include "Core/Managers/GameService.h"
+#include "Core/GameService.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
 
-MainMenuScene::MainMenuScene(flecs::world& world)
+MenuScene::MenuScene(flecs::world& world)
     : Scene(world)
 {
 }
 
-void MainMenuScene::Initialize()
+void MenuScene::Initialize()
 {
     Scene::Initialize();
-    GetRootEntity().set_name("MainMenuScene");
+    GetRootEntity().set_name("MenuScene");
 
     const auto& world = GetWorld();
 
     CreateUIEntities(world);
 
     // --- Declare local systems ---
-    MainMenu::ProcessKeyPressed::Initialize(world, GetRootEntity());
-    MainMenu::ProcessExitGameIntent::Initialize(world, GetRootEntity());
+    Menu::ProcessKeyPressed::Initialize(world, GetRootEntity());
+    Menu::ProcessExitGameIntent::Initialize(world, GetRootEntity());
 }
 
-void MainMenuScene::CreateUIEntities(const flecs::world& world)
+void MenuScene::CreateUIEntities(const flecs::world& world)
 {
     constexpr float centerX = Configuration::RESOLUTION.x / 2.f;
     constexpr float centerY = Configuration::RESOLUTION.y / 2.f;

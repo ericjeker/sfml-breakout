@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.31)
 project(Breakout)
 
-# --- CMake Configuration ---
+# --- CMake Specifications ---
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -26,6 +26,7 @@ add_subdirectory(Core)
 # --- Games or Sub-Projects ---
 add_subdirectory(Breakout)
 
+# --- Installation ---
 install(TARGETS Breakout
         EXPORT Breakout
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

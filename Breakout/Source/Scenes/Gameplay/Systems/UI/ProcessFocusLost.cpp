@@ -2,7 +2,7 @@
 
 #include "ProcessFocusLost.h"
 
-#include "Scenes/Gameplay/Components/PauseGameIntent.h"
+#include "../../Components/Intents/PauseGameIntent.h"
 
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"

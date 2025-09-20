@@ -12,7 +12,9 @@
 #include <unordered_map>
 #include <variant>
 
-
+/**
+ * @brief Simple resource manager that can load resources from a manifest file.
+ */
 class ResourceManager
 {
 public:
@@ -68,4 +70,3 @@ private:
 
     std::unordered_map<std::string, ResourceVariant> _resources;
 };
-

@@ -2,7 +2,8 @@
 
 #include "Core/Modules/Render/RenderModule.h"
 
-#include "Core/Managers/GameService.h"
+#include "Core/GameService.h"
+
 #include "Core/Modules/Particles/Components/Particle.h"
 #include "Core/Modules/Render/Components/CircleRenderable.h"
 #include "Core/Modules/Render/Components/RectangleRenderable.h"
@@ -266,15 +267,15 @@ RenderModule::RenderModule(const flecs::world& world)
     world.component<ZOrder>();
 
     // --- We apply all the Transform to the Renderables ---
-    world.system<const Transform, CircleRenderable>("ApplyTransformToCircle").kind(flecs::PreStore).each(ApplyTransformToCircle);
-    world.system<const Transform, RectangleRenderable>("ApplyTransformToRectangle")
+    world.system<const Transform, CircleRenderable>("RenderModule::ApplyTransformToCircle").kind(flecs::PreStore).each(ApplyTransformToCircle);
+    world.system<const Transform, RectangleRenderable>("RenderModule::ApplyTransformToRectangle")
         .kind(flecs::PreStore)
         .each(ApplyTransformToRectangle);
-    world.system<const Transform, SpriteRenderable>("ApplyTransformToSprite").kind(flecs::PreStore).each(ApplyTransformToSprite);
+    world.system<const Transform, SpriteRenderable>("RenderModule::ApplyTransformToSprite").kind(flecs::PreStore).each(ApplyTransformToSprite);
 
     // --- Render all the Renderable Components ---
-    world.system("Render").kind(flecs::OnStore).run(Render);
-    world.system("RenderParticles").kind(flecs::OnStore).run(RenderAllParticles);
+    world.system("RenderModule::Render").kind(flecs::OnStore).run(Render);
+    world.system("RenderModule::RenderParticles").kind(flecs::OnStore).run(RenderAllParticles);
 }
 
 } // namespace Modules

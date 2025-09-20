@@ -11,11 +11,7 @@
 
 
 /**
- * @class: GameStateManager
- *
- * @short Manage game states with a stack state pattern.
- *
- * Given we use a Stack State, only the top State is Updated.
+ * @brief Manage game states with a stack state pattern. This is similar to a LayerManager.
  *
  * Examples of State-Scene Relationships:
  *
@@ -35,5 +31,3 @@ private:
     std::unique_ptr<GameState> _currentState;
     std::stack<std::unique_ptr<GameState>> _stateStack;
 };
-
-

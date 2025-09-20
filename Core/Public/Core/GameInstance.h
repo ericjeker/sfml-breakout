@@ -17,16 +17,22 @@ public:
     virtual void Shutdown();
 
     /**
-     * This is the big RUN function that stats everything
+     * @brief This is the big RUN function that stats everything
      * @param renderWindow
      */
     void Run(sf::RenderWindow& renderWindow);
+
+    /**
+     * @brief Translate the SFML events to Flecs entities
+     * @param renderWindow
+     */
     void HandleEvents(sf::RenderWindow& renderWindow) const;
     static void RunDeferredEvents(flecs::world& world);
 
     void RequestExit();
     [[nodiscard]] bool ShouldExit() const;
 
+    // The Main And Only God World, AKA The Universe
     [[nodiscard]] flecs::world& GetWorld();
     [[nodiscard]] const flecs::world& GetWorld() const;
 

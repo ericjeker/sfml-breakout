@@ -1,11 +1,11 @@
 // Copyright (c) Eric Jeker 2025.
 
+#include "Core/GameService.h"
 #include "Breakout.h"
 
 #include "Core/Configuration.h"
 #include "Core/GameInstance.h"
 #include "Core/Managers/AudioManager.h"
-#include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Managers/SceneManager.h"

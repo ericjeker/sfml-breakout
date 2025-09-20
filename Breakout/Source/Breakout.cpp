@@ -2,11 +2,11 @@
 
 #include "Breakout.h"
 
-#include "GameStates/MainMenu/MainMenuState.h"
+#include "Core/GameService.h"
+#include "GameStates/Menu/MenuState.h"
 #include "Modules/Breakout/BreakoutModule.h"
 
 #include "Core/Managers/AudioManager.h"
-#include "Core/Managers/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Camera/CameraModule.h"
@@ -50,7 +50,7 @@ void Breakout::Initialize()
 
     // --- Load the initial state where the initial scene will be loaded ---
     LOG_DEBUG("Breakout::Initialization: Load the Main Menu State");
-    GameService::Get<GameStateManager>().ChangeState(std::make_unique<MainMenuState>(world));
+    GameService::Get<GameStateManager>().ChangeState(std::make_unique<MenuState>(world));
 
     // --- Start the main theme ---
     // TODO: disabled during development as this was driving me insane

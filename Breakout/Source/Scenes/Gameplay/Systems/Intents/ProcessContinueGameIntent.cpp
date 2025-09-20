@@ -2,7 +2,7 @@
 
 #include "ProcessContinueGameIntent.h"
 
-#include "Scenes/Gameplay/Components/ContinueGameIntent.h"
+#include "../../Components/Intents/ContinueGameIntent.h"
 #include "Scenes/Gameplay/Components/Paddle.h"
 #include "Scenes/Gameplay/Entities/BallEntity.h"
 

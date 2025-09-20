@@ -2,9 +2,9 @@
 
 #include "ProcessLaunchBallIntent.h"
 
+#include "../../Components/Intents/LaunchBallIntent.h"
 #include "Scenes/Gameplay/Components/AttachedToPaddle.h"
 #include "Scenes/Gameplay/Components/Ball.h"
-#include "Scenes/Gameplay/Components/LaunchBallIntent.h"
 
 #include "Core/Modules/Physics/Components/ColliderShape.h"
 #include "Core/Modules/Physics/Components/Velocity.h"

@@ -13,6 +13,9 @@
 template <typename T>
 using EventListener = std::function<void(const T& event, void* sender)>;
 
+/**
+ * @brief PubSub system, where event can be processes immediately or deferred.
+ */
 class EventManager
 {
 public:
@@ -93,22 +96,7 @@ public:
         _deferredEvents.emplace_back(typeIndex, std::move(eventExecutor));
     }
 
-    void ProcessDeferredEvents()
-    {
-        // Process all deferred events
-        for (auto& deferredEvent : _deferredEvents)
-        {
-            LOG_DEBUG(
-                "(EventManager::ProcessDeferredEvents: Processing deferred event: " +
-                std::string(deferredEvent.eventType.name())
-            );
-            deferredEvent.eventExecutor();
-        }
-
-        // Clear the deferred events after processing
-        _deferredEvents.clear();
-    }
-
+    void ProcessDeferredEvents();
 private:
     std::map<std::type_index, std::vector<TypeErasedListener>> _listeners;
     std::vector<DeferredEvent> _deferredEvents;

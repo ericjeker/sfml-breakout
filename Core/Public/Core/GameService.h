@@ -27,9 +27,10 @@
 namespace GameService
 {
 
-// We use type erasure here to avoid using std::any
 /**
  * @brief Base class for service wrappers using type erasure pattern.
+ *
+ * We use type erasure here to avoid using std::any
  */
 struct ServiceBase
 {
@@ -64,9 +65,9 @@ struct ServiceWrapper final : ServiceBase
     }
 };
 
+// Type definition
 using ServiceMap = std::unordered_map<std::type_index, std::unique_ptr<ServiceBase>>;
 inline ServiceMap services;
-
 
 inline void Initialize()
 {

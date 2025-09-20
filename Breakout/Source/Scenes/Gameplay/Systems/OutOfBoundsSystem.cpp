@@ -2,12 +2,12 @@
 
 #include "OutOfBoundsSystem.h"
 
+#include "../Components/Intents/ContinueGameIntent.h"
 #include "GameStates/Gameplay/Components/Lives.h"
 #include "GameStates/Gameplay/Components/Multiplier.h"
 #include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/Ball.h"
-#include "Scenes/Gameplay/Components/ContinueGameIntent.h"
-#include "Scenes/Gameplay/Components/GameOverIntent.h"
+#include "Scenes/Gameplay/Components/Intents/GameOverIntent.h"
 
 #include "Core/Configuration.h"
 #include "Core/Modules/Input/Components/Command.h"

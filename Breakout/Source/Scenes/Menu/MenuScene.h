@@ -5,10 +5,10 @@
 
 #include "Core/Scenes/Scene.h"
 
-class MainMenuScene final : public Scene
+class MenuScene final : public Scene
 {
 public:
-    explicit MainMenuScene(flecs::world& world);
+    explicit MenuScene(flecs::world& world);
 
     void Initialize() override;
 

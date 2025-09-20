@@ -4,7 +4,7 @@
 
 #include <flecs.h>
 
-namespace MainMenu
+namespace Menu
 {
 
 struct ProcessKeyPressed

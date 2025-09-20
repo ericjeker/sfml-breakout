@@ -1,4 +1,4 @@
-# --- Sources Files
+# --- Sources Files ---
 file(GLOB_RECURSE SOURCE_FILES Private/*.cpp)
 file(GLOB_RECURSE HEADER_FILES Private/*.h)
 

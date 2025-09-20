@@ -2,12 +2,12 @@
 
 #include "Core/Modules/Camera/CameraModule.h"
 
-#include "Core/Components/WindowResizeIntent.h"
-#include "Core/Managers/GameService.h"
+#include "Core/GameService.h"
 #include "Core/Modules/Camera/Components/CameraShake.h"
 #include "Core/Modules/Camera/Components/CameraShakeIntent.h"
 #include "Core/Modules/Camera/Singletons/MainCamera.h"
-#include "Core/Singletons/WindowSize.h"
+#include "Core/Modules/Window/Components/WindowResizeIntent.h"
+#include "Core/Modules/Window/Singletons/WindowSize.h"
 #include "Core/Utils/Logger.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>

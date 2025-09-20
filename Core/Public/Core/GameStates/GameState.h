@@ -6,7 +6,9 @@
 
 #include <flecs.h>
 
-
+/**
+ * @brief The GameState is a Layer that we can push to the game stack using the GameStateManager.
+ */
 class GameState
 {
 public:

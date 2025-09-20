@@ -4,8 +4,7 @@
 
 #include "Modules/Breakout/Components/TransitionGameStateIntent.h"
 #include "Modules/Breakout/Singletons/GameStateGameWon.h"
-#include "Scenes/Gameplay/Components/NavigateToMainMenuIntent.h"
-#include "Scenes/Gameplay/Components/RestartGameIntent.h"
+#include "Scenes/Gameplay/Components/Intents/RestartGameIntent.h"
 
 #include "Core/Configuration.h"
 #include "Core/Modules/Input/Components/Command.h"
@@ -15,7 +14,7 @@
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
-#include "Core/Singletons/FrameCount.h"
+#include "Core/Modules/Window/Singletons/FrameCount.h"
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"
 
@@ -111,7 +110,8 @@ void GameWonScene::CreateUISystems(const flecs::world& world)
     world.system<const KeyPressed>("GameWonScene.ProcessKeyPressed")
         .kind(flecs::PostLoad)
         .write<TransitionGameStateIntent>()
-        .with<GameStateGameWon>().singleton()
+        .with<GameStateGameWon>()
+        .singleton()
         .each([](const flecs::entity& e, const KeyPressed& k) {
             LOG_DEBUG("GameWonScene::ProcessKeyPressed");
             if (k.scancode == sf::Keyboard::Scancode::Escape)

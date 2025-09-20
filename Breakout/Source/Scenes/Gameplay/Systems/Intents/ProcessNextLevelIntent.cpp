@@ -2,17 +2,17 @@
 
 #include "ProcessNextLevelIntent.h"
 
+#include "../../Components/Intents/NextLevelIntent.h"
 #include "GameStates/Gameplay/Components/CurrentLevel.h"
 #include "GameStates/Gameplay/Components/Multiplier.h"
 #include "Scenes/Debug/DebugScene.h"
-#include "Scenes/Gameplay/Components/NextLevelIntent.h"
 #include "Scenes/Gameplay/GameplayScene.h"
 #include "Scenes/Hud/HudScene.h"
 
-#include "Core/Components/DeferredEvent.h"
-#include "Core/Managers/GameService.h"
+#include "Core/GameService.h"
 #include "Core/Managers/SceneManager.h"
-#include "Core/Singletons/FrameCount.h"
+#include "Core/Modules/Window/Components/DeferredEvent.h"
+#include "Core/Modules/Window/Singletons/FrameCount.h"
 
 namespace
 {

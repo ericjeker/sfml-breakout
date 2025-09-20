@@ -2,7 +2,7 @@
 
 #include "Core/Scenes/Scene.h"
 
-#include "Core/Managers/GameService.h"
+#include "Core/GameService.h"
 
 
 Scene::Scene(flecs::world& world)

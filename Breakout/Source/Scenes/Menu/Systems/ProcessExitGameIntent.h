@@ -5,10 +5,10 @@
 #include <flecs.h>
 
 
-namespace MainMenu
+namespace Menu
 {
 struct ProcessExitGameIntent
 {
     static void Initialize(const flecs::world& world, const flecs::entity& rootEntity);
 };
-} // namespace MainMenu
+} // namespace Menu

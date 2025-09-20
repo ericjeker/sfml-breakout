@@ -5,10 +5,10 @@
 #include "Core/GameStates/GameState.h"
 
 
-class MainMenuState final : public GameState
+class MenuState final : public GameState
 {
 public:
-    explicit MainMenuState(flecs::world& world);
+    explicit MenuState(flecs::world& world);
     void Enter() override;
     void Exit() override;
 };

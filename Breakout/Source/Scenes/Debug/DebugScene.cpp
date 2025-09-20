@@ -2,9 +2,9 @@
 
 #include "Scenes/Debug/DebugScene.h"
 
+#include "Core/GameService.h"
 #include "Modules/Breakout/Singletons/GameStatePlaying.h"
 
-#include "Core/Managers/GameService.h"
 #include "Core/Modules/Render/Components/TextRenderable.h"
 #include "Core/Modules/Render/RenderModule.h"
 #include "Core/Modules/UI/Prefabs/Text.h"

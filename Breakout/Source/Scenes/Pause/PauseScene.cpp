@@ -2,20 +2,20 @@
 
 #include "Scenes/Pause/PauseScene.h"
 
+#include "../Gameplay/Components/Intents/ResumeGameIntent.h"
 #include "Modules/Breakout/Components/TransitionGameStateIntent.h"
 #include "Modules/Breakout/Singletons/GameStatePaused.h"
-#include "Scenes/Gameplay/Components/ResumeGameIntent.h"
 #include "Scenes/Gameplay/GameplayScene.h"
 
-#include "Core/Components/DeferredEvent.h"
 #include "Core/Configuration.h"
-#include "Core/Managers/GameService.h"
+#include "Core/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
+#include "Core/Modules/Window/Components/DeferredEvent.h"
 #include "Core/Scenes/Tags/ScenePaused.h"
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"

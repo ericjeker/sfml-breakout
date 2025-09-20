@@ -2,6 +2,6 @@
 
 #pragma once
 
-struct NavigateToMainMenuIntent
+struct NavigateToMenuIntent
 {
 };

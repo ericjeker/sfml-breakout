@@ -2,6 +2,7 @@
 
 #include "GameplayState.h"
 
+#include "Core/GameService.h"
 #include "Components/CurrentLevel.h"
 #include "Components/Lives.h"
 #include "Components/MaxLevel.h"
@@ -15,7 +16,6 @@
 #include "Scenes/Pause/PauseScene.h"
 
 #include "Core/GameStates/GameState.h"
-#include "Core/Managers/GameService.h"
 #include "Core/Managers/SceneManager.h"
 
 GameplayState::GameplayState(flecs::world& world)

@@ -2,11 +2,11 @@
 
 #include "ProcessExitGameIntent.h"
 
-#include "Scenes/MainMenu/Components/ExitGameIntent.h"
+#include "Scenes/Menu/Components/ExitGameIntent.h"
 
-#include "Core/Components/DeferredEvent.h"
 #include "Core/GameInstance.h"
-#include "Core/Managers/GameService.h"
+#include "Core/GameService.h"
+#include "Core/Modules/Window/Components/DeferredEvent.h"
 
 namespace
 {
@@ -20,10 +20,10 @@ void Update(const flecs::iter& it, size_t, const ExitGameIntent i)
 
 } // namespace
 
-namespace MainMenu
+namespace Menu
 {
 void ProcessExitGameIntent::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<const ExitGameIntent>("ProcessExitGameIntent").each(Update).child_of(rootEntity);
 }
-} // namespace MainMenu
+} // namespace Menu

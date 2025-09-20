@@ -8,7 +8,9 @@
 #include <memory>
 #include <typeindex>
 
-
+/**
+ * @brief Scenes can be loaded additively or as single scenes
+ */
 enum class SceneLoadMode
 {
     Single,
@@ -16,8 +18,8 @@ enum class SceneLoadMode
 };
 
 /**
- * The SceneManager responsibility is to maintain a list of all currently active scenes, regardless of which GameState
- * requested them. It handles the low-level loading, unloading, updating, and rendering of these scenes.
+ * @brief The SceneManager responsibility is to maintain a list of all currently active scenes, regardless of which
+ * GameState requested them.
  *
  * Scenes can overlap, and even if the GameState is paused because another state has been pushed at the top of the state
  * stack, all the scenes still need to be rendered in order.

@@ -2,7 +2,7 @@
 
 #include "Core/Modules/Render/Factories/Sprite.h"
 
-#include "Core/Managers/GameService.h"
+#include "Core/GameService.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Render/Components/SpriteRenderable.h"
 #include "Core/Modules/Render/Components/Transform.h"
