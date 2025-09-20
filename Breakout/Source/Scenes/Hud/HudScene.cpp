@@ -2,9 +2,9 @@
 
 #include "HudScene.h"
 
-#include "GameStates/Gameplay/Components/Lives.h"
-#include "GameStates/Gameplay/Components/Multiplier.h"
-#include "GameStates/Gameplay/Components/Score.h"
+#include "../../Modules/Breakout/Singletons/Lives.h"
+#include "../../Modules/Breakout/Singletons/Multiplier.h"
+#include "Modules/Breakout/Singletons/Score.h"
 #include "Modules/Breakout/Singletons/GameStatePlaying.h"
 
 #include "Core/Configuration.h"

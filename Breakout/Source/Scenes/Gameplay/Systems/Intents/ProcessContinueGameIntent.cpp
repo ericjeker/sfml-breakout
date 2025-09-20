@@ -2,12 +2,14 @@
 
 #include "ProcessContinueGameIntent.h"
 
-#include "../../Components/Intents/ContinueGameIntent.h"
+#include "Scenes/Gameplay/Components/Intents/ContinueGameIntent.h"
 #include "Scenes/Gameplay/Components/Paddle.h"
 #include "Scenes/Gameplay/Entities/BallEntity.h"
 
 #include "Core/Configuration.h"
 #include "Core/Modules/Render/Components/Transform.h"
+
+#include <functional>
 
 namespace
 {
@@ -27,7 +29,7 @@ std::function<void(flecs::entity, ContinueGameIntent)> Update(const flecs::entit
 
 } // namespace
 
-void ProcessContinueGameIntent::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
+void ProcessContinueGameIntent::Register(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<const ContinueGameIntent>("ProcessContinueGameIntent")
         .kind(flecs::PreUpdate)

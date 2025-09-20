@@ -2,8 +2,8 @@
 
 #include "CollisionDetectionSystem.h"
 
-#include "GameStates/Gameplay/Components/Multiplier.h"
-#include "GameStates/Gameplay/Components/Score.h"
+#include "../../../Modules/Breakout/Singletons/Multiplier.h"
+#include "Modules/Breakout/Singletons/Score.h"
 #include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/Ball.h"
 #include "Scenes/Gameplay/Components/Health.h"
@@ -23,6 +23,8 @@
 #include "Core/Utils/Vector.h"
 
 #include <tracy/Tracy.hpp>
+
+#include <cmath>
 
 namespace
 {
@@ -163,10 +165,11 @@ void ProcessCollisionDetection(
 }
 } // namespace
 
-void CollisionDetectionSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
+void CollisionDetectionSystem::Register(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<const Transform, const Size, const Origin, const ColliderShape>("CollisionDetectionSystem")
-        .with<GameStatePlaying>().singleton()
+        .with<GameStatePlaying>()
+        .singleton()
         .each(ProcessCollisionDetection)
         .child_of(rootEntity);
 }

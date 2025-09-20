@@ -38,7 +38,7 @@ void ProcessScreenBounce(Transform& t, Velocity& v, const ColliderShape& c, cons
 
 } // namespace
 
-void ScreenBounceSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
+void ScreenBounceSystem::Register(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<Transform, Velocity, const ColliderShape, const Radius, const Ball>("ScreenBounceSystem")
         .with<GameStatePlaying>().singleton()

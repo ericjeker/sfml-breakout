@@ -2,12 +2,11 @@
 
 #include "Scenes/Gameplay/GameplayScene.h"
 
-#include "Core/GameService.h"
+#include "../../Modules/Breakout/Singletons/CurrentLevel.h"
 #include "Components/MoveIntent.h"
 #include "Entities/BallEntity.h"
 #include "Entities/BlockEntity.h"
 #include "Entities/PaddleEntity.h"
-#include "GameStates/Gameplay/Components/CurrentLevel.h"
 #include "Prefabs/MoveLeftCommand.h"
 #include "Prefabs/MoveRightCommand.h"
 #include "Scenes/Debug/DebugScene.h"
@@ -24,6 +23,7 @@
 #include "Systems/UI/ProcessKeyPressed.h"
 
 #include "Core/Configuration.h"
+#include "Core/GameService.h"
 #include "Core/Managers/FileManager.h"
 #include "Core/Modules/Input/Singletons/InputBindings.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
@@ -65,25 +65,25 @@ void GameplayScene::Initialize()
     BallEntity::Create(world, GetRootEntity(), zOrder);
 
     // --- Paddle & Ball Control ---
-    PaddleMovementSystem::Initialize(world, GetRootEntity());
-    ProcessLaunchBallIntent::Initialize(world, GetRootEntity());
-    ApplyPaddlePositionToBallSystem::Initialize(world, GetRootEntity());
+    PaddleMovementSystem::Register(world, GetRootEntity());
+    ProcessLaunchBallIntent::Register(world, GetRootEntity());
+    ApplyPaddlePositionToBallSystem::Register(world, GetRootEntity());
 
     // --- Physics, Collision, Constraints ---
-    ScreenBounceSystem::Initialize(world, GetRootEntity());
-    CollisionDetectionSystem::Initialize(world, GetRootEntity());
-    ConstrainPaddleToScreenSystem::Initialize(world, GetRootEntity());
+    ScreenBounceSystem::Register(world, GetRootEntity());
+    CollisionDetectionSystem::Register(world, GetRootEntity());
+    ConstrainPaddleToScreenSystem::Register(world, GetRootEntity());
 
     // --- Game Over / Game Won ---
     // TODO: instead, check if there are no more ball on the screen = GAME OVER or LOSE ONE LIFE
-    OutOfBoundsSystem::Initialize(world, GetRootEntity());
-    CheckAllBlocksDestroyedSystem::Initialize(world, GetRootEntity());
+    OutOfBoundsSystem::Register(world, GetRootEntity());
+    CheckAllBlocksDestroyedSystem::Register(world, GetRootEntity());
 
     // --- UI & Intents ---
     //Gameplay::ProcessFocusLost::Initialize(world, GetRootEntity());
-    Gameplay::ProcessKeyPressed::Initialize(world, GetRootEntity());
-    ProcessNextLevelIntent::Initialize(world, GetRootEntity());
-    ProcessContinueGameIntent::Initialize(world, GetRootEntity());
+    Gameplay::ProcessKeyPressed::Register(world, GetRootEntity());
+    ProcessNextLevelIntent::Register(world, GetRootEntity());
+    ProcessContinueGameIntent::Register(world, GetRootEntity());
 }
 
 void GameplayScene::CreateInputBindings(const flecs::world& world)

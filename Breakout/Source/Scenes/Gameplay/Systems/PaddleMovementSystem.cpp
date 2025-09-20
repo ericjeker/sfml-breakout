@@ -24,7 +24,7 @@ void Update(const flecs::entity& cmd, const MoveIntent& i, const Target& t)
 
 } // namespace
 
-void PaddleMovementSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
+void PaddleMovementSystem::Register(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<const MoveIntent, const Target>("PaddleMovementSystem")
         .kind(flecs::PreUpdate)

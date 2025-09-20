@@ -2,8 +2,8 @@
 
 #include "Scenes/Pause/PauseScene.h"
 
+#include "../../Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
 #include "../Gameplay/Components/Intents/ResumeGameIntent.h"
-#include "Modules/Breakout/Components/TransitionGameStateIntent.h"
 #include "Modules/Breakout/Singletons/GameStatePaused.h"
 #include "Scenes/Gameplay/GameplayScene.h"
 
@@ -11,12 +11,11 @@
 #include "Core/GameService.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
+#include "Core/Modules/Scene/Tags/ScenePaused.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
-#include "Core/Modules/Window/Components/DeferredEvent.h"
-#include "Core/Scenes/Tags/ScenePaused.h"
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"
 
@@ -99,10 +98,8 @@ void PauseScene::Initialize()
             .backgroundColor = sf::Color::Transparent,
             .position = {CENTER_X, CENTER_Y + 100},
             .zOrder = ++zOrder,
-            .onClick =
-                [](const flecs::world& stage) {
-                    stage.entity().set<TransitionGameStateIntent>({GameTransitions::OpenMenu});
-                },
+            .onClick = [](const flecs::world& stage
+                       ) { stage.entity().set<TransitionGameStateIntent>({GameTransitions::OpenMenu}); },
         }
     )
         .child_of(GetRootEntity());
@@ -114,7 +111,8 @@ void PauseScene::CreateUISystems(const flecs::world& world)
     world.system<const KeyPressed>("ProcessKeyPressed")
         .kind(flecs::PostLoad)
         .write<ResumeGameIntent>()
-        .with<GameStatePaused>().singleton()
+        .with<GameStatePaused>()
+        .singleton()
         .each([rootEntity = GetRootEntity()](const flecs::entity& e, const KeyPressed& k) {
             if (rootEntity.has<ScenePaused>())
             {

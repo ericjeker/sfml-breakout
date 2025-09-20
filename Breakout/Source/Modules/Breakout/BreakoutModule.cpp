@@ -2,14 +2,12 @@
 
 #include "BreakoutModule.h"
 
-#include "Core/GameService.h"
-#include "Components/TransitionGameStateIntent.h"
-#include "GameStates/Gameplay/Components/CurrentLevel.h"
-#include "GameStates/Gameplay/Components/Lives.h"
-#include "GameStates/Gameplay/Components/Multiplier.h"
-#include "GameStates/Gameplay/Components/Score.h"
+#include "Components/Intents/TransitionGameStateIntent.h"
 #include "GameStates/Gameplay/GameplayState.h"
 #include "GameStates/Menu/MenuState.h"
+#include "Modules/Breakout/Singletons/Lives.h"
+#include "Modules/Breakout/Singletons/Multiplier.h"
+#include "Modules/Breakout/Singletons/Score.h"
 #include "Scenes/Debug/DebugScene.h"
 #include "Scenes/GameOver/GameOverScene.h"
 #include "Scenes/GameWon/GameWonScene.h"
@@ -17,14 +15,17 @@
 #include "Scenes/Gameplay/Tasks/PauseGame.h"
 #include "Scenes/Hud/HudScene.h"
 #include "Scenes/Pause/PauseScene.h"
+#include "Singletons/CurrentLevel.h"
 #include "Singletons/GameStateGameLost.h"
 #include "Singletons/GameStateGameWon.h"
 #include "Singletons/GameStateMenu.h"
 #include "Singletons/GameStatePaused.h"
 #include "Singletons/GameStatePlaying.h"
+#include "Singletons/MaxLevel.h"
 
-#include "Core/Modules/Window/Components/DeferredEvent.h"
+#include "Core/GameService.h"
 #include "Core/Managers/GameStateManager.h"
+#include "Core/Modules/Window/Components/DeferredEvent.h"
 #include "Core/Utils/Logger.h"
 
 namespace
@@ -118,16 +119,26 @@ namespace Modules
 
 BreakoutModule::BreakoutModule(const flecs::world& world)
 {
+    // --- Register Singletons ---
     world.singleton<GameStatePlaying>();
     world.singleton<GameStatePaused>();
     world.singleton<GameStateMenu>();
     world.singleton<GameStateGameWon>();
     world.singleton<GameStateGameLost>();
 
+    world.singleton<Score>();
+    world.singleton<Lives>();
+    world.singleton<Multiplier>();
+    world.singleton<CurrentLevel>();
+    world.singleton<MaxLevel>();
+
+    // --- Register Components ---
     world.component<TransitionGameStateIntent>();
 
+    // --- Initialize Singletons ---
     world.add<GameStateMenu>();
 
+    // --- Register Systems ---
     world.system<const TransitionGameStateIntent>("ProcessGameInstanceStateTransition")
         .write<GameStatePlaying>()
         .write<GameStatePaused>()

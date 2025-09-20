@@ -10,6 +10,7 @@
 ### Flecs Specifics Cleanup
 
 - [ ] All the systems should be in their own files.
+- [ ] Some Prefabs are actually factories, they should be namespaced accordingly.
 
 ## Bugs / Improvements
 

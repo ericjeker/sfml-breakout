@@ -41,6 +41,7 @@ void GameState::Resume()
 
 bool GameState::IsPaused() const
 {
+    return false;
 }
 
 flecs::world& GameState::GetWorld()

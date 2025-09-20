@@ -7,5 +7,5 @@
 
 struct CheckAllBlocksDestroyedSystem
 {
-    static void Initialize(const flecs::world& world, const flecs::entity& rootEntity);
+    static void Register(const flecs::world& world, const flecs::entity& rootEntity);
 };

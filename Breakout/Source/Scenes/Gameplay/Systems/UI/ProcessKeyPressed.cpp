@@ -4,13 +4,13 @@
 
 #include "../../Components/Intents/LaunchBallIntent.h"
 #include "../../Components/Intents/PauseGameIntent.h"
-#include "Modules/Breakout/Components/TransitionGameStateIntent.h"
+#include "Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
 #include "Modules/Breakout/Singletons/GameStatePlaying.h"
 
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
+#include "Core/Modules/Scene/Tags/ScenePaused.h"
 #include "Core/Modules/UI/Components/KeyPressed.h"
-#include "Core/Scenes/Tags/ScenePaused.h"
 #include "Core/Utils/Logger.h"
 
 #include <SFML/Window/Keyboard.hpp>
@@ -55,7 +55,7 @@ auto Update(flecs::entity rootEntity)
 
 namespace Gameplay
 {
-void ProcessKeyPressed::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
+void ProcessKeyPressed::Register(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<const KeyPressed>("Gameplay.ProcessKeyPressed")
         .kind(flecs::PreUpdate)

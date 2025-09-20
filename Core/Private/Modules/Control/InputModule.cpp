@@ -8,7 +8,7 @@
 #include "Core/Modules/Input/Singletons/InputBindings.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 
-namespace Modules
+namespace Core::Modules
 {
 
 InputModule::InputModule(const flecs::world& world)

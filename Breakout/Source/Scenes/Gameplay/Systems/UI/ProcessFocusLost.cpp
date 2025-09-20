@@ -2,7 +2,7 @@
 
 #include "ProcessFocusLost.h"
 
-#include "../../Components/Intents/PauseGameIntent.h"
+#include "Scenes/Gameplay/Components/Intents/PauseGameIntent.h"
 
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
@@ -20,7 +20,7 @@ void Update(const flecs::entity e, const FocusLost f)
 
 namespace Gameplay
 {
-void ProcessFocusLost::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
+void ProcessFocusLost::Register(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<const FocusLost>().write<PauseGameIntent>().each(Update).child_of(rootEntity);
 }

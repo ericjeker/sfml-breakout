@@ -20,6 +20,7 @@ public:
 
     [[nodiscard]] flecs::entity GetRootEntity() const;
 
+    // TODO: do I really need a state management in my game state?
     void Pause();
     void Resume();
     [[nodiscard]] bool IsPaused() const;
@@ -29,5 +30,7 @@ public:
 
 private:
     flecs::world& _world;
+
+    // TODO: do I really need a root entity for my game states?
     flecs::entity _rootEntity;
 };

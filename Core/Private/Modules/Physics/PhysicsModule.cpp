@@ -142,7 +142,7 @@ void AddDebugCollisionInfo(const flecs::entity& e, const CollisionInfo& c)
 } // namespace
 
 
-namespace Modules
+namespace Core::Modules
 {
 
 PhysicsModule::PhysicsModule(const flecs::world& world)

@@ -2,9 +2,9 @@
 
 #include "OutOfBoundsSystem.h"
 
+#include "../../../Modules/Breakout/Singletons/Lives.h"
+#include "../../../Modules/Breakout/Singletons/Multiplier.h"
 #include "../Components/Intents/ContinueGameIntent.h"
-#include "GameStates/Gameplay/Components/Lives.h"
-#include "GameStates/Gameplay/Components/Multiplier.h"
 #include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/Ball.h"
 #include "Scenes/Gameplay/Components/Intents/GameOverIntent.h"
@@ -47,7 +47,7 @@ void Update(const flecs::entity ball, const Transform& t, const Ball& b)
 } // namespace
 
 
-void OutOfBoundsSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
+void OutOfBoundsSystem::Register(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<Transform, const Ball>("OutOfBoundsSystem")
         .write<ContinueGameIntent>()

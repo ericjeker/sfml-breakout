@@ -251,7 +251,7 @@ void Render(const flecs::iter& it)
 
 } // namespace
 
-namespace Modules
+namespace Core::Modules
 {
 
 RenderModule::RenderModule(const flecs::world& world)

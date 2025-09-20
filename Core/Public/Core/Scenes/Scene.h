@@ -3,10 +3,8 @@
 #pragma once
 
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Window/Event.hpp>
 
 #include <flecs.h>
-#include <optional>
 #include <string>
 
 

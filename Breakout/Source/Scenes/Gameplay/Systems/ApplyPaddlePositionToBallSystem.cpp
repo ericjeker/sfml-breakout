@@ -24,7 +24,7 @@ void Update(const flecs::entity& e, Transform& t, const AttachedToPaddle& ap, co
 
 } // namespace
 
-void ApplyPaddlePositionToBallSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
+void ApplyPaddlePositionToBallSystem::Register(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<Transform, const AttachedToPaddle, const Ball>("ApplyPaddlePositionToBall")
         .with<GameStatePlaying>().singleton()

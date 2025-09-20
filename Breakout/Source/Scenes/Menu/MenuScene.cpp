@@ -1,9 +1,10 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "GameStates/Gameplay/GameplayState.h"
-#include "Modules/Breakout/Components/TransitionGameStateIntent.h"
-#include "Scenes/Menu/Components/ExitGameIntent.h"
 #include "Scenes/Menu/MenuScene.h"
+
+#include "../../Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
+#include "GameStates/Gameplay/GameplayState.h"
+#include "Scenes/Menu/Components/ExitGameIntent.h"
 #include "Systems/ProcessExitGameIntent.h"
 #include "Systems/ProcessKeyPressed.h"
 

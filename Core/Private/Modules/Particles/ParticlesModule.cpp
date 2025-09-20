@@ -77,7 +77,7 @@ void EmitParticles(const flecs::iter& it, size_t idx, ParticleEmitter& emitter, 
 
 } // namespace
 
-namespace Modules
+namespace Core::Modules
 {
 
 ParticlesModule::ParticlesModule(const flecs::world& world)

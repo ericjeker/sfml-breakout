@@ -2,9 +2,9 @@
 
 #include "ProcessNextLevelIntent.h"
 
+#include "../../../../Modules/Breakout/Singletons/CurrentLevel.h"
+#include "../../../../Modules/Breakout/Singletons/Multiplier.h"
 #include "../../Components/Intents/NextLevelIntent.h"
-#include "GameStates/Gameplay/Components/CurrentLevel.h"
-#include "GameStates/Gameplay/Components/Multiplier.h"
 #include "Scenes/Debug/DebugScene.h"
 #include "Scenes/Gameplay/GameplayScene.h"
 #include "Scenes/Hud/HudScene.h"
@@ -42,7 +42,7 @@ void Update(const flecs::entity& e, const NextLevelIntent& i)
 
 } // namespace
 
-void ProcessNextLevelIntent::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
+void ProcessNextLevelIntent::Register(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<const NextLevelIntent>("ProcessNextLevelIntent").kind(flecs::PreStore).each(Update).child_of(rootEntity);
 }

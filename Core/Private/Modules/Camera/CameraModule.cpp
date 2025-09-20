@@ -107,7 +107,7 @@ void UpdateCameraShake(const flecs::entity& e, CameraShake& shake)
 } // namespace
 
 
-namespace Modules
+namespace Core::Modules
 {
 
 CameraModule::CameraModule(const flecs::world& world)

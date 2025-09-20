@@ -7,7 +7,7 @@
 #include <flecs.h>
 
 
-namespace Modules
+namespace Core::Modules
 {
 
 struct PhysicsModule

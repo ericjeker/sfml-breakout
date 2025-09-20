@@ -9,6 +9,6 @@ namespace Gameplay
 {
 struct ProcessFocusLost
 {
-    static void Initialize(const flecs::world& world, const flecs::entity& rootEntity);
+    static void Register(const flecs::world& world, const flecs::entity& rootEntity);
 };
 } // namespace Gameplay

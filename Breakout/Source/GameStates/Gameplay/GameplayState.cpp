@@ -2,12 +2,11 @@
 
 #include "GameplayState.h"
 
-#include "Core/GameService.h"
-#include "Components/CurrentLevel.h"
-#include "Components/Lives.h"
-#include "Components/MaxLevel.h"
-#include "Components/Multiplier.h"
-#include "Components/Score.h"
+#include "Modules/Breakout/Singletons/CurrentLevel.h"
+#include "Modules/Breakout/Singletons/Lives.h"
+#include "Modules/Breakout/Singletons/MaxLevel.h"
+#include "Modules/Breakout/Singletons/Multiplier.h"
+#include "Modules/Breakout/Singletons/Score.h"
 #include "Scenes/Debug/DebugScene.h"
 #include "Scenes/GameOver/GameOverScene.h"
 #include "Scenes/GameWon/GameWonScene.h"
@@ -15,6 +14,7 @@
 #include "Scenes/Hud/HudScene.h"
 #include "Scenes/Pause/PauseScene.h"
 
+#include "Core/GameService.h"
 #include "Core/GameStates/GameState.h"
 #include "Core/Managers/SceneManager.h"
 
@@ -25,11 +25,12 @@ GameplayState::GameplayState(flecs::world& world)
 
 void GameplayState::Enter()
 {
-    LOG_DEBUG("GameplayState::Enter");
     GameState::Enter();
 
     // --- Create the game session ---
     const auto& world = GetWorld();
+
+    // --- Initialize game session singletons ---
     world.set<Score>({});
     world.set<Lives>({1});
     world.set<Multiplier>({});
@@ -46,7 +47,7 @@ void GameplayState::Enter()
     sceneManager.AddScene<PauseScene>(std::make_unique<PauseScene>(GetWorld()));
     sceneManager.AddScene<HudScene>(std::make_unique<HudScene>(GetWorld()));
 
-    // --- Load the default scene ---
+    // --- Load the default scenes ---
     sceneManager.LoadScene<GameplayScene>(SceneLoadMode::Single);
     sceneManager.LoadScene<HudScene>(SceneLoadMode::Additive);
     sceneManager.LoadScene<DebugScene>(SceneLoadMode::Additive);
@@ -54,7 +55,6 @@ void GameplayState::Enter()
 
 void GameplayState::Exit()
 {
-    LOG_DEBUG("GameplayState::Exit");
     GameState::Exit();
 
     // --- Clean-up scenes ---

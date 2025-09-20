@@ -5,9 +5,6 @@
 #include "Core/Scenes/Scene.h"
 
 
-struct FPS
-{
-};
 
 class DebugScene final : public Scene
 {

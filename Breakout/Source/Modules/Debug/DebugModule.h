@@ -4,13 +4,12 @@
 
 #include <flecs.h>
 
-
-namespace Core::Modules
+namespace Modules
 {
 
-struct InputModule
+struct DebugModule
 {
-    explicit InputModule(const flecs::world& world);
+    explicit DebugModule(const flecs::world& world);
 };
 
 } // namespace Modules

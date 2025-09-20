@@ -2,10 +2,11 @@
 
 #include "Breakout.h"
 
-#include "Core/GameService.h"
 #include "GameStates/Menu/MenuState.h"
 #include "Modules/Breakout/BreakoutModule.h"
+#include "Modules/Debug/DebugModule.h"
 
+#include "Core/GameService.h"
 #include "Core/Managers/AudioManager.h"
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/ResourceManager.h"
@@ -30,22 +31,22 @@ void Breakout::Initialize()
     // --- Initialize the World with global systems and singletons ---
     auto& world = GetWorld();
 
+    // clang-format off
 #ifdef DEBUG
     // Creates REST server on port 27750
     LOG_DEBUG("Breakout::Initialization: Creating flecs REST server");
     world.set<flecs::Rest>({});
+    world.import<flecs::stats>();
 #endif
-
-    // clang-format off
-    world.import<flecs::stats>(); // gather stats
-    world.import<Modules::CameraModule>();
-    world.import<Modules::InputModule>();
-    world.import<Modules::LifetimeModule>();
-    world.import<Modules::PhysicsModule>();
-    world.import<Modules::ParticlesModule>();
-    world.import<Modules::RenderModule>();
-    world.import<Modules::UIModule>();
+    world.import<Core::Modules::CameraModule>();
+    world.import<Core::Modules::InputModule>();
+    world.import<Core::Modules::LifetimeModule>();
+    world.import<Core::Modules::PhysicsModule>();
+    world.import<Core::Modules::ParticlesModule>();
+    world.import<Core::Modules::RenderModule>();
+    world.import<Core::Modules::UIModule>();
     world.import<Modules::BreakoutModule>();
+    world.import<Modules::DebugModule>();
     // clang-format on
 
     // --- Load the initial state where the initial scene will be loaded ---
@@ -59,8 +60,6 @@ void Breakout::Initialize()
 
 void Breakout::Shutdown()
 {
-    GameInstance::Shutdown();
-
-    LOG_DEBUG("Breakout::Shutdown");
     GameService::Get<AudioManager>().StopMusic();
+    GameInstance::Shutdown();
 }

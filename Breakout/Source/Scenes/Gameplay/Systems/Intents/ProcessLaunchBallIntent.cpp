@@ -29,7 +29,7 @@ void Update(const flecs::entity& cmd, const LaunchBallIntent& l)
 
 } // namespace
 
-void ProcessLaunchBallIntent::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
+void ProcessLaunchBallIntent::Register(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<const LaunchBallIntent>("LaunchBallSystem").kind(flecs::PreUpdate).each(Update).child_of(rootEntity);
 }

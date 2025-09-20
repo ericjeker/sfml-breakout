@@ -2,35 +2,15 @@
 
 #include "Scenes/Debug/DebugScene.h"
 
+#include "Modules/Debug/Tags/FPSWidget.h"
+
 #include "Core/GameService.h"
-#include "Modules/Breakout/Singletons/GameStatePlaying.h"
-
-#include "Core/Modules/Render/Components/TextRenderable.h"
-#include "Core/Modules/Render/RenderModule.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
-
-#include <Core/Themes/Nord.h>
-#include <cmath>
+#include "Core/Themes/Nord.h"
 
 namespace
 {
 
-void CalculateFPS(const flecs::iter& it, size_t, const TextRenderable& textRenderable, const FPS& f)
-{
-    static float sinceLastUpdate = 0.f;
-    static int frameCount = 0;
-    const float deltaTime = it.world().delta_time();
-    sinceLastUpdate += deltaTime;
-    frameCount++;
-
-    if (sinceLastUpdate >= .3f)
-    {
-        const float averageFps = std::ceil(frameCount / sinceLastUpdate);
-        textRenderable.text->setString("FPS: " + std::to_string(static_cast<int>(averageFps)));
-        sinceLastUpdate = 0.f;
-        frameCount = 0;
-    }
-}
 
 } // namespace
 
@@ -46,10 +26,6 @@ void DebugScene::Initialize()
 
     const auto& world = GetWorld();
 
-    // --- Systems ---
-    world.system<const TextRenderable, const FPS>("UpdateFPS")
-        .each(CalculateFPS).child_of(GetRootEntity());
-
     // --- Resources ---
     Prefabs::Text::Create(
         world,
@@ -62,6 +38,6 @@ void DebugScene::Initialize()
             .position = {5.f, 5.f},
         }
     )
-        .add<FPS>()
+        .add<FPSWidget>()
         .child_of(GetRootEntity());
 }

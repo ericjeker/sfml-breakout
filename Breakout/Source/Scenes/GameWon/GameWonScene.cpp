@@ -2,7 +2,7 @@
 
 #include "GameWonScene.h"
 
-#include "Modules/Breakout/Components/TransitionGameStateIntent.h"
+#include "../../Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
 #include "Modules/Breakout/Singletons/GameStateGameWon.h"
 #include "Scenes/Gameplay/Components/Intents/RestartGameIntent.h"
 

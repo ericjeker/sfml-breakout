@@ -28,7 +28,7 @@ void Update(Transform& t, const Size& s, const Paddle& p)
 
 } // namespace
 
-void ConstrainPaddleToScreenSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
+void ConstrainPaddleToScreenSystem::Register(const flecs::world& world, const flecs::entity& rootEntity)
 {
     world.system<Transform, const Size, const Paddle>("ConstrainPaddleToScreenSystem")
         .with<GameStatePlaying>().singleton()

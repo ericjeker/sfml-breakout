@@ -29,7 +29,7 @@
 #include "Core/Modules/UI/Prefabs/MousePressedEvent.h"
 #include "Core/Modules/UI/Prefabs/MouseReleasedEvent.h"
 
-namespace Modules
+namespace Core::Modules
 {
 
 UIModule::UIModule(const flecs::world& world)

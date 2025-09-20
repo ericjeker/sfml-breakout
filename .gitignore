@@ -1,12 +1,15 @@
+# IDEs
 .cache/
 .idea/
 .vs/
 .vscode/
 
-# Build directories in CLion
-Build/
-Debug/
-Release/
-
+# Build
+/Build/
+/Build/Debug/
+/Build/Release/
+out/
 cmake-*
+
+# CMake
 CMakeUserPresets.json

@@ -33,7 +33,7 @@ void DestroyEntity(const flecs::entity& e, const LifetimeOneFrame&)
 
 } // namespace
 
-namespace Modules
+namespace Core::Modules
 {
 
 LifetimeModule::LifetimeModule(const flecs::world& world)

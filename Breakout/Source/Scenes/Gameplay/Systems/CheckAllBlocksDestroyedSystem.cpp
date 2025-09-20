@@ -2,11 +2,11 @@
 
 #include "CheckAllBlocksDestroyedSystem.h"
 
+#include "../../../Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
+#include "../../../Modules/Breakout/Singletons/CurrentLevel.h"
+#include "../../../Modules/Breakout/Singletons/MaxLevel.h"
 #include "../Components/Intents/GameWonIntent.h"
 #include "../Components/Intents/NextLevelIntent.h"
-#include "GameStates/Gameplay/Components/CurrentLevel.h"
-#include "GameStates/Gameplay/Components/MaxLevel.h"
-#include "Modules/Breakout/Components/TransitionGameStateIntent.h"
 #include "Modules/Breakout/Singletons/GameStatePlaying.h"
 #include "Scenes/Gameplay/Components/Block.h"
 #include "Scenes/Gameplay/Components/Indestructible.h"
@@ -52,7 +52,7 @@ auto Update()
 
 } // namespace
 
-void CheckAllBlocksDestroyedSystem::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
+void CheckAllBlocksDestroyedSystem::Register(const flecs::world& world, const flecs::entity& rootEntity)
 {
     // Unmatched task
     world.system("CheckAllBlocksDestroyedSystem")
