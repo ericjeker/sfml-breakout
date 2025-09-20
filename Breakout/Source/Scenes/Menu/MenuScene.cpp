@@ -2,10 +2,10 @@
 
 #include "Scenes/Menu/MenuScene.h"
 
-#include "../../Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
+#include "Modules/Breakout/Components/Intents/ExitGameIntent.h"
+#include "Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
+#include "Modules/Breakout/Systems/Intents/ProcessExitGameIntent.h"
 #include "GameStates/Gameplay/GameplayState.h"
-#include "Scenes/Menu/Components/ExitGameIntent.h"
-#include "Systems/ProcessExitGameIntent.h"
 #include "Systems/ProcessKeyPressed.h"
 
 #include "Core/Configuration.h"

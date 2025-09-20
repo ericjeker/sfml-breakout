@@ -107,6 +107,7 @@ void PauseScene::Initialize()
 
 void PauseScene::CreateUISystems(const flecs::world& world)
 {
+
     // Query for KeyPressed
     world.system<const KeyPressed>("ProcessKeyPressed")
         .kind(flecs::PostLoad)

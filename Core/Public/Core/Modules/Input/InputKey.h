@@ -12,7 +12,7 @@
  * @brief Represents an abstraction for user input keys in a system.
  *
  * The InputKey class provides a mechanism for managing and interpreting
- * keys that are utilized as inputs, typically in event handling systems,
+ * keys that are used as inputs, typically in event handling systems,
  * user interface controls, or similar contexts. This class can encapsulate
  * various attributes or characteristics of a key, such as its code, state,
  * or other metadata, offering a structured way to handle key-based inputs.

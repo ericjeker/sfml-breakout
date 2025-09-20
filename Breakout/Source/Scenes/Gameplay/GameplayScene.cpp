@@ -9,17 +9,6 @@
 #include "Modules/Breakout/Prefabs/MoveLeftCommand.h"
 #include "Modules/Breakout/Prefabs/MoveRightCommand.h"
 #include "Modules/Breakout/Singletons/CurrentLevel.h"
-#include "Modules/Breakout/Systems/ApplyPaddlePositionToBallSystem.h"
-#include "Modules/Breakout/Systems/CheckAllBlocksDestroyedSystem.h"
-#include "Modules/Breakout/Systems/CollisionDetectionSystem.h"
-#include "Modules/Breakout/Systems/ConstrainPaddleToScreenSystem.h"
-#include "Modules/Breakout/Systems/Intents/ProcessContinueGameIntent.h"
-#include "Modules/Breakout/Systems/Intents/ProcessLaunchBallIntent.h"
-#include "Modules/Breakout/Systems/Intents/ProcessNextLevelIntent.h"
-#include "Modules/Breakout/Systems/OutOfBoundsSystem.h"
-#include "Modules/Breakout/Systems/PaddleMovementSystem.h"
-#include "Modules/Breakout/Systems/ScreenBounceSystem.h"
-#include "Modules/Breakout/Systems/UI/ProcessKeyPressed.h"
 #include "Scenes/Debug/DebugScene.h"
 
 #include "Core/Configuration.h"
@@ -27,6 +16,7 @@
 #include "Core/Managers/FileManager.h"
 #include "Core/Modules/Input/Singletons/InputBindings.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
+#include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Themes/Nord.h"
 #include "Core/Utils/Logger.h"
 
@@ -63,8 +53,6 @@ void GameplayScene::Initialize()
     CreateBlocks(world, zOrder);
     PaddleEntity::Create(world, GetRootEntity(), zOrder);
     BallEntity::Create(world, GetRootEntity(), zOrder);
-
-
 }
 
 void GameplayScene::CreateInputBindings(const flecs::world& world)

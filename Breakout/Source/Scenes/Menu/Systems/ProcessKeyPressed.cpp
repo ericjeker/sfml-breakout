@@ -2,8 +2,8 @@
 
 #include "ProcessKeyPressed.h"
 
+#include "../../../Modules/Breakout/Components/Intents/ExitGameIntent.h"
 #include "Modules/Breakout/Singletons/GameStateMenu.h"
-#include "Scenes/Menu/Components/ExitGameIntent.h"
 
 #include "Core/Modules/Input/Components/Command.h"
 #include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"

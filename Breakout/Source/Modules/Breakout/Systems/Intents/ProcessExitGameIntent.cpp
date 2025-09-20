@@ -2,7 +2,7 @@
 
 #include "ProcessExitGameIntent.h"
 
-#include "Scenes/Menu/Components/ExitGameIntent.h"
+#include "../../Components/Intents/ExitGameIntent.h"
 
 #include "Core/GameInstance.h"
 #include "Core/GameService.h"
