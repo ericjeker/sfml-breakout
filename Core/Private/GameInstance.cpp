@@ -115,6 +115,7 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow) const
         }
         else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
         {
+            LOG_DEBUG("GameInstance::HandleEvent -> KeyPressed");
             // We log all the key pressed events, the game will later handle them
             world.entity().is_a<Prefabs::KeyPressedEvent>().set<KeyPressed>({
                 .code = keyPressed->code,
@@ -126,6 +127,7 @@ void GameInstance::HandleEvents(sf::RenderWindow& renderWindow) const
         }
         else if (const auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>())
         {
+            LOG_DEBUG("GameInstance::HandleEvent -> MouseButtonReleased");
             // Same here for the mouse events
             world.entity().is_a<Prefabs::MouseReleasedEvent>().set<MouseReleased>(
                 {.position = mouseReleased->position, .button = mouseReleased->button}

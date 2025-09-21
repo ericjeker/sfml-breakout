@@ -31,11 +31,11 @@ void GameplayState::Enter()
     const auto& world = GetWorld();
 
     // --- Initialize game session singletons ---
-    world.set<Score>({});
-    world.set<Lives>({1});
-    world.set<Multiplier>({});
-    world.set<CurrentLevel>({});
-    world.set<MaxLevel>({1});
+    world.set<Score>({0});
+    world.set<Lives>({3});
+    world.set<Multiplier>({1});
+    world.set<CurrentLevel>({1});
+    world.set<MaxLevel>({3});
 
     auto& sceneManager = GameService::Get<SceneManager>();
 

@@ -2,7 +2,7 @@
 
 #include "ProcessNextLevelIntent.h"
 
-#include "../../../../Modules/Breakout/Components/Intents/NextLevelIntent.h"
+#include "Modules/Breakout/Components/Intents/NextLevelIntent.h"
 #include "Modules/Breakout/Singletons/CurrentLevel.h"
 #include "Modules/Breakout/Singletons/Multiplier.h"
 #include "Scenes/Debug/DebugScene.h"

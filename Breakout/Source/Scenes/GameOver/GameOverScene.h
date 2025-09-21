@@ -12,5 +12,5 @@ public:
     void Initialize() override;
 
 private:
-    void CreateUISystems(const flecs::world& world);
+    void CreateEventBindings(const flecs::world& world) const;
 };

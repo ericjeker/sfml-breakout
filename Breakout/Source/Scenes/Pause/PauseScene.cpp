@@ -2,22 +2,19 @@
 
 #include "Scenes/Pause/PauseScene.h"
 
-#include "../../Modules/Breakout/Components/Intents/ResumeGameIntent.h"
-#include "../../Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
-#include "Modules/Breakout/Singletons/GameStatePaused.h"
+#include "Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
+#include "Modules/Breakout/Prefabs/TransitionGameStateIntent.h"
 #include "Scenes/Gameplay/GameplayScene.h"
 
 #include "Core/Configuration.h"
 #include "Core/GameService.h"
-#include "Core/Managers/GameStateManager.h"
+#include "Core/Modules/Event/Components/EventBindings.h"
+#include "Core/Modules/Input/InputKey.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
-#include "Core/Modules/Scene/Tags/ScenePaused.h"
-#include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
 #include "Core/Themes/Nord.h"
-#include "Core/Utils/Logger.h"
 
 PauseScene::PauseScene(flecs::world& world)
     : Scene(world)
@@ -27,6 +24,7 @@ PauseScene::PauseScene(flecs::world& world)
 void PauseScene::Initialize()
 {
     Scene::Initialize();
+    SetName("PauseScene");
     GetRootEntity().set_name("PauseScene");
 
     constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
@@ -34,8 +32,8 @@ void PauseScene::Initialize()
 
     const auto& world = GetWorld();
 
-    // --- Create Local Systems ---
-    CreateUISystems(world);
+    // --- Create Event Bindings ---
+    CreateEventBindings(world);
 
     // --- Create entities ---
     float zOrder = 0.f;
@@ -80,8 +78,9 @@ void PauseScene::Initialize()
             .zOrder = ++zOrder,
             .onClick =
                 [](const flecs::world& stage) {
-                    // stage.entity().add<LifetimeOneFrame>().add<Command>().add<ResumeGameIntent>();
-                    stage.entity().set<TransitionGameStateIntent>({GameTransitions::ResumePlaying});
+                    stage.entity().is_a<Prefabs::TransitionGameStateIntent>().set<TransitionGameStateIntent>(
+                        {GameTransitions::ResumePlaying}
+                    );
                 },
         }
     )
@@ -98,35 +97,23 @@ void PauseScene::Initialize()
             .backgroundColor = sf::Color::Transparent,
             .position = {CENTER_X, CENTER_Y + 100},
             .zOrder = ++zOrder,
-            .onClick = [](const flecs::world& stage
-                       ) { stage.entity().set<TransitionGameStateIntent>({GameTransitions::OpenMenu}); },
+            .onClick =
+                [](const flecs::world& stage) {
+                    stage.entity().is_a<Prefabs::TransitionGameStateIntent>().set<TransitionGameStateIntent>(
+                        {GameTransitions::OpenMenu}
+                    );
+                },
         }
     )
         .child_of(GetRootEntity());
 }
 
-void PauseScene::CreateUISystems(const flecs::world& world)
+
+void PauseScene::CreateEventBindings(const flecs::world& world) const
 {
+    auto resumeGame = world.prefab("Pause::ResumeGameIntent").is_a<Prefabs::TransitionGameStateIntent>().set<TransitionGameStateIntent>(
+        {GameTransitions::ResumePlaying}
+    );
 
-    // Query for KeyPressed
-    world.system<const KeyPressed>("ProcessKeyPressed")
-        .kind(flecs::PostLoad)
-        .write<ResumeGameIntent>()
-        .with<GameStatePaused>()
-        .singleton()
-        .each([rootEntity = GetRootEntity()](const flecs::entity& e, const KeyPressed& k) {
-            if (rootEntity.has<ScenePaused>())
-            {
-                return;
-            }
-
-            if (k.scancode == sf::Keyboard::Scancode::Escape)
-            {
-                e.world().entity().set<TransitionGameStateIntent>({GameTransitions::ResumePlaying});
-                LOG_DEBUG("PauseScene::ProcessKeyPressed: Escape -> Add ResumeGameIntent");
-            }
-
-            e.destruct();
-        })
-        .child_of(GetRootEntity());
+    GetRootEntity().set<EventBindings>({{{InputKey::Keyboard(sf::Keyboard::Key::Escape), resumeGame}}});
 }

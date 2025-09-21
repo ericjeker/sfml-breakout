@@ -16,6 +16,7 @@ DebugScene::DebugScene(flecs::world& world)
 void DebugScene::Initialize()
 {
     Scene::Initialize();
+    SetName("DebugScene");
     GetRootEntity().set_name("DebugScene");
 
     const auto& world = GetWorld();

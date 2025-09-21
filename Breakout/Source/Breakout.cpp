@@ -11,6 +11,7 @@
 #include "Core/Managers/GameStateManager.h"
 #include "Core/Managers/ResourceManager.h"
 #include "Core/Modules/Camera/CameraModule.h"
+#include "Core/Modules/Event/EventModule.h"
 #include "Core/Modules/Input/InputModule.h"
 #include "Core/Modules/Lifetime/LifetimeModule.h"
 #include "Core/Modules/Particles/ParticlesModule.h"
@@ -38,13 +39,14 @@ void Breakout::Initialize()
     world.set<flecs::Rest>({});
     world.import<flecs::stats>();
 #endif
-    world.import<Core::Modules::CameraModule>();
+    world.import<Core::Modules::EventModule>();
     world.import<Core::Modules::InputModule>();
-    world.import<Core::Modules::LifetimeModule>();
+    world.import<Core::Modules::CameraModule>();
+    world.import<Core::Modules::UIModule>();
     world.import<Core::Modules::PhysicsModule>();
     world.import<Core::Modules::ParticlesModule>();
     world.import<Core::Modules::RenderModule>();
-    world.import<Core::Modules::UIModule>();
+    world.import<Core::Modules::LifetimeModule>();
     world.import<Modules::BreakoutModule>();
     world.import<Modules::DebugModule>();
     // clang-format on

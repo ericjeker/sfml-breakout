@@ -71,11 +71,13 @@ struct InputKey
     std::function<bool()> isActivated;
 
     // Constructor Helpers
+    // TODO: Add chords to they keyboard keys (alt, ctrl, shift, system)
     static InputKey Keyboard(sf::Keyboard::Key key)
     {
         return {.id = Key{key}, .isActivated = [key] { return sf::Keyboard::isKeyPressed(key); }};
     }
 
+    // TODO: Add chords to they keyboard keys (alt, ctrl, shift, system)
     static InputKey Mouse(sf::Mouse::Button button)
     {
         return {.id = MouseBtn{button}, .isActivated = [button] { return sf::Mouse::isButtonPressed(button); }};

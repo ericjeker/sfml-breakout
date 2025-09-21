@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "Core/Scenes/Scene.h"
 #include "Core/Managers/ResourceManager.h"
+#include "Core/Modules/Scene/Components/SceneDepth.h"
+#include "Core/Scenes/Scene.h"
 
 #include <memory>
 #include <typeindex>
@@ -82,6 +83,8 @@ public:
         {
             it->second->SetLoaded(true);
             it->second->Initialize();
+            // Assign the current depth and increment the counter for the next scene
+            it->second->GetRootEntity().set<SceneDepth>({_currentSceneDepth++});
         }
     }
 
@@ -122,4 +125,5 @@ public:
 private:
     std::unordered_map<std::type_index, std::unique_ptr<Scene>> _scenes;
     std::vector<std::type_index> _sceneOrder;
+    int _currentSceneDepth{0};
 };

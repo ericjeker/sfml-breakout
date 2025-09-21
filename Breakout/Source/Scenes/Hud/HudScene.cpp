@@ -19,6 +19,7 @@ HudScene::HudScene(flecs::world& world)
 void HudScene::Initialize()
 {
     Scene::Initialize();
+    SetName("HudScene");
     GetRootEntity().set_name("HudScene");
 
     const auto& world = GetWorld();

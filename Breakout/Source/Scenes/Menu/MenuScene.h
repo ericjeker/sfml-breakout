@@ -9,9 +9,7 @@ class MenuScene final : public Scene
 {
 public:
     explicit MenuScene(flecs::world& world);
-
     void Initialize() override;
-
-private:
-    void CreateUIEntities(const flecs::world& world);
+    void CreateEventBindings(const flecs::world& world) const;
+    void CreateUIEntities(const flecs::world& world) const;
 };

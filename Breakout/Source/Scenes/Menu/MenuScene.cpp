@@ -2,14 +2,16 @@
 
 #include "Scenes/Menu/MenuScene.h"
 
+#include "GameStates/Gameplay/GameplayState.h"
 #include "Modules/Breakout/Components/Intents/ExitGameIntent.h"
 #include "Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
+#include "Modules/Breakout/Prefabs/ExitGameIntent.h"
 #include "Modules/Breakout/Systems/Intents/ProcessExitGameIntent.h"
-#include "GameStates/Gameplay/GameplayState.h"
-#include "Systems/ProcessKeyPressed.h"
 
 #include "Core/Configuration.h"
 #include "Core/GameService.h"
+#include "Core/Modules/Event/Components/EventBindings.h"
+#include "Core/Modules/Input/InputKey.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
@@ -23,21 +25,29 @@ MenuScene::MenuScene(flecs::world& world)
 void MenuScene::Initialize()
 {
     Scene::Initialize();
+    SetName("MenuScene");
     GetRootEntity().set_name("MenuScene");
 
     const auto& world = GetWorld();
 
+    // --- Register Event Bindings ---
     CreateUIEntities(world);
-
-    // --- Declare local systems ---
-    Menu::ProcessKeyPressed::Initialize(world, GetRootEntity());
-    Menu::ProcessExitGameIntent::Initialize(world, GetRootEntity());
+    CreateEventBindings(world);
 }
 
-void MenuScene::CreateUIEntities(const flecs::world& world)
+void MenuScene::CreateEventBindings(const flecs::world& world) const
 {
-    constexpr float centerX = Configuration::RESOLUTION.x / 2.f;
-    constexpr float centerY = Configuration::RESOLUTION.y / 2.f;
+    auto exitGame = world.prefab().is_a<Prefabs::ExitGameIntent>();
+
+    GetRootEntity().set<EventBindings>({{
+        {InputKey::Keyboard(sf::Keyboard::Key::Escape), exitGame},
+    }});
+}
+
+void MenuScene::CreateUIEntities(const flecs::world& world) const
+{
+    constexpr float CENTER_X = Configuration::RESOLUTION.x / 2.f;
+    constexpr float CENTER_Y = Configuration::RESOLUTION.y / 2.f;
 
     float zOrder = 0;
 
@@ -77,7 +87,7 @@ void MenuScene::CreateUIEntities(const flecs::world& world)
          .fontSize = 60.f,
          .textColor = NordTheme::SnowStorm3,
          .origin = sf::Vector2f{0.5f, 0.5f},
-         .position = {centerX, centerY - 200},
+         .position = {CENTER_X, CENTER_Y - 200},
          .zOrder = zOrder++}
     )
         .set_name("Title")
@@ -92,7 +102,7 @@ void MenuScene::CreateUIEntities(const flecs::world& world)
             .fontSize = 48.f,
             .textColor = NordTheme::SnowStorm3,
             .backgroundColor = sf::Color::Transparent,
-            .position = {centerX, centerY},
+            .position = {CENTER_X, CENTER_Y},
             .zOrder = zOrder++,
             .onClick = [](const flecs::world& stage
                        ) { stage.entity().set<TransitionGameStateIntent>({GameTransitions::StartPlaying}); },
@@ -110,7 +120,7 @@ void MenuScene::CreateUIEntities(const flecs::world& world)
             .fontSize = 36.f,
             .textColor = NordTheme::SnowStorm3,
             .backgroundColor = sf::Color::Transparent,
-            .position = {centerX, centerY + 100},
+            .position = {CENTER_X, CENTER_Y + 100},
             .zOrder = zOrder++,
             .onClick = [](const flecs::world& stage) { stage.entity().add<ExitGameIntent>(); },
         }

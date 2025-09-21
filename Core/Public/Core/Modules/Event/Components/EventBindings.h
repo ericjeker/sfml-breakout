@@ -4,12 +4,13 @@
 
 #include "Core/Modules/Input/InputKey.h"
 
+#include <flecs.h>
 #include <unordered_map>
 
-
-struct InputBindings
+struct EventBindings
 {
-    std::unordered_map<InputKey, flecs::entity, InputKeyHash> map;
+    std::unordered_map<InputKey, flecs::entity, InputKeyHash> map{};
 };
+
 
 

@@ -2,17 +2,15 @@
 
 #include "GameOverScene.h"
 
-#include "Modules/Breakout/Components/Intents/NavigateToMenuIntent.h"
-#include "Modules/Breakout/Components/Intents/RestartGameIntent.h"
-#include "Modules/Breakout/Singletons/GameStateGameLost.h"
+#include "Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
+#include "Modules/Breakout/Prefabs/RestartGameIntent.h"
+#include "Modules/Breakout/Prefabs/TransitionGameStateIntent.h"
 #include "Scenes/Gameplay/GameplayScene.h"
 
 #include "Core/Configuration.h"
 #include "Core/GameService.h"
-#include "Core/Modules/Input/Components/Command.h"
-#include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
+#include "Core/Modules/Event/Components/EventBindings.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
-#include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
@@ -26,6 +24,7 @@ GameOverScene::GameOverScene(flecs::world& world)
 void GameOverScene::Initialize()
 {
     Scene::Initialize();
+    SetName("GameOverScene");
     GetRootEntity().set_name("GameOverScene");
 
     constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
@@ -34,7 +33,7 @@ void GameOverScene::Initialize()
     const auto& world = GetWorld();
 
     // --- Create Local Systems ---
-    CreateUISystems(world);
+    CreateEventBindings(world);
 
     // --- Create entities ---
     float zOrder = 0.f;
@@ -77,8 +76,12 @@ void GameOverScene::Initialize()
             .backgroundColor = sf::Color::Transparent,
             .position = {CENTER_X, CENTER_Y},
             .zOrder = ++zOrder,
-            .onClick = [](const flecs::world& stage
-                       ) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<RestartGameIntent>(); },
+            .onClick =
+                [](const flecs::world& stage) {
+                    stage.entity().is_a<Prefabs::TransitionGameStateIntent>().set<TransitionGameStateIntent>(
+                        {GameTransitions::RestartPlaying}
+                    );
+                },
         }
     )
         .child_of(GetRootEntity());
@@ -93,26 +96,15 @@ void GameOverScene::Initialize()
          .backgroundColor = sf::Color::Transparent,
          .position = {CENTER_X, CENTER_Y + 100},
          .zOrder = ++zOrder,
-         .onClick = [](const flecs::world& stage
-                    ) { stage.entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMenuIntent>(); }}
+         .onClick =
+             [](const flecs::world& stage) {
+                 stage.entity().is_a<Prefabs::TransitionGameStateIntent>().set<TransitionGameStateIntent>({GameTransitions::OpenMenu});
+             }}
     ).child_of(GetRootEntity());
 }
 
-// TODO: replace by key bindings system at the event level
-void GameOverScene::CreateUISystems(const flecs::world& world)
+void GameOverScene::CreateEventBindings(const flecs::world& world) const
 {
-    // Query for KeyPressed
-    world.system<const KeyPressed>("GameOverScene.ProcessKeyPressed")
-        .kind(flecs::PostLoad)
-        .with<GameStateGameLost>()
-        .singleton()
-        .each([](const flecs::entity& e, const KeyPressed& k) {
-            LOG_DEBUG("GameOverScene::ProcessKeyPressed");
-            if (k.scancode == sf::Keyboard::Scancode::Escape)
-            {
-                e.world().entity().add<LifetimeOneFrame>().add<Command>().add<NavigateToMenuIntent>();
-                e.destruct();
-            }
-        })
-        .child_of(GetRootEntity());
+    auto restartGame = world.prefab("GameOver::RestartGameIntent").is_a<Prefabs::RestartGameIntent>();
+    GetRootEntity().set<EventBindings>({{{InputKey::Keyboard(sf::Keyboard::Key::Escape), restartGame}}});
 }

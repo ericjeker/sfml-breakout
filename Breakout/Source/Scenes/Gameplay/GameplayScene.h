@@ -21,10 +21,12 @@ private:
         bool isIndestructible{};
     };
 
-    void CreateInputBindings(const flecs::world& world);
+    static void CreateInputBindings(const flecs::world& world);
+    void CreateEventBindings(const flecs::world& world) const;
+
     static std::map<char, BlockDefinition> LoadBlockDefinitions(const std::string& filename);
-    void CreateBlocks(const flecs::world& world, float& zOrder);
-    void CreateBackground(const flecs::world& world, float& zOrder);
+    void CreateBlocks(const flecs::world& world, float& zOrder) const;
+    void CreateBackground(const flecs::world& world, float& zOrder) const;
 };
 
 

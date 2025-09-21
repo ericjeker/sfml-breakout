@@ -2,21 +2,16 @@
 
 #include "GameWonScene.h"
 
-#include "Modules/Breakout/Components/Intents/RestartGameIntent.h"
 #include "Modules/Breakout/Components/Intents/TransitionGameStateIntent.h"
-#include "Modules/Breakout/Singletons/GameStateGameWon.h"
+#include "Modules/Breakout/Prefabs/TransitionGameStateIntent.h"
 
 #include "Core/Configuration.h"
-#include "Core/Modules/Input/Components/Command.h"
-#include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
+#include "Core/Modules/Event/Components/EventBindings.h"
 #include "Core/Modules/Render/Factories/Rectangle.h"
-#include "Core/Modules/UI/Components/KeyPressed.h"
 #include "Core/Modules/UI/Components/MouseReleased.h"
 #include "Core/Modules/UI/Prefabs/Button.h"
 #include "Core/Modules/UI/Prefabs/Text.h"
-#include "Core/Modules/Window/Singletons/FrameCount.h"
 #include "Core/Themes/Nord.h"
-#include "Core/Utils/Logger.h"
 
 GameWonScene::GameWonScene(flecs::world& world)
     : Scene(world)
@@ -26,6 +21,7 @@ GameWonScene::GameWonScene(flecs::world& world)
 void GameWonScene::Initialize()
 {
     Scene::Initialize();
+    SetName("GameWonScene");
     GetRootEntity().set_name("GameWonScene");
 
     constexpr float CENTER_X = Configuration::RESOLUTION.x / 2;
@@ -34,7 +30,7 @@ void GameWonScene::Initialize()
     const auto& world = GetWorld();
 
     // --- Create Local Systems ---
-    CreateUISystems(world);
+    CreateEventBindings(world);
 
     // --- Create entities ---
     float zOrder = 0.f;
@@ -79,11 +75,8 @@ void GameWonScene::Initialize()
             .zOrder = ++zOrder,
             .onClick =
                 [](const flecs::world& stage) {
-                    const auto entity = stage.entity().add<LifetimeOneFrame>().add<Command>().add<RestartGameIntent>();
-                    LOG_DEBUG(
-                        "GameWonScene::RestartButton::onClick -> Add RestartGameIntent, entity: {}, framecount: {}",
-                        entity.id(),
-                        stage.get<FrameCount>().frameCount
+                    stage.entity().is_a<Prefabs::TransitionGameStateIntent>().set<TransitionGameStateIntent>(
+                        {GameTransitions::RestartPlaying}
                     );
                 },
         }
@@ -100,27 +93,19 @@ void GameWonScene::Initialize()
          .backgroundColor = sf::Color::Transparent,
          .position = {CENTER_X, CENTER_Y + 100},
          .zOrder = ++zOrder,
-         .onClick = [](const flecs::world& stage
-                    ) { stage.entity().set<TransitionGameStateIntent>({GameTransitions::OpenMenu}); }}
+         .onClick =
+             [](const flecs::world& stage) {
+                 stage.entity().is_a<Prefabs::TransitionGameStateIntent>().set<TransitionGameStateIntent>(
+                     {GameTransitions::OpenMenu}
+                 );
+             }}
     ).child_of(GetRootEntity());
 }
 
-// TODO: replace by key bindings system at the event level
-void GameWonScene::CreateUISystems(const flecs::world& world)
+void GameWonScene::CreateEventBindings(const flecs::world& world) const
 {
-    // Query for KeyPressed
-    world.system<const KeyPressed>("GameWonScene.ProcessKeyPressed")
-        .kind(flecs::PostLoad)
-        .write<TransitionGameStateIntent>()
-        .with<GameStateGameWon>()
-        .singleton()
-        .each([](const flecs::entity& e, const KeyPressed& k) {
-            LOG_DEBUG("GameWonScene::ProcessKeyPressed");
-            if (k.scancode == sf::Keyboard::Scancode::Escape)
-            {
-                e.world().entity().set<TransitionGameStateIntent>({GameTransitions::OpenMenu});
-                e.destruct();
-            }
-        })
-        .child_of(GetRootEntity());
+    auto transitionToMenu = world.prefab("GameWon::OpenMenu")
+                                .is_a<Prefabs::TransitionGameStateIntent>()
+                                .set<TransitionGameStateIntent>({GameTransitions::OpenMenu});
+    GetRootEntity().set<EventBindings>({{{InputKey::Keyboard(sf::Keyboard::Key::Escape), transitionToMenu}}});
 }

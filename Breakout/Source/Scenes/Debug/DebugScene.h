@@ -5,7 +5,6 @@
 #include "Core/Scenes/Scene.h"
 
 
-
 class DebugScene final : public Scene
 {
 public:

@@ -10,5 +10,5 @@ class PauseScene final : public Scene
 public:
     explicit PauseScene(flecs::world& world);
     void Initialize() override;
-    void CreateUISystems(const flecs::world& world);
+    void CreateEventBindings(const flecs::world& world) const;
 };

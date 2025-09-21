@@ -2,10 +2,19 @@
 
 #include "BreakoutModule.h"
 
+#include "Components/Intents/ExitGameIntent.h"
+#include "Components/Intents/LaunchBallIntent.h"
+#include "Components/Intents/RestartGameIntent.h"
+#include "Components/Intents/ResumeGameIntent.h"
 #include "Components/Intents/TransitionGameStateIntent.h"
 #include "Modules/Breakout/Singletons/Lives.h"
 #include "Modules/Breakout/Singletons/Multiplier.h"
 #include "Modules/Breakout/Singletons/Score.h"
+#include "Prefabs/ExitGameIntent.h"
+#include "Prefabs/LaunchBallIntent.h"
+#include "Prefabs/RestartGameIntent.h"
+#include "Prefabs/ResumeGameIntent.h"
+#include "Prefabs/TransitionGameStateIntent.h"
 #include "Singletons/CurrentLevel.h"
 #include "Singletons/GameStateGameLost.h"
 #include "Singletons/GameStateGameWon.h"
@@ -21,12 +30,16 @@
 #include "Systems/Hud/UpdateMultiplierWidget.h"
 #include "Systems/Hud/UpdateScoreWidget.h"
 #include "Systems/Intents/ProcessContinueGameIntent.h"
+#include "Systems/Intents/ProcessExitGameIntent.h"
 #include "Systems/Intents/ProcessLaunchBallIntent.h"
 #include "Systems/Intents/ProcessNextLevelIntent.h"
 #include "Systems/Intents/ProcessTransitionGameStateIntent.h"
 #include "Systems/OutOfBoundsSystem.h"
 #include "Systems/PaddleMovementSystem.h"
 #include "Systems/ScreenBounceSystem.h"
+
+#include "Core/Modules/Input/Components/Command.h"
+#include "Core/Modules/Lifetime/Components/LifetimeOneFrame.h"
 
 namespace Modules
 {
@@ -40,23 +53,29 @@ BreakoutModule::BreakoutModule(const flecs::world& world)
     world.singleton<GameStateGameWon>();
     world.singleton<GameStateGameLost>();
 
+    // --- Register Game Session Singletons ---
     world.singleton<Score>();
     world.singleton<Lives>();
     world.singleton<Multiplier>();
     world.singleton<CurrentLevel>();
     world.singleton<MaxLevel>();
 
-    // --- Register Components ---
-    world.component<TransitionGameStateIntent>();
-
     // --- Initialize Singletons ---
     world.add<GameStateMenu>();
 
+    // --- Register Prefabs ---
+    world.prefab<Prefabs::TransitionGameStateIntent>().add<Command>().add<LifetimeOneFrame>().add<TransitionGameStateIntent>();
+    world.prefab<Prefabs::LaunchBallIntent>().add<Command>().add<LifetimeOneFrame>().add<LaunchBallIntent>();
+    world.prefab<Prefabs::ResumeGameIntent>().add<Command>().add<LifetimeOneFrame>().add<ResumeGameIntent>();
+    world.prefab<Prefabs::RestartGameIntent>().add<Command>().add<LifetimeOneFrame>().add<RestartGameIntent>();
+    world.prefab<Prefabs::ExitGameIntent>().add<Command>().add<LifetimeOneFrame>().add<ExitGameIntent>();
+
     // --- Register Systems ---
+
     // --- Paddle & Ball Control ---
     PaddleMovementSystem::Register(world);
-    ProcessLaunchBallIntent::Register(world);
     ApplyPaddlePositionToBallSystem::Register(world);
+    ProcessLaunchBallIntent::Register(world);
 
     // --- Physics, Collision, Constraints ---
     ScreenBounceSystem::Register(world);
@@ -64,14 +83,10 @@ BreakoutModule::BreakoutModule(const flecs::world& world)
     ConstrainPaddleToScreenSystem::Register(world);
 
     // --- Game Over / Game Won ---
-    // TODO: instead, check if there are no more ball on the screen = GAME OVER or LOSE ONE LIFE
     OutOfBoundsSystem::Register(world);
     CheckAllBlocksDestroyedSystem::Register(world);
 
     // --- UI & Intents ---
-    // TODO: ProcessKeyPressed should use bindings
-    //Gameplay::ProcessFocusLost::Initialize(world);
-    //Gameplay::ProcessKeyPressed::Register(world);
     ProcessNextLevelIntent::Register(world);
     ProcessContinueGameIntent::Register(world);
     ProcessTransitionGameStateIntent::Register(world);
@@ -81,6 +96,11 @@ BreakoutModule::BreakoutModule(const flecs::world& world)
     UpdateMultiplierWidget::Register(world);
     UpdateLivesWidget::Register(world);
 
+    // --- Scene & State Transitions ---
+    ProcessContinueGameIntent::Register(world);
+    ProcessTransitionGameStateIntent::Register(world);
+    ProcessExitGameIntent::Register(world);
+    ProcessNextLevelIntent::Register(world);
 }
 
 } // namespace Modules

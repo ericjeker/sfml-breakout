@@ -3,7 +3,7 @@
 #include "Core/Scenes/Scene.h"
 
 #include "Core/GameService.h"
-
+#include "Core/Modules/Scene/Tags/SceneRoot.h"
 
 Scene::Scene(flecs::world& world)
     : _world(world)
@@ -12,7 +12,8 @@ Scene::Scene(flecs::world& world)
 
 void Scene::Initialize()
 {
-    _rootEntity = GetWorld().entity();
+    _rootEntity = GetWorld().entity().add<SceneRoot>();
+    LOG_DEBUG("Scene:Initialize -> Creating {} -> {}", GetName(), _rootEntity.id());
 }
 
 void Scene::Shutdown()
@@ -22,6 +23,7 @@ void Scene::Shutdown()
         return;
     }
 
+    LOG_DEBUG("Scene:Shutdown -> Deleting {} -> {}", GetName(), GetRootEntity().id());
     GetWorld().defer([&] {
         GetWorld().delete_with(flecs::ChildOf, GetRootEntity());
         GetRootEntity().destruct();

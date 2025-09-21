@@ -12,10 +12,10 @@
 namespace
 {
 
-void Update(const flecs::entity& cmd, const LaunchBallIntent&)
+void Update(const flecs::entity& intent, const LaunchBallIntent&)
 {
     // Get the ball entity
-    cmd.world().query<const Ball, const AttachedToPaddle>().each(
+    intent.world().query<const Ball, const AttachedToPaddle>().each(
         [](const flecs::entity ball, const Ball b, const AttachedToPaddle ap) {
             ball.remove<AttachedToPaddle>();
             ball.set<Velocity>({{0.f, -500.f}});
@@ -24,7 +24,7 @@ void Update(const flecs::entity& cmd, const LaunchBallIntent&)
     );
 
     // Destroy the command entity
-    cmd.destruct();
+    intent.destruct();
 }
 
 } // namespace

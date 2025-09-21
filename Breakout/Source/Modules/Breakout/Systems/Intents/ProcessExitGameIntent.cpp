@@ -2,7 +2,7 @@
 
 #include "ProcessExitGameIntent.h"
 
-#include "../../Components/Intents/ExitGameIntent.h"
+#include "Modules/Breakout/Components/Intents/ExitGameIntent.h"
 
 #include "Core/GameInstance.h"
 #include "Core/GameService.h"
@@ -10,20 +10,17 @@
 
 namespace
 {
-
-void Update(const flecs::iter& it, size_t, const ExitGameIntent i)
+void Update(const flecs::entity& e, const ExitGameIntent)
 {
-    it.world().entity().set<DeferredEvent>({.callback = [](const flecs::world& world) {
+    e.world().entity().set<DeferredEvent>({.callback = [](const flecs::world&) {
         GameService::Get<GameInstance>().RequestExit();
     }});
-}
 
+    e.destruct();
+}
 } // namespace
 
-namespace Menu
+void ProcessExitGameIntent::Register(const flecs::world& world)
 {
-void ProcessExitGameIntent::Initialize(const flecs::world& world, const flecs::entity& rootEntity)
-{
-    world.system<const ExitGameIntent>("ProcessExitGameIntent").each(Update).child_of(rootEntity);
+    world.system<const ExitGameIntent>("ProcessExitGameIntent").each(Update);
 }
-} // namespace Menu

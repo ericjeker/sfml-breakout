@@ -86,8 +86,8 @@ System phases are called in the following order:
 
 #### flecs::PostLoad
 
+* Add intents from InputBindings and EventBindings
 * Add UI events taken from the events pool
-* Add control commands from InputBindings
 * Process UI events & Control commands
   * Hit Test on UI Elements
 

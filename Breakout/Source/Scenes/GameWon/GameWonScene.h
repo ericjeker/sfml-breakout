@@ -9,5 +9,5 @@ class GameWonScene final : public Scene
 public:
     explicit GameWonScene(flecs::world& world);
     void Initialize() override;
-    void CreateUISystems(const flecs::world& world);
+    void CreateEventBindings(const flecs::world& world) const;
 };
