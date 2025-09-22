@@ -10,12 +10,12 @@ namespace
 
 void UpdateLifetime(const flecs::iter& it, size_t, Lifetime& lifetime)
 {
-    lifetime.lifetime -= it.delta_time();
+    lifetime.seconds -= it.delta_time();
 }
 
 void LifetimeCull(const flecs::entity& e, const Lifetime& lifetime)
 {
-    if (lifetime.lifetime <= 0.f)
+    if (lifetime.seconds <= 0.f)
     {
         e.destruct();
     }

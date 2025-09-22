@@ -7,7 +7,9 @@
 #include <flecs.h>
 #include <functional>
 
-using ParticleGenerator = std::function<flecs::entity(flecs::world, const Transform&)>;
+
+struct ParticleEmitter;
+using ParticleGenerator = std::function<flecs::entity(flecs::world, const ParticleEmitter&, const Transform&)>;
 
 struct ParticleEmitter
 {
@@ -18,8 +20,8 @@ struct ParticleEmitter
     // Particle settings
     float minLifetime{0.5f};
     float maxLifetime{1.2f};
-    float minSpeed{20.f};
-    float maxSpeed{80.f};
+    float minVelocity{20.f};
+    float maxVelocity{80.f};
 
     // The emitter itself has a Transform rotation
     float minAngleDeg{-10.f};
@@ -27,7 +29,7 @@ struct ParticleEmitter
 
     // State
     bool enabled{true};
-    bool loop{true};
+    bool loop{false};
 
     // Custom particle generator
     ParticleGenerator generator;
@@ -35,3 +37,4 @@ struct ParticleEmitter
     // Runtime
     float spawnAccumulator{0.f};
 };
+

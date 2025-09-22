@@ -4,5 +4,5 @@
 
 struct Lifetime
 {
-    float lifetime = 0.f;
+    float seconds = 0.f;
 };

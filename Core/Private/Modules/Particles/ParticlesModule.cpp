@@ -16,19 +16,20 @@ namespace
 
 ParticleGenerator CreateDefaultParticleGenerator()
 {
-    return [](flecs::world world, const Transform& emitterTransform) -> flecs::entity
+    return [](flecs::world world, const ParticleEmitter& emitter, const Transform& emitterTransform) -> flecs::entity
     {
-        const sf::Vector2f v = {Random::UniformFloat(-100, 100), Random::UniformFloat(-100, 100)};
+        const auto velocity = Random::UniformFloat(emitter.minVelocity, emitter.maxVelocity);
+        const sf::Vector2f v = {Random::UniformFloat(-velocity, velocity), Random::UniformFloat(-velocity, velocity)};
         return world.entity()
             .is_a<Prefabs::Particle>()
             .set<Velocity>({v})
             .set<ZOrder>({1000.f})
             .set<Transform>({.position = emitterTransform.position})
-            .set<Lifetime>({Random::UniformFloat(0.5f, 1.2f)});
+            .set<Lifetime>({Random::UniformFloat(emitter.minLifetime, emitter.maxLifetime)});
     };
 }
 
-void EmitParticles(const flecs::iter& it, size_t idx, ParticleEmitter& emitter, const Transform& t)
+void EmitParticles(const flecs::iter& it, size_t idx, ParticleEmitter& emitter, const Transform& transform)
 {
     if (!emitter.enabled)
     {
@@ -71,7 +72,7 @@ void EmitParticles(const flecs::iter& it, size_t idx, ParticleEmitter& emitter, 
 
     for (int i = 0; i < toSpawn; i++)
     {
-        emitter.generator(it.world(), t);
+        emitter.generator(it.world(), emitter, transform);
     }
 }
 

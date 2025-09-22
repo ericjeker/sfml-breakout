@@ -13,6 +13,7 @@
 
 #include "Core/Modules/Camera/Components/CameraShakeIntent.h"
 #include "Core/Modules/Lifetime/Components/Lifetime.h"
+#include "Core/Modules/Particles/Components/ParticleEmitter.h"
 #include "Core/Modules/Physics/Components/ColliderShape.h"
 #include "Core/Modules/Physics/Components/CollisionInfo.h"
 #include "Core/Modules/Physics/Components/Velocity.h"
@@ -107,6 +108,8 @@ void ProcessCollisionDetection(
             // Move circle out of penetration
             ballTransform.position = ballTransform.position + collisionInfo.normal * collisionInfo.penetrationDepth;
 
+            const auto& world = blockEntity.world();
+
             if (isPaddle)
             {
                 // Calculate where on the paddle the ball hit relative to the paddle center
@@ -129,7 +132,7 @@ void ProcessCollisionDetection(
                 ballVelocity.velocity = CalculateReflection(ballVelocity.velocity, modifiedNormal);
 
                 // Get the game session and reset the multiplier
-                blockEntity.world().get_mut<Multiplier>().multiplier = 1;
+                world.get_mut<Multiplier>().multiplier = 1;
             }
             else
             {
@@ -151,14 +154,19 @@ void ProcessCollisionDetection(
                     blockEntity.destruct();
 
                     // Update the score
-                    int& multiplier = blockEntity.world().get_mut<Multiplier>().multiplier;
-                    auto& score = blockEntity.world().get_mut<Score>();
+                    int& multiplier = world.get_mut<Multiplier>().multiplier;
+                    auto& score = world.get_mut<Score>();
                     score.score += 100 * multiplier;
                     score.blocksDestroyed += 1;
                     multiplier += 1;
 
                     // Trigger a shake (e.g., when something explodes)
-                    blockEntity.world().entity().set<CameraShakeIntent>({.intensity = 3.0f, .duration = 0.3f});
+                    world.entity().set<CameraShakeIntent>({.intensity = 3.0f, .duration = 0.3f});
+
+                    // Emit particles
+                    const auto blockCenterPosition = blockEntity.get<Transform>().position + blockEntity.get<Size>().size * 0.5f;
+                    world.entity().set<ParticleEmitter>({.ratePerSecond = 500.f}).set<Lifetime>({0.2}).set<Transform>({.position = blockCenterPosition});
+                    world.entity().set<ParticleEmitter>({.ratePerSecond = 50.f}).set<Lifetime>({0.1}).set<Transform>({.position = blockCenterPosition});
                 }
             }
         }
