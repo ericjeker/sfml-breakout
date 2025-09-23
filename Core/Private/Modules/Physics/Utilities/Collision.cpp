@@ -1,11 +1,11 @@
 // Copyright (c) Eric Jeker 2025.
 
-#include "Core/Utils/Collision.h"
+#include "Core/Modules/Physics/Utilities/Collision.h"
 
 #include <algorithm>
 #include <tracy/Tracy.hpp>
 
-namespace Collision
+namespace Core
 {
 
 CollisionInfo CheckAABBCircleCollision(const sf::FloatRect& aabb, const sf::Vector2f& circleCenter, const float circleRadius)
@@ -72,5 +72,4 @@ CollisionInfo CheckAABBCircleCollision(const sf::FloatRect& aabb, const sf::Vect
     return info;
 }
 
-
-} // namespace Collision
+}

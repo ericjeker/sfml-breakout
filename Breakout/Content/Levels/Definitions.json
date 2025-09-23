@@ -1,20 +1,20 @@
 {
   "definitions": {
     "R": {
-      "color": [255, 0, 0],
+      "color": [46, 52, 64],
       "health": 1
     },
     "G": {
-      "color": [0, 255, 0],
+      "color": [59, 66, 82],
       "health": 2,
       "powerup": "PADDLE_SIZE"
     },
     "B": {
-      "color": [0, 0, 255],
+      "color": [67, 76, 94],
       "health": 3
     },
     "I": {
-      "color": [100, 100, 100],
+      "color": [236, 239, 244],
       "indestructible": true
     }
   }

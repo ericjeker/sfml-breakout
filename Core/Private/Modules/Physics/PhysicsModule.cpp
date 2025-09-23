@@ -24,13 +24,8 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 
-#include <numbers>
 #include <tracy/Tracy.hpp>
 
-namespace sf
-{
-class RenderWindow;
-}
 namespace
 {
 
